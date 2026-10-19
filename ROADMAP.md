@@ -144,7 +144,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 - [x] Ajouter une CSP stricte via `<meta http-equiv="Content-Security-Policy">` (`default-src 'self'`, pas d'`unsafe-eval`)
 - [x] CI GitHub Actions : lint, typecheck, tests, build
 - [x] Déploiement automatique sur GitHub Pages depuis `main`
-- [ ] Fichiers repo : `LICENSE`, `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CLAUDE.md`
+- [x] Fichiers repo : `LICENSE`, `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CLAUDE.md`
 
 **Critère d'acceptation** : `pnpm dev` affiche une coquille d'app vide et la CI est verte.
 
