@@ -16,7 +16,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { Plus } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState, type MouseEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { useTheme } from '@/app/theme'
 import { Button } from '@/components/ui/button'
 import { ENTITY_TYPES } from '@/domain/entity-types'
@@ -105,14 +105,23 @@ export function GraphCanvas() {
   const [pendingEntity, setPendingEntity] = useState<Position | null>(null)
   const [pendingConnection, setPendingConnection] = useState<Connection | null>(null)
 
+  // Set while React Flow reports its own selection, which it already holds.
+  const selectionFromCanvas = useRef(false)
+
   // Domain edits and store-driven selection (e.g. a freshly created element) flow into React Flow.
   useEffect(
     () =>
       useGraphStore.subscribe((state, previous) => {
-        if (state.entities !== previous.entities || state.selection !== previous.selection) {
+        /*
+         * Echoing a canvas selection back would loop: React Flow reports node and edge selection
+         * separately (a box selection reports "node A" before "node A + its edge"), and pushing the
+         * intermediate state back would unselect the edge, which React Flow then selects again.
+         */
+        const selectionChanged = state.selection !== previous.selection && !selectionFromCanvas.current
+        if (state.entities !== previous.entities || selectionChanged) {
           setNodes((current) => syncNodes(current, state.entities, state.selection))
         }
-        if (state.relations !== previous.relations || state.selection !== previous.selection) {
+        if (state.relations !== previous.relations || selectionChanged) {
           setEdges((current) => syncEdges(current, state.relations, state.selection))
         }
       }),
@@ -139,8 +148,14 @@ export function GraphCanvas() {
   )
 
   const onSelectionChange = useCallback(
-    ({ nodes, edges }: OnSelectionChangeParams) =>
-      setSelection({ entityIds: nodes.map((node) => node.id), relationIds: edges.map((edge) => edge.id) }),
+    ({ nodes, edges }: OnSelectionChangeParams) => {
+      selectionFromCanvas.current = true
+      try {
+        setSelection({ entityIds: nodes.map((node) => node.id), relationIds: edges.map((edge) => edge.id) })
+      } finally {
+        selectionFromCanvas.current = false
+      }
+    },
     [setSelection],
   )
 
