@@ -1,20 +1,31 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  filrouge: open-source, local-first static web app for building OSINT investigation graphs
+  (entities, relations, sources). No backend, no account; all data stays in the browser.
+  Product reference and task order: ROADMAP.md. Agent guide and architecture: CLAUDE.md.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Stack: Vite, React 19, TypeScript (strict, noUncheckedIndexedAccess), Tailwind v4, shadcn/ui,
+  @xyflow/react (React Flow), Zustand, Dexie (IndexedDB), Zod 4, react-markdown.
+  Package manager: Bun (`bun run <script>`; `bun run test` runs Vitest, never `bun test`).
+  Tests: Vitest + fake-indexeddb for units, Playwright against the production build for e2e.
+  Hosting: GitHub Pages on a dedicated domain, hash router (`#/i/<id>`).
+
+  Non-negotiable constraints:
+  - No network request at runtime; strict CSP injected at build time (vite.config.ts).
+  - Never `dangerouslySetInnerHTML`; Markdown only through src/lib/markdown.tsx (no raw HTML,
+    no images, http(s)/mailto links only).
+  - Every imported or persisted record is validated by a Zod schema (src/domain/schemas.ts).
+  - Never log investigation content.
+  - Data model change: bump SCHEMA_VERSION and add a tested migration.
+
+  Conventions: Conventional Commits, one commit per task. Code, comments, commits and specs in
+  English; user-facing UI strings and ROADMAP/CLAUDE.md in French.
+
+rules:
+  specs:
+    - Describe observable behavior (UI, persisted data, exported file), not implementation details
+    - Every requirement has at least one scenario that an automated test could check
+  tasks:
+    - Each task maps to one Conventional Commit
+    - Include the verification commands (lint, format:check, typecheck, test, test:e2e when UI changes)
