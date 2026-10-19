@@ -138,7 +138,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 
 ### v0.0 — Fondations
 
-- [ ] Initialiser le projet Vite + React + TS (strict) avec pnpm
+- [x] Initialiser le projet Vite + React + TS (strict) avec pnpm
 - [ ] Configurer Tailwind v4, shadcn/ui, thème clair/sombre (suivi du système + bascule manuelle)
 - [ ] Configurer ESLint, Prettier, Vitest, Playwright
 - [ ] Ajouter une CSP stricte via `<meta http-equiv="Content-Security-Policy">` (`default-src 'self'`, pas d'`unsafe-eval`)
