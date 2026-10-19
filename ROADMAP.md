@@ -160,7 +160,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 - [ ] Création de relation par glisser d'un nœud à l'autre, avec saisie du label
 - [ ] Panneau latéral de détail : édition du label, des propriétés, des tags et des notes Markdown (rendu assaini)
 - [ ] Suppression d'entités/relations (touche Suppr), suppression en cascade des relations orphelines
-- [ ] Sauvegarde automatique debouncée de toutes les modifications, y compris les positions
+- [x] Sauvegarde automatique debouncée de toutes les modifications, y compris les positions
 - [ ] Export / import JSON d'une enquête (format versionné, validé par Zod, rejet propre en cas d'erreur)
 
 **Critère d'acceptation** : je crée une enquête, ajoute 10 entités reliées, recharge la page,
