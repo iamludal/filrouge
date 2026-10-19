@@ -195,6 +195,7 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [ ] Vue tableau de toutes les entités (tri, filtres, édition rapide)
 - [ ] Timeline des entités et relations datées (type `event` et propriétés date)
 - [ ] Carte Leaflet des entités géolocalisées. **Désactivée par défaut**, avec un avertissement expliquant que les tuiles sont chargées depuis un serveur tiers
+- [ ] Dossiers d'enquêtes sur l'écran d'accueil (un seul niveau, sans imbrication) : créer, renommer, supprimer un dossier (ses enquêtes reviennent à la racine, jamais supprimées), déplacer une enquête, filtrer la liste par dossier. Le dossier est une organisation locale : non inclus dans l'export
 
 ### v1.0 — Sécurité, interopérabilité, distribution
 
