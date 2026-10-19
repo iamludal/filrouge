@@ -61,6 +61,23 @@ persisted when the drag ends.
 - **WHEN** the user drags a node and releases it, then reloads the page
 - **THEN** the node is at its new grid-aligned position
 
+### Requirement: Select several elements
+The user SHALL be able to select several elements by Cmd/Ctrl-clicking them or by drawing a
+rectangle with Shift+drag. The rectangle SHALL select every entity whose circle it fully encloses,
+and the links attached to those entities.
+
+#### Scenario: Rectangle around two linked nodes
+- **WHEN** the user Shift+drags a rectangle around linked entities A and B
+- **THEN** A, B and the link A–B are selected
+
+#### Scenario: Rectangle tight around an entity
+- **WHEN** the rectangle encloses an entity's circle, however short or long its label
+- **THEN** the entity is selected
+
+#### Scenario: Rectangle beside an entity
+- **WHEN** the rectangle covers only empty canvas next to an entity's circle
+- **THEN** the entity is not selected
+
 ### Requirement: Selection drives the detail panel
 Selecting exactly one entity or one relation SHALL show its editor in the detail panel. Selecting
 several elements SHALL show how many are selected. With no selection the panel SHALL invite the

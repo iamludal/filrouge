@@ -29,6 +29,8 @@ test('status and Admiralty grades: edit, render, persist and round-trip', async 
   const panel = page.getByRole('complementary')
   await expect(circle(page, 'Alice')).toHaveCSS('border-top-style', 'solid')
   await expect(edgePath(page, 0)).toHaveCSS('stroke-dasharray', '6px, 4px')
+  // Relations reload in id order, not creation order: keep a handle on this one.
+  const knowsPath = page.locator(`[id="${await edgePath(page, 0).getAttribute('id')}"]`)
 
   // The new relation is selected: its link label carries the grade.
   await pick(panel, 'Fiabilité de la source', 'C — Assez fiable')
@@ -61,7 +63,7 @@ test('status and Admiralty grades: edit, render, persist and round-trip', async 
   await page.reload()
   await expect(node(page, 'Alice').getByText('B2')).toBeVisible()
   await expect(page.getByText('connaît · C3')).toBeVisible()
-  await expect(edgePath(page, 0)).toHaveCSS('stroke-dasharray', '6px, 4px')
+  await expect(knowsPath).toHaveCSS('stroke-dasharray', '6px, 4px')
 
   // Clearing the grade removes the badge.
   await node(page, 'Alice').click()

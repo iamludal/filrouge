@@ -9,6 +9,9 @@ import { cn } from '@/lib/utils'
 /**
  * Drag the node body to move it, drag the small dot to create a relation. While a connection is
  * in progress, the whole node becomes a drop target.
+ *
+ * The node's box hugs its circle and label: React Flow measures it for box selection, so it must
+ * match what the user sees as the entity.
  */
 export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeProps<EntityNodeType>) {
   const { entity } = data
@@ -18,7 +21,7 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
   const label = entity.label || `${type.label} sans nom`
 
   return (
-    <div className="group relative flex w-36 flex-col items-center gap-1.5" title={label}>
+    <div className="group relative flex w-max max-w-36 flex-col items-center gap-1.5" title={label}>
       <div
         className={cn(
           'relative flex size-12 items-center justify-center rounded-full border-2 bg-card shadow-sm transition-shadow',

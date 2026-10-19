@@ -8,6 +8,7 @@ import {
   MiniMap,
   Panel,
   ReactFlow,
+  SelectionMode,
   useReactFlow,
   type Connection,
   type EdgeChange,
@@ -33,8 +34,16 @@ const edgeTypes = { relation: FloatingEdge }
 export const GRID_SIZE = 16
 const SNAP_GRID: [number, number] = [GRID_SIZE, GRID_SIZE]
 const DELETE_KEYS = ['Delete', 'Backspace']
-// Entity nodes are 144px wide; their circle is centred horizontally.
-const NODE_HALF_WIDTH = 72
+/*
+ * A stored position is the top-left corner of a 144px-wide slot with the entity's circle centred
+ * in it. React Flow nodes are as wide as their circle or label, so they are anchored by their
+ * top-centre, 72px to the right of the stored position.
+ */
+const SLOT_HALF_WIDTH = 72
+const NODE_ORIGIN: [number, number] = [0.5, 0]
+
+const toCanvas = (position: Position): Position => ({ x: position.x + SLOT_HALF_WIDTH, y: position.y })
+const fromCanvas = (position: Position): Position => ({ x: position.x - SLOT_HALF_WIDTH, y: position.y })
 
 function snap(position: Position): Position {
   return {
@@ -60,7 +69,7 @@ function syncNodes(
       ...node,
       id: entity.id,
       type: 'entity',
-      position: node?.dragging ? node.position : entity.position,
+      position: node?.dragging ? node.position : toCanvas(entity.position),
       selected: selected.has(entity.id),
       data: { entity },
     }
@@ -135,7 +144,7 @@ export function GraphCanvas() {
       const moved: Record<string, Position> = {}
       for (const change of changes) {
         if (change.type === 'position' && change.position && !change.dragging)
-          moved[change.id] = change.position
+          moved[change.id] = fromCanvas(change.position)
       }
       if (Object.keys(moved).length > 0) moveEntities(moved)
     },
@@ -215,6 +224,8 @@ export function GraphCanvas() {
         snapToGrid
         snapGrid={SNAP_GRID}
         deleteKeyCode={DELETE_KEYS}
+        nodeOrigin={NODE_ORIGIN}
+        selectionMode={SelectionMode.Partial}
         zoomOnDoubleClick={false}
         minZoom={0.1}
         fitView={fitView}
@@ -242,7 +253,7 @@ export function GraphCanvas() {
         onOpenChange={(open) => !open && setPendingEntity(null)}
         onSubmit={(type, label) => {
           if (pendingEntity)
-            addEntity(type, { x: pendingEntity.x - NODE_HALF_WIDTH, y: pendingEntity.y - 24 }, label)
+            addEntity(type, { x: pendingEntity.x - SLOT_HALF_WIDTH, y: pendingEntity.y - 24 }, label)
         }}
       />
 
