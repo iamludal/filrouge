@@ -153,7 +153,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 - [x] Schémas Zod du modèle (§4) + tests de validation
 - [x] Base Dexie (tables `investigations`, `entities`, `relations`, `sources`, `attachments`, index par `investigationId`)
 - [x] Repositories CRUD + tests avec fake-indexeddb
-- [ ] Écran d'accueil : liste des enquêtes, créer, renommer, supprimer (avec confirmation)
+- [x] Écran d'accueil : liste des enquêtes, créer, renommer, supprimer (avec confirmation)
 - [ ] Canvas React Flow : zoom, pan, minimap, grille magnétique
 - [ ] Nœud personnalisé par type d'entité (icône, couleur, label)
 - [ ] Ajout d'entité (barre d'outils + double-clic sur le canvas)
