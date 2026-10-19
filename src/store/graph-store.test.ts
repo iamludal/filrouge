@@ -184,10 +184,11 @@ describe('graph store: sources', () => {
     useGraphStore.getState().detachSource({ type: 'entity', id: a.id }, doomed.id, true)
     const state = useGraphStore.getState()
     expect(state.sources[doomed.id]).toBeUndefined()
-    expect(state.attachments[attachment.id]).toBeUndefined()
+    // The screenshot stays in memory and is never deleted by a save: an undo may need it.
+    expect(state.attachments[attachment.id]).toBe(attachment)
     const changes = state.takeChanges()!
     expect(changes.deleteSourceIds).toEqual([doomed.id])
-    expect(changes.deleteAttachmentIds).toEqual([attachment.id])
+    expect(changes).not.toHaveProperty('deleteAttachmentIds')
   })
 
   it('removing a source strips every reference to it', () => {
@@ -212,7 +213,7 @@ describe('graph store: sources', () => {
     expect(changes.upsertRelations).toHaveLength(1)
   })
 
-  it('replaces and removes a screenshot, dropping one that was never saved', () => {
+  it('replaces and removes a screenshot, keeping the released ones for undo', () => {
     const investigation = openEmpty()
     const store = useGraphStore.getState()
     const first = fakeAttachment(investigation.id, '1')
@@ -223,14 +224,14 @@ describe('graph store: sources', () => {
     let state = useGraphStore.getState()
     expect(state.sources[source.id]!.attachmentId).toBe(second.id)
     expect(state.sources[source.id]!.sha256).toBe(second.sha256)
-    expect(state.attachments[first.id]).toBeUndefined()
-    expect([...state.dirty.attachments]).toEqual([second.id])
+    expect(state.attachments[first.id]).toBe(first)
+    expect([...state.dirty.attachments].sort()).toEqual([first.id, second.id].sort())
 
     useGraphStore.getState().setSourceAttachment(source.id, null)
     state = useGraphStore.getState()
     expect(state.sources[source.id]!.attachmentId).toBeUndefined()
     expect(state.sources[source.id]!.sha256).toBeUndefined()
-    expect(state.dirty.attachments.size).toBe(0)
+    expect(state.attachments[second.id]).toBe(second)
   })
 
   it('keeps sources when the entity using them is deleted', () => {

@@ -207,7 +207,7 @@ describe('graph repository: sources and attachments', () => {
     expect(await db.entities.count()).toBe(0)
   })
 
-  it('deletes the screenshot with its source', async () => {
+  it('keeps the screenshot when its source is deleted, until it is purged', async () => {
     const { investigations, graph, db } = setup()
     const investigation = await investigations.create('Suppression')
     const attachment = makeAttachment(investigation.id)
@@ -220,10 +220,14 @@ describe('graph repository: sources and attachments', () => {
 
     await graph.applyChanges({ ...base(investigation.id), deleteSourceIds: [source.id] })
     expect(await db.sources.count()).toBe(0)
-    expect(await db.attachments.count()).toBe(0)
+    expect(await db.attachments.count()).toBe(1)
+
+    // Undo: the source comes back and its screenshot is still there.
+    await graph.applyChanges({ ...base(investigation.id), upsertSources: [source] })
+    expect(await db.sources.count()).toBe(1)
   })
 
-  it('deletes the previous screenshot when a source is re-pointed or cleared', async () => {
+  it('keeps the previous screenshot when a source is re-pointed or cleared', async () => {
     const { investigations, graph, db } = setup()
     const investigation = await investigations.create('Remplacement')
     const first = makeAttachment(investigation.id, 1)
@@ -240,11 +244,43 @@ describe('graph repository: sources and attachments', () => {
       upsertSources: [{ ...source, attachmentId: second.id, sha256: second.sha256 }],
       upsertAttachments: [second],
     })
-    expect((await db.attachments.toArray()).map((a) => a.id)).toEqual([second.id])
+    expect(await db.attachments.count()).toBe(2)
 
     const { attachmentId: _a, sha256: _s, ...cleared } = source
     await graph.applyChanges({ ...base(investigation.id), upsertSources: [cleared] })
-    expect(await db.attachments.count()).toBe(0)
+    expect(await db.attachments.count()).toBe(2)
+
+    // Undo back to the first screenshot: the batch is accepted.
+    await graph.applyChanges({ ...base(investigation.id), upsertSources: [source] })
+    expect(await db.sources.get(source.id)).toMatchObject({ attachmentId: first.id })
+  })
+
+  it('still refuses a source pointing at a missing screenshot', async () => {
+    const { investigations, graph, db } = setup()
+    const investigation = await investigations.create('Capture manquante')
+    const source = makeSource(investigation.id, makeAttachment(investigation.id))
+    await expect(graph.applyChanges({ ...base(investigation.id), upsertSources: [source] })).rejects.toThrow(
+      'Capture introuvable',
+    )
+    expect(await db.sources.count()).toBe(0)
+  })
+
+  it('purges only the screenshots no source of the investigation references', async () => {
+    const { investigations, graph, db } = setup()
+    const investigation = await investigations.create('Purge')
+    const other = await investigations.create('Autre')
+    const kept = makeAttachment(investigation.id, 1)
+    const orphan = makeAttachment(investigation.id, 2)
+    const otherOrphan = makeAttachment(other.id, 3)
+    await graph.applyChanges({
+      ...base(investigation.id),
+      upsertSources: [makeSource(investigation.id, kept)],
+      upsertAttachments: [kept, orphan],
+    })
+    await graph.applyChanges({ ...base(other.id), upsertAttachments: [otherOrphan] })
+
+    await graph.purgeUnreferencedAttachments(investigation.id)
+    expect((await db.attachments.toArray()).map((a) => a.id).sort()).toEqual([kept.id, otherOrphan.id].sort())
   })
 
   it('refuses to delete a source still referenced by a stored element', async () => {
@@ -305,5 +341,26 @@ describe('investigations repository: attachments', () => {
 
     await target.investigations.remove(investigation.id)
     expect(await target.db.attachments.count()).toBe(0)
+  })
+
+  it('counts and exports only the screenshots a source references', async () => {
+    const { investigations, graph, attachments } = setup()
+    const investigation = await investigations.create('Orphelines')
+    const kept = makeAttachment(investigation.id, 4)
+    const orphan = makeAttachment(investigation.id, 5)
+    await graph.applyChanges({
+      investigationId: investigation.id,
+      upsertEntities: [],
+      upsertRelations: [],
+      deleteEntityIds: [],
+      deleteRelationIds: [],
+      upsertSources: [makeSource(investigation.id, kept)],
+      upsertAttachments: [kept, orphan],
+    })
+
+    expect(await attachments.stats(investigation.id)).toEqual({ count: 1, totalSize: kept.size })
+    expect((await investigations.loadExport(investigation.id))!.attachments.map((a) => a.id)).toEqual([
+      kept.id,
+    ])
   })
 })

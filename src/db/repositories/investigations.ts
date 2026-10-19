@@ -76,8 +76,12 @@ export function investigationsRepository(db: FilrougeDatabase = defaultDb) {
     async loadExport(id: string): Promise<InvestigationExport | undefined> {
       const snapshot = await this.loadSnapshot(id)
       if (!snapshot) return undefined
-      const attachments = await db.attachments.where('investigationId').equals(id).toArray()
-      return { snapshot, attachments }
+      // Screenshots released by a deleted source may still be stored until the next purge.
+      const referenced = new Set(
+        snapshot.sources.flatMap((source) => (source.attachmentId ? [source.attachmentId] : [])),
+      )
+      const stored = await db.attachments.where('investigationId').equals(id).toArray()
+      return { snapshot, attachments: stored.filter((attachment) => referenced.has(attachment.id)) }
     },
 
     /**

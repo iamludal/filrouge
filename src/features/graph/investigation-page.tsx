@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { routeHref } from '@/app/router'
 import { Button } from '@/components/ui/button'
+import { graph } from '@/db/repositories/graph'
 import { investigations } from '@/db/repositories/investigations'
 import { useExportInvestigation } from '@/features/import-export/use-import-export'
 import { DetailPanel } from '@/features/graph/detail-panel'
 import { GraphCanvas } from '@/features/graph/graph-canvas'
+import { HistoryControls } from '@/features/graph/history-controls'
 import { SaveIndicator } from '@/features/graph/save-indicator'
 import { PasteScreenshot } from '@/features/sources/paste-screenshot'
 import { SourcesLibrary } from '@/features/sources/sources-library-dialog'
@@ -29,15 +31,21 @@ export function InvestigationPage({ id }: { id: string }) {
     )
     autosave.current = saver
 
-    void investigations.loadSnapshot(id).then((snapshot) => {
-      if (cancelled) return
-      if (!snapshot) {
-        setState('missing')
-        return
-      }
-      useGraphStore.getState().load(snapshot)
-      setState('ready')
-    })
+    // Screenshots released by deleted sources are only dropped here and on leave,
+    // so an undo can bring them back. Best effort: a failure is retried on the next open.
+    const purge = () => graph.purgeUnreferencedAttachments(id).catch(() => {})
+
+    void purge()
+      .then(() => investigations.loadSnapshot(id))
+      .then((snapshot) => {
+        if (cancelled) return
+        if (!snapshot) {
+          setState('missing')
+          return
+        }
+        useGraphStore.getState().load(snapshot)
+        setState('ready')
+      })
 
     // Best effort: flush pending edits when the tab is hidden or closed.
     const onHide = () => void saver.flush()
@@ -49,10 +57,13 @@ export function InvestigationPage({ id }: { id: string }) {
       cancelled = true
       window.removeEventListener('pagehide', onHide)
       document.removeEventListener('visibilitychange', onVisibility)
-      void saver.flush().finally(() => {
-        saver.stop()
-        if (useGraphStore.getState().investigation?.id === id) useGraphStore.getState().close()
-      })
+      void saver
+        .flush()
+        .then(purge)
+        .finally(() => {
+          saver.stop()
+          if (useGraphStore.getState().investigation?.id === id) useGraphStore.getState().close()
+        })
     }
   }, [id])
 
@@ -79,6 +90,7 @@ export function InvestigationPage({ id }: { id: string }) {
         </Button>
         <h1 className="min-w-0 truncate font-medium">{investigation.name}</h1>
         <div className="ml-auto flex items-center gap-3">
+          <HistoryControls />
           <SaveIndicator />
           <SourcesLibrary />
           <Button

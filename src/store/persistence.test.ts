@@ -97,4 +97,60 @@ describe('autosave', () => {
     ])
     autosave.stop()
   })
+
+  it('saves the state reached by undo and redo', async () => {
+    const { repository, investigation } = await setup()
+    const autosave = startAutosave(repository, 60_000)
+    const store = () => useGraphStore.getState()
+    const a = store().addEntity('person', { x: 0, y: 0 }, 'A')
+    const b = store().addEntity('email', { x: 100, y: 0 }, 'B')
+    const relation = store().addRelation(a.id, b.id, 'utilise')!
+    await autosave.flush()
+
+    store().removeElements([a.id], [])
+    await autosave.flush()
+    expect(await repository.listEntities(investigation.id)).toHaveLength(1)
+    expect(await repository.listRelations(investigation.id)).toEqual([])
+
+    store().undo()
+    expect(store().saveStatus).toBe('pending')
+    await autosave.flush()
+    expect(store().saveStatus).toBe('saved')
+    expect((await repository.listEntities(investigation.id)).map((e) => e.id).sort()).toEqual(
+      [a.id, b.id].sort(),
+    )
+    expect((await repository.listRelations(investigation.id)).map((r) => r.id)).toEqual([relation.id])
+
+    store().redo()
+    await autosave.flush()
+    expect((await repository.listEntities(investigation.id)).map((e) => e.id)).toEqual([b.id])
+    expect(await repository.listRelations(investigation.id)).toEqual([])
+    autosave.stop()
+  })
+
+  it('saves an undone source deletion with its screenshot still stored', async () => {
+    const { repository, investigation } = await setup()
+    const autosave = startAutosave(repository, 60_000)
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 2])
+    const attachment = {
+      id: crypto.randomUUID(),
+      investigationId: investigation.id,
+      blob: new Blob([bytes], { type: 'image/png' }),
+      mime: 'image/png' as const,
+      size: bytes.length,
+      sha256: 'b'.repeat(64),
+    }
+    const source = useGraphStore.getState().createSource({ title: 'Capture' }, attachment)!
+    await autosave.flush()
+
+    useGraphStore.getState().removeSource(source.id)
+    await autosave.flush()
+    expect(await repository.listSources(investigation.id)).toEqual([])
+
+    useGraphStore.getState().undo()
+    await autosave.flush()
+    expect(useGraphStore.getState().saveStatus).toBe('saved')
+    expect(await repository.listSources(investigation.id)).toEqual([source])
+    autosave.stop()
+  })
 })

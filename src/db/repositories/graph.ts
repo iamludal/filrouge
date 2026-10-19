@@ -20,7 +20,6 @@ export interface GraphChanges {
   upsertSources?: Source[]
   deleteSourceIds?: string[]
   upsertAttachments?: Attachment[]
-  deleteAttachmentIds?: string[]
 }
 
 export function graphRepository(db: FilrougeDatabase = defaultDb) {
@@ -40,10 +39,10 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
     /**
      * Applies a batch of graph edits atomically. Every record is re-validated so that a bug in
      * the UI layer can never persist malformed data. Deleting an entity also deletes the
-     * relations attached to it, even ones not listed in `deleteRelationIds`. Deleting a source,
-     * or pointing it at another screenshot, deletes the screenshot it held. A batch that would
-     * leave an element pointing at a missing source, or a source at a missing screenshot, is
-     * refused as a whole.
+     * relations attached to it, even ones not listed in `deleteRelationIds`. Screenshots released
+     * by a deleted or re-pointed source stay stored (see `purgeUnreferencedAttachments`). A batch
+     * that would leave an element pointing at a missing source, or a source at a missing
+     * screenshot, is refused as a whole.
      */
     async applyChanges(changes: GraphChanges): Promise<void> {
       const { investigationId } = changes
@@ -58,7 +57,6 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
         belongs(attachmentSchema.parse(attachment)),
       )
       const deletedSourceIds = new Set(changes.deleteSourceIds ?? [])
-      const deletedAttachmentIds = new Set(changes.deleteAttachmentIds ?? [])
 
       await db.transaction(
         'rw',
@@ -66,16 +64,6 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
         async () => {
           const upsertedSourceIds = new Set(sources.map((source) => source.id))
           const upsertedAttachmentIds = new Set(attachments.map((attachment) => attachment.id))
-
-          // Screenshots released by deleted or re-pointed sources.
-          const stored = await db.sources.bulkGet([...deletedSourceIds, ...upsertedSourceIds])
-          for (const previous of stored) {
-            if (!previous?.attachmentId) continue
-            const next = sources.find((source) => source.id === previous.id)
-            if (deletedSourceIds.has(previous.id) || next?.attachmentId !== previous.attachmentId) {
-              deletedAttachmentIds.add(previous.attachmentId)
-            }
-          }
 
           // Every source reference must resolve to a source that exists after this batch.
           const referenced = new Set<string>()
@@ -119,9 +107,7 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
               : [],
           )
           const present = await db.attachments.bulkGet(wanted)
-          wanted.forEach((id, index) => {
-            if (!present[index] || deletedAttachmentIds.has(id)) throw new Error('Capture introuvable')
-          })
+          if (present.some((attachment) => !attachment)) throw new Error('Capture introuvable')
 
           if (changes.deleteEntityIds.length > 0) {
             await db.entities.bulkDelete(changes.deleteEntityIds)
@@ -130,12 +116,6 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
           }
           if (changes.deleteRelationIds.length > 0) await db.relations.bulkDelete(changes.deleteRelationIds)
           if (deletedSourceIds.size > 0) await db.sources.bulkDelete([...deletedSourceIds])
-          if (deletedAttachmentIds.size > 0) {
-            // A re-added screenshot id wins over a deletion listed in the same batch.
-            await db.attachments.bulkDelete(
-              [...deletedAttachmentIds].filter((id) => !upsertedAttachmentIds.has(id)),
-            )
-          }
           if (attachments.length > 0) await db.attachments.bulkPut(attachments)
           if (sources.length > 0) await db.sources.bulkPut(sources)
           if (entities.length > 0) await db.entities.bulkPut(entities)
@@ -143,6 +123,23 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
           await db.investigations.update(investigationId, { updatedAt: nowIso() })
         },
       )
+    },
+
+    /**
+     * Deletes the investigation's screenshots that no source references. Called when an
+     * investigation is opened or left, so that a screenshot released during the session could
+     * still be restored by an undo.
+     */
+    async purgeUnreferencedAttachments(investigationId: string): Promise<void> {
+      await db.transaction('rw', [db.sources, db.attachments], async () => {
+        const sources = await db.sources.where('investigationId').equals(investigationId).toArray()
+        const referenced = new Set(
+          sources.flatMap((source) => (source.attachmentId ? [source.attachmentId] : [])),
+        )
+        const stored = await db.attachments.where('investigationId').equals(investigationId).primaryKeys()
+        const orphans = stored.filter((id) => !referenced.has(id))
+        if (orphans.length > 0) await db.attachments.bulkDelete(orphans)
+      })
     },
   }
 }

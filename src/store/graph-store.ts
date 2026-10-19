@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { temporal } from 'zundo'
 import type { EntityTypeId } from '@/domain/entity-types'
 import {
   attachmentLink,
@@ -20,6 +21,15 @@ import type {
 } from '@/domain/schemas'
 import type { GraphChanges } from '@/db/repositories/graph'
 import { nowIso } from '@/lib/ids'
+import {
+  createGrouping,
+  diffRecords,
+  HISTORY_LIMIT,
+  pickRecords,
+  sameRecords,
+  type RecordMaps,
+  type StateDiff,
+} from '@/store/history'
 
 export type EntityPatch = Partial<Omit<Entity, 'id' | 'investigationId' | 'createdAt' | 'updatedAt'>>
 export type RelationPatch = Partial<
@@ -47,7 +57,6 @@ interface Dirty {
   sources: ReadonlySet<string>
   deletedSources: ReadonlySet<string>
   attachments: ReadonlySet<string>
-  deletedAttachments: ReadonlySet<string>
 }
 
 export interface GraphState {
@@ -91,6 +100,10 @@ export interface GraphState {
   removeSource: (id: string) => void
   setSelection: (selection: Selection) => void
 
+  /** Reverts the last recorded edit of the entities, relations and sources. */
+  undo: () => void
+  redo: () => void
+
   /** Hands the pending edits over to the persistence layer and clears them. */
   takeChanges: () => GraphChanges | null
   /** Puts back edits that failed to save so the next attempt retries them. */
@@ -109,7 +122,6 @@ function emptyDirty(): Dirty {
     sources: new Set(),
     deletedSources: new Set(),
     attachments: new Set(),
-    deletedAttachments: new Set(),
   }
 }
 
@@ -162,244 +174,67 @@ function patchElement(state: GraphState, ref: ElementRef, patch: (element: Eleme
   }
 }
 
-export const useGraphStore = create<GraphState>()((set, get) => {
-  /** Marks records as modified. */
-  const touch = (state: GraphState, entityIds: string[], relationIds: string[]) => ({
-    dirty: {
-      ...state.dirty,
-      entities: withAdded(state.dirty.entities, entityIds),
-      relations: withAdded(state.dirty.relations, relationIds),
-    },
-    saveStatus: 'pending' as const,
-  })
+/** The sorted keys of a patch: edits of the same fields share a history step. */
+const fieldsOf = (patch: object) => Object.keys(patch).sort().join(',')
 
-  /**
-   * Forgets a screenshot that is no longer used. One never written is simply dropped; a stored
-   * one is also listed for deletion.
-   */
-  const releaseAttachment = (state: GraphState, attachmentId: string) => ({
-    attachments: omit(state.attachments, [attachmentId]),
-    dirty: {
-      attachments: withRemoved(state.dirty.attachments, [attachmentId]),
-      deletedAttachments: withAdded(state.dirty.deletedAttachments, [attachmentId]),
-    },
-  })
+/** Merges bursts of edits to one field into one history step. */
+const grouping = createGrouping()
 
+/** Tells storage about the records that changed between two states of the history. */
+function markDiff(dirty: Dirty, diff: StateDiff): Dirty {
+  const touched = (current: ReadonlySet<string>, kind: keyof StateDiff) =>
+    withRemoved(withAdded(current, diff[kind].upserted), diff[kind].removed)
+  const deleted = (current: ReadonlySet<string>, kind: keyof StateDiff) =>
+    withAdded(withRemoved(current, diff[kind].upserted), diff[kind].removed)
   return {
-    investigation: null,
-    entities: {},
-    relations: {},
-    sources: {},
-    attachments: {},
-    selection: EMPTY_SELECTION,
-    dirty: emptyDirty(),
-    saveStatus: 'saved',
+    ...dirty,
+    entities: touched(dirty.entities, 'entities'),
+    deletedEntities: deleted(dirty.deletedEntities, 'entities'),
+    relations: touched(dirty.relations, 'relations'),
+    deletedRelations: deleted(dirty.deletedRelations, 'relations'),
+    sources: touched(dirty.sources, 'sources'),
+    deletedSources: deleted(dirty.deletedSources, 'sources'),
+  }
+}
 
-    load: (snapshot) =>
-      set({
-        investigation: snapshot.investigation,
-        entities: Object.fromEntries(snapshot.entities.map((entity) => [entity.id, entity])),
-        relations: Object.fromEntries(snapshot.relations.map((relation) => [relation.id, relation])),
-        sources: Object.fromEntries(snapshot.sources.map((source) => [source.id, source])),
-        attachments: {},
-        selection: EMPTY_SELECTION,
-        dirty: emptyDirty(),
-        saveStatus: 'saved',
-      }),
-
-    close: () =>
-      set({
-        investigation: null,
-        entities: {},
-        relations: {},
-        sources: {},
-        attachments: {},
-        selection: EMPTY_SELECTION,
-        dirty: emptyDirty(),
-        saveStatus: 'saved',
-      }),
-
-    setInvestigation: (investigation) => set({ investigation }),
-
-    addEntity: (type, position, label) => {
-      const investigation = get().investigation
-      if (!investigation) throw new Error('Aucune enquête ouverte')
-      const entity = createEntity(investigation.id, type, position, label)
-      set((state) => ({
-        entities: { ...state.entities, [entity.id]: entity },
-        selection: { entityIds: [entity.id], relationIds: [] },
-        ...touch(state, [entity.id], []),
-      }))
-      return entity
+/** Steps through the history, then queues the records it changed for the next save. */
+function travel(direction: 'undo' | 'redo') {
+  const before = pickRecords(useGraphStore.getState())
+  grouping.reset()
+  useGraphStore.temporal.getState()[direction]()
+  const state = useGraphStore.getState()
+  const diff = diffRecords(before, pickRecords(state))
+  const changed = Object.values(diff).some((d) => d.upserted.length > 0 || d.removed.length > 0)
+  if (!changed) return
+  useGraphStore.setState({
+    dirty: markDiff(state.dirty, diff),
+    saveStatus: 'pending',
+    selection: {
+      entityIds: state.selection.entityIds.filter((id) => state.entities[id]),
+      relationIds: state.selection.relationIds.filter((id) => state.relations[id]),
     },
+  })
+}
 
-    updateEntity: (id, patch) =>
-      set((state) => {
-        const current = state.entities[id]
-        if (!current) return state
-        return {
-          entities: { ...state.entities, [id]: { ...current, ...patch, updatedAt: nowIso() } },
-          ...touch(state, [id], []),
-        }
-      }),
-
-    moveEntities: (positions) =>
-      set((state) => {
-        const entities = { ...state.entities }
-        const moved: string[] = []
-        for (const [id, position] of Object.entries(positions)) {
-          const current = entities[id]
-          if (!current || (current.position.x === position.x && current.position.y === position.y)) continue
-          entities[id] = { ...current, position }
-          moved.push(id)
-        }
-        if (moved.length === 0) return state
-        return { entities, ...touch(state, moved, []) }
-      }),
-
-    addRelation: (from, to, label, directed = true, status) => {
-      const { investigation, entities } = get()
-      if (!investigation || from === to || !entities[from] || !entities[to]) return null
-      const relation = createRelation(investigation.id, from, to, label, directed, status)
-      set((state) => ({
-        relations: { ...state.relations, [relation.id]: relation },
-        selection: { entityIds: [], relationIds: [relation.id] },
-        ...touch(state, [], [relation.id]),
-      }))
-      return relation
-    },
-
-    updateRelation: (id, patch) =>
-      set((state) => {
-        const current = state.relations[id]
-        if (!current) return state
-        return {
-          relations: { ...state.relations, [id]: { ...current, ...patch, updatedAt: nowIso() } },
-          ...touch(state, [], [id]),
-        }
-      }),
-
-    removeElements: (entityIds, relationIds) =>
-      set((state) => {
-        const removedEntities = entityIds.filter((id) => state.entities[id])
-        const removedRelations = [
-          ...new Set([
-            ...relationIds.filter((id) => state.relations[id]),
-            ...orphanedRelationIds(Object.values(state.relations), removedEntities),
-          ]),
-        ]
-        if (removedEntities.length === 0 && removedRelations.length === 0) return state
-        return {
-          entities: omit(state.entities, removedEntities),
-          relations: omit(state.relations, removedRelations),
-          selection: {
-            entityIds: state.selection.entityIds.filter((id) => !removedEntities.includes(id)),
-            relationIds: state.selection.relationIds.filter((id) => !removedRelations.includes(id)),
-          },
-          dirty: {
-            ...state.dirty,
-            entities: withRemoved(state.dirty.entities, removedEntities),
-            relations: withRemoved(state.dirty.relations, removedRelations),
-            deletedEntities: withAdded(state.dirty.deletedEntities, removedEntities),
-            deletedRelations: withAdded(state.dirty.deletedRelations, removedRelations),
-          },
-          saveStatus: 'pending',
-        }
-      }),
-
-    createSource: (fields, attachment, attachTo) => {
-      const investigation = get().investigation
-      if (!investigation) return null
-      const source = createSource(investigation.id, fields, attachment)
-      set((state) => {
-        const attached = attachTo
-          ? patchElement(state, attachTo, (element) => [...element.sourceIds, source.id])
-          : null
-        const touched = attached && attachTo ? touch(state, ...elementIds(attachTo)) : touch(state, [], [])
-        return {
-          ...attached,
-          sources: { ...state.sources, [source.id]: source },
-          attachments: attachment ? { ...state.attachments, [attachment.id]: attachment } : state.attachments,
-          dirty: {
-            ...touched.dirty,
-            sources: withAdded(state.dirty.sources, [source.id]),
-            attachments: attachment
-              ? withAdded(state.dirty.attachments, [attachment.id])
-              : state.dirty.attachments,
-          },
-          saveStatus: 'pending',
-        }
-      })
-      return source
-    },
-
-    updateSource: (id, patch) =>
-      set((state) => {
-        const current = state.sources[id]
-        if (!current) return state
-        return {
-          sources: { ...state.sources, [id]: { ...current, ...patch } },
-          dirty: { ...state.dirty, sources: withAdded(state.dirty.sources, [id]) },
-          saveStatus: 'pending',
-        }
-      }),
-
-    setSourceAttachment: (sourceId, attachment) =>
-      set((state) => {
-        const current = state.sources[sourceId]
-        if (!current) return state
-        const { attachmentId, sha256: _sha256, originalSha256: _original, ...rest } = current
-        const next: Source = { ...rest, ...attachmentLink(attachment ?? undefined) }
-        const released =
-          attachmentId && attachmentId !== attachment?.id ? releaseAttachment(state, attachmentId) : null
-        const attachments = released?.attachments ?? state.attachments
-        const dirty = {
+export const useGraphStore = create<GraphState>()(
+  temporal<GraphState, [], [], RecordMaps>(
+    (set, get) => {
+      /** Marks records as modified. */
+      const touch = (state: GraphState, entityIds: string[], relationIds: string[]) => ({
+        dirty: {
           ...state.dirty,
-          ...released?.dirty,
-          sources: withAdded(state.dirty.sources, [sourceId]),
-        }
-        return {
-          sources: { ...state.sources, [sourceId]: next },
-          attachments: attachment ? { ...attachments, [attachment.id]: attachment } : attachments,
-          dirty: attachment
-            ? {
-                ...dirty,
-                attachments: withAdded(dirty.attachments, [attachment.id]),
-                deletedAttachments: withRemoved(dirty.deletedAttachments, [attachment.id]),
-              }
-            : dirty,
-          saveStatus: 'pending',
-        }
-      }),
-
-    attachSource: (element, sourceId) =>
-      set((state) => {
-        if (!state.sources[sourceId]) return state
-        const patched = patchElement(state, element, (current) =>
-          current.sourceIds.includes(sourceId) ? current.sourceIds : [...current.sourceIds, sourceId],
-        )
-        return patched ? { ...patched, ...touch(state, ...elementIds(element)) } : state
-      }),
-
-    detachSource: (element, sourceId, deleteSource = false) => {
-      set((state) => {
-        const patched = patchElement(state, element, (current) =>
-          current.sourceIds.filter((id) => id !== sourceId),
-        )
-        return patched ? { ...patched, ...touch(state, ...elementIds(element)) } : state
+          entities: withAdded(state.dirty.entities, entityIds),
+          relations: withAdded(state.dirty.relations, relationIds),
+        },
+        saveStatus: 'pending' as const,
       })
-      const state = get()
-      const stillUsed = sourceUsage([
-        ...Object.values(state.entities),
-        ...Object.values(state.relations),
-      ]).has(sourceId)
-      if (deleteSource && !stillUsed) get().removeSource(sourceId)
-    },
 
-    removeSource: (id) =>
-      set((state) => {
-        const source = state.sources[id]
-        if (!source) return state
+      /**
+       * Deletes a source and strips it from the elements citing it. Its screenshot stays in memory
+       * and in storage, so that undoing can bring it back.
+       */
+      const dropSource = (state: GraphState, id: string) => {
+        if (!state.sources[id]) return null
         const entities = { ...state.entities }
         const relations = { ...state.relations }
         const changedEntities: string[] = []
@@ -422,84 +257,324 @@ export const useGraphStore = create<GraphState>()((set, get) => {
           }
           changedRelations.push(key)
         }
-        const released = source.attachmentId ? releaseAttachment(state, source.attachmentId) : null
         const touched = touch(state, changedEntities, changedRelations)
         return {
           entities,
           relations,
           sources: omit(state.sources, [id]),
-          attachments: released?.attachments ?? state.attachments,
           dirty: {
             ...touched.dirty,
-            ...released?.dirty,
             sources: withRemoved(state.dirty.sources, [id]),
             deletedSources: withAdded(state.dirty.deletedSources, [id]),
           },
-          saveStatus: 'pending',
+          saveStatus: 'pending' as const,
         }
-      }),
-
-    setSelection: (selection) =>
-      set((state) =>
-        sameIds(state.selection.entityIds, selection.entityIds) &&
-        sameIds(state.selection.relationIds, selection.relationIds)
-          ? state
-          : { selection },
-      ),
-
-    takeChanges: () => {
-      const { investigation, entities, relations, sources, attachments, dirty } = get()
-      if (!investigation || !isDirty(dirty)) return null
-      const changes: GraphChanges = {
-        investigationId: investigation.id,
-        upsertEntities: [...dirty.entities].flatMap((id) => entities[id] ?? []),
-        upsertRelations: [...dirty.relations].flatMap((id) => relations[id] ?? []),
-        deleteEntityIds: [...dirty.deletedEntities],
-        deleteRelationIds: [...dirty.deletedRelations],
-        upsertSources: [...dirty.sources].flatMap((id) => sources[id] ?? []),
-        deleteSourceIds: [...dirty.deletedSources],
-        upsertAttachments: [...dirty.attachments].flatMap((id) => attachments[id] ?? []),
-        deleteAttachmentIds: [...dirty.deletedAttachments],
       }
-      set({ dirty: emptyDirty() })
-      return changes
+
+      /** The loaded or emptied state is a starting point, not a step to undo. */
+      const forgetHistory = () => {
+        grouping.reset()
+        useGraphStore.temporal.getState().clear()
+      }
+
+      return {
+        investigation: null,
+        entities: {},
+        relations: {},
+        sources: {},
+        attachments: {},
+        selection: EMPTY_SELECTION,
+        dirty: emptyDirty(),
+        saveStatus: 'saved',
+
+        load: (snapshot) => {
+          set({
+            investigation: snapshot.investigation,
+            entities: Object.fromEntries(snapshot.entities.map((entity) => [entity.id, entity])),
+            relations: Object.fromEntries(snapshot.relations.map((relation) => [relation.id, relation])),
+            sources: Object.fromEntries(snapshot.sources.map((source) => [source.id, source])),
+            attachments: {},
+            selection: EMPTY_SELECTION,
+            dirty: emptyDirty(),
+            saveStatus: 'saved',
+          })
+          forgetHistory()
+        },
+
+        close: () => {
+          set({
+            investigation: null,
+            entities: {},
+            relations: {},
+            sources: {},
+            attachments: {},
+            selection: EMPTY_SELECTION,
+            dirty: emptyDirty(),
+            saveStatus: 'saved',
+          })
+          forgetHistory()
+        },
+
+        setInvestigation: (investigation) => set({ investigation }),
+
+        addEntity: (type, position, label) => {
+          const investigation = get().investigation
+          if (!investigation) throw new Error('Aucune enquête ouverte')
+          const entity = createEntity(investigation.id, type, position, label)
+          set((state) => ({
+            entities: { ...state.entities, [entity.id]: entity },
+            selection: { entityIds: [entity.id], relationIds: [] },
+            ...touch(state, [entity.id], []),
+          }))
+          return entity
+        },
+
+        updateEntity: (id, patch) =>
+          grouping.group(`entity:${id}:${fieldsOf(patch)}`, () =>
+            set((state) => {
+              const current = state.entities[id]
+              if (!current) return state
+              return {
+                entities: { ...state.entities, [id]: { ...current, ...patch, updatedAt: nowIso() } },
+                ...touch(state, [id], []),
+              }
+            }),
+          ),
+
+        moveEntities: (positions) =>
+          grouping.group(`move:${fieldsOf(positions)}`, () =>
+            set((state) => {
+              const entities = { ...state.entities }
+              const moved: string[] = []
+              for (const [id, position] of Object.entries(positions)) {
+                const current = entities[id]
+                if (!current || (current.position.x === position.x && current.position.y === position.y))
+                  continue
+                entities[id] = { ...current, position }
+                moved.push(id)
+              }
+              if (moved.length === 0) return state
+              return { entities, ...touch(state, moved, []) }
+            }),
+          ),
+
+        addRelation: (from, to, label, directed = true, status) => {
+          const { investigation, entities } = get()
+          if (!investigation || from === to || !entities[from] || !entities[to]) return null
+          const relation = createRelation(investigation.id, from, to, label, directed, status)
+          set((state) => ({
+            relations: { ...state.relations, [relation.id]: relation },
+            selection: { entityIds: [], relationIds: [relation.id] },
+            ...touch(state, [], [relation.id]),
+          }))
+          return relation
+        },
+
+        updateRelation: (id, patch) =>
+          grouping.group(`relation:${id}:${fieldsOf(patch)}`, () =>
+            set((state) => {
+              const current = state.relations[id]
+              if (!current) return state
+              return {
+                relations: { ...state.relations, [id]: { ...current, ...patch, updatedAt: nowIso() } },
+                ...touch(state, [], [id]),
+              }
+            }),
+          ),
+
+        removeElements: (entityIds, relationIds) =>
+          set((state) => {
+            const removedEntities = entityIds.filter((id) => state.entities[id])
+            const removedRelations = [
+              ...new Set([
+                ...relationIds.filter((id) => state.relations[id]),
+                ...orphanedRelationIds(Object.values(state.relations), removedEntities),
+              ]),
+            ]
+            if (removedEntities.length === 0 && removedRelations.length === 0) return state
+            return {
+              entities: omit(state.entities, removedEntities),
+              relations: omit(state.relations, removedRelations),
+              selection: {
+                entityIds: state.selection.entityIds.filter((id) => !removedEntities.includes(id)),
+                relationIds: state.selection.relationIds.filter((id) => !removedRelations.includes(id)),
+              },
+              dirty: {
+                ...state.dirty,
+                entities: withRemoved(state.dirty.entities, removedEntities),
+                relations: withRemoved(state.dirty.relations, removedRelations),
+                deletedEntities: withAdded(state.dirty.deletedEntities, removedEntities),
+                deletedRelations: withAdded(state.dirty.deletedRelations, removedRelations),
+              },
+              saveStatus: 'pending',
+            }
+          }),
+
+        createSource: (fields, attachment, attachTo) => {
+          const investigation = get().investigation
+          if (!investigation) return null
+          const source = createSource(investigation.id, fields, attachment)
+          set((state) => {
+            const attached = attachTo
+              ? patchElement(state, attachTo, (element) => [...element.sourceIds, source.id])
+              : null
+            const touched =
+              attached && attachTo ? touch(state, ...elementIds(attachTo)) : touch(state, [], [])
+            return {
+              ...attached,
+              sources: { ...state.sources, [source.id]: source },
+              attachments: attachment
+                ? { ...state.attachments, [attachment.id]: attachment }
+                : state.attachments,
+              dirty: {
+                ...touched.dirty,
+                sources: withAdded(state.dirty.sources, [source.id]),
+                attachments: attachment
+                  ? withAdded(state.dirty.attachments, [attachment.id])
+                  : state.dirty.attachments,
+              },
+              saveStatus: 'pending',
+            }
+          })
+          return source
+        },
+
+        updateSource: (id, patch) =>
+          grouping.group(`source:${id}:${fieldsOf(patch)}`, () =>
+            set((state) => {
+              const current = state.sources[id]
+              if (!current) return state
+              return {
+                sources: { ...state.sources, [id]: { ...current, ...patch } },
+                dirty: { ...state.dirty, sources: withAdded(state.dirty.sources, [id]) },
+                saveStatus: 'pending',
+              }
+            }),
+          ),
+
+        setSourceAttachment: (sourceId, attachment) =>
+          set((state) => {
+            const current = state.sources[sourceId]
+            if (!current) return state
+            const {
+              attachmentId: _attachmentId,
+              sha256: _sha256,
+              originalSha256: _original,
+              ...rest
+            } = current
+            const next: Source = { ...rest, ...attachmentLink(attachment ?? undefined) }
+            // The replaced screenshot stays in memory and in storage, so that undoing can bring it back.
+            const dirty = { ...state.dirty, sources: withAdded(state.dirty.sources, [sourceId]) }
+            return {
+              sources: { ...state.sources, [sourceId]: next },
+              attachments: attachment
+                ? { ...state.attachments, [attachment.id]: attachment }
+                : state.attachments,
+              dirty: attachment
+                ? { ...dirty, attachments: withAdded(dirty.attachments, [attachment.id]) }
+                : dirty,
+              saveStatus: 'pending',
+            }
+          }),
+
+        attachSource: (element, sourceId) =>
+          set((state) => {
+            if (!state.sources[sourceId]) return state
+            const patched = patchElement(state, element, (current) =>
+              current.sourceIds.includes(sourceId) ? current.sourceIds : [...current.sourceIds, sourceId],
+            )
+            return patched ? { ...patched, ...touch(state, ...elementIds(element)) } : state
+          }),
+
+        detachSource: (element, sourceId, deleteSource = false) =>
+          // One `set`, so that detaching and deleting the source is a single history step.
+          set((state) => {
+            const patched = patchElement(state, element, (current) =>
+              current.sourceIds.filter((id) => id !== sourceId),
+            )
+            if (!patched) return state
+            const detached = { ...patched, ...touch(state, ...elementIds(element)) }
+            if (!deleteSource) return detached
+            const next = { ...state, ...detached }
+            const stillUsed = sourceUsage([
+              ...Object.values(next.entities),
+              ...Object.values(next.relations),
+            ]).has(sourceId)
+            return stillUsed ? detached : (dropSource(next, sourceId) ?? detached)
+          }),
+
+        removeSource: (id) => set((state) => dropSource(state, id) ?? state),
+
+        setSelection: (selection) =>
+          set((state) =>
+            sameIds(state.selection.entityIds, selection.entityIds) &&
+            sameIds(state.selection.relationIds, selection.relationIds)
+              ? state
+              : { selection },
+          ),
+
+        undo: () => travel('undo'),
+        redo: () => travel('redo'),
+
+        takeChanges: () => {
+          const { investigation, entities, relations, sources, attachments, dirty } = get()
+          if (!investigation || !isDirty(dirty)) return null
+          const changes: GraphChanges = {
+            investigationId: investigation.id,
+            upsertEntities: [...dirty.entities].flatMap((id) => entities[id] ?? []),
+            upsertRelations: [...dirty.relations].flatMap((id) => relations[id] ?? []),
+            deleteEntityIds: [...dirty.deletedEntities],
+            deleteRelationIds: [...dirty.deletedRelations],
+            upsertSources: [...dirty.sources].flatMap((id) => sources[id] ?? []),
+            deleteSourceIds: [...dirty.deletedSources],
+            upsertAttachments: [...dirty.attachments].flatMap((id) => attachments[id] ?? []),
+          }
+          set({ dirty: emptyDirty() })
+          return changes
+        },
+
+        restoreChanges: (changes) =>
+          set((state) => {
+            if (state.investigation?.id !== changes.investigationId) return state
+            const deletedEntities = withAdded(state.dirty.deletedEntities, changes.deleteEntityIds)
+            const deletedRelations = withAdded(state.dirty.deletedRelations, changes.deleteRelationIds)
+            return {
+              dirty: {
+                // Records deleted since the failed attempt must not be resurrected.
+                entities: withAdded(
+                  state.dirty.entities,
+                  changes.upsertEntities.map((e) => e.id).filter((id) => state.entities[id]),
+                ),
+                relations: withAdded(
+                  state.dirty.relations,
+                  changes.upsertRelations.map((r) => r.id).filter((id) => state.relations[id]),
+                ),
+                deletedEntities,
+                deletedRelations,
+                sources: withAdded(
+                  state.dirty.sources,
+                  (changes.upsertSources ?? []).map((src) => src.id).filter((id) => state.sources[id]),
+                ),
+                deletedSources: withAdded(state.dirty.deletedSources, changes.deleteSourceIds ?? []),
+                attachments: withAdded(
+                  state.dirty.attachments,
+                  (changes.upsertAttachments ?? []).map((a) => a.id).filter((id) => state.attachments[id]),
+                ),
+              },
+            }
+          }),
+
+        setSaveStatus: (saveStatus) => set({ saveStatus }),
+      }
     },
-
-    restoreChanges: (changes) =>
-      set((state) => {
-        if (state.investigation?.id !== changes.investigationId) return state
-        const deletedEntities = withAdded(state.dirty.deletedEntities, changes.deleteEntityIds)
-        const deletedRelations = withAdded(state.dirty.deletedRelations, changes.deleteRelationIds)
-        return {
-          dirty: {
-            // Records deleted since the failed attempt must not be resurrected.
-            entities: withAdded(
-              state.dirty.entities,
-              changes.upsertEntities.map((e) => e.id).filter((id) => state.entities[id]),
-            ),
-            relations: withAdded(
-              state.dirty.relations,
-              changes.upsertRelations.map((r) => r.id).filter((id) => state.relations[id]),
-            ),
-            deletedEntities,
-            deletedRelations,
-            sources: withAdded(
-              state.dirty.sources,
-              (changes.upsertSources ?? []).map((src) => src.id).filter((id) => state.sources[id]),
-            ),
-            deletedSources: withAdded(state.dirty.deletedSources, changes.deleteSourceIds ?? []),
-            attachments: withAdded(
-              state.dirty.attachments,
-              (changes.upsertAttachments ?? []).map((a) => a.id).filter((id) => state.attachments[id]),
-            ),
-            deletedAttachments: withAdded(state.dirty.deletedAttachments, changes.deleteAttachmentIds ?? []),
-          },
-        }
-      }),
-
-    setSaveStatus: (saveStatus) => set({ saveStatus }),
-  }
-})
+    {
+      partialize: pickRecords,
+      equality: sameRecords,
+      limit: HISTORY_LIMIT,
+      handleSet: (record) => grouping.handleSet(record),
+    },
+  ),
+)
 
 function elementIds(ref: ElementRef): [string[], string[]] {
   return ref.type === 'entity' ? [[ref.id], []] : [[], [ref.id]]

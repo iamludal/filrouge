@@ -218,3 +218,41 @@ test('export with screenshots round-trips the bytes; files from before screensho
   })
   await expect(page.getByRole('link', { name: /Ancienne/ })).toBeVisible()
 })
+
+/** Number of screenshots in IndexedDB, whatever investigation they belong to. */
+function storedScreenshots(page: Page) {
+  return page.evaluate(
+    () =>
+      new Promise<number>((resolve, reject) => {
+        const open = indexedDB.open('filrouge')
+        open.onerror = () => reject(open.error)
+        open.onsuccess = () => {
+          const count = open.result.transaction('attachments').objectStore('attachments').count()
+          count.onsuccess = () => {
+            open.result.close()
+            resolve(count.result)
+          }
+          count.onerror = () => reject(count.error)
+        }
+      }),
+  )
+}
+
+test('a deleted source keeps its screenshot stored until the investigation is left', async ({ page }) => {
+  await createInvestigation(page, 'Purge')
+  await addEntityAt(page, 150, 150, 'A')
+  await selectEntity(page, 'A')
+  await addSourceTo(page, 'Profil')
+
+  await page.getByRole('button', { name: 'Retirer Profil' }).click()
+  const confirm = page.getByRole('alertdialog')
+  await confirm.getByLabel('Supprimer aussi la source et sa capture').check()
+  await confirm.getByRole('button', { name: 'Retirer' }).click()
+  await expect(page.getByRole('button', { name: 'Sources (0)' })).toBeVisible()
+  await expect(page.getByRole('status')).toHaveText('Enregistré')
+  expect(await storedScreenshots(page)).toBe(1)
+
+  await page.getByRole('link', { name: 'Retour aux enquêtes' }).click()
+  await expect(page.getByRole('button', { name: 'Nouvelle enquête' })).toBeVisible()
+  await expect.poll(() => storedScreenshots(page)).toBe(0)
+})
