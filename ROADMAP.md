@@ -151,7 +151,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 ### v0.1 — MVP : graphe éditable et persistant
 
 - [x] Schémas Zod du modèle (§4) + tests de validation
-- [ ] Base Dexie (tables `investigations`, `entities`, `relations`, `sources`, `attachments`, index par `investigationId`)
+- [x] Base Dexie (tables `investigations`, `entities`, `relations`, `sources`, `attachments`, index par `investigationId`)
 - [ ] Repositories CRUD + tests avec fake-indexeddb
 - [ ] Écran d'accueil : liste des enquêtes, créer, renommer, supprimer (avec confirmation)
 - [ ] Canvas React Flow : zoom, pan, minimap, grille magnétique
