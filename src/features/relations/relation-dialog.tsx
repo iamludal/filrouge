@@ -12,14 +12,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { RELATION_SUGGESTIONS } from '@/domain/relations'
-import { LIMITS } from '@/domain/schemas'
+import { LIMITS, type Status } from '@/domain/schemas'
 
 interface RelationDialogProps {
   open: boolean
   fromLabel: string
   toLabel: string
   onOpenChange: (open: boolean) => void
-  onSubmit: (label: string, directed: boolean) => void
+  onSubmit: (label: string, directed: boolean, status: Status) => void
 }
 
 export function RelationDialog({ open, onOpenChange, ...props }: RelationDialogProps) {
@@ -35,10 +35,11 @@ export function RelationDialog({ open, onOpenChange, ...props }: RelationDialogP
 function RelationForm({ fromLabel, toLabel, onOpenChange, onSubmit }: Omit<RelationDialogProps, 'open'>) {
   const [label, setLabel] = useState('')
   const [directed, setDirected] = useState(true)
+  const [hypothesis, setHypothesis] = useState(true)
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
-    onSubmit(label.trim() || 'lié à', directed)
+    onSubmit(label.trim() || 'lié à', directed, hypothesis ? 'hypothesis' : 'verified')
     onOpenChange(false)
   }
 
@@ -70,6 +71,10 @@ function RelationForm({ fromLabel, toLabel, onOpenChange, onSubmit }: Omit<Relat
       <div className="flex items-center gap-2">
         <Switch id="relation-directed" checked={directed} onCheckedChange={setDirected} />
         <Label htmlFor="relation-directed">Orientée (flèche)</Label>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch id="relation-hypothesis" checked={hypothesis} onCheckedChange={setHypothesis} />
+        <Label htmlFor="relation-hypothesis">Hypothèse</Label>
       </div>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

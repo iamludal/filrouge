@@ -23,6 +23,32 @@ describe('graph store', () => {
     expect(useGraphStore.getState().saveStatus).toBe('pending')
   })
 
+  it('creates entities verified and relations as hypotheses unless told otherwise', () => {
+    openEmpty()
+    const store = useGraphStore.getState()
+    const a = store.addEntity('person', { x: 0, y: 0 })
+    const b = store.addEntity('email', { x: 100, y: 0 })
+    expect(a.status).toBe('verified')
+    expect(store.addRelation(a.id, b.id, 'utilise')?.status).toBe('hypothesis')
+    expect(store.addRelation(a.id, b.id, 'utilise', true, 'verified')?.status).toBe('verified')
+  })
+
+  it('stores a cleared grade as absent and tracks status changes as edits', () => {
+    openEmpty()
+    const a = useGraphStore.getState().addEntity('person', { x: 0, y: 0 })
+    useGraphStore.getState().updateEntity(a.id, { confidence: { reliability: 'B', credibility: 2 } })
+    useGraphStore.getState().takeChanges()
+
+    useGraphStore.getState().updateEntity(a.id, { status: 'hypothesis' })
+    expect(useGraphStore.getState().takeChanges()?.upsertEntities).toMatchObject([
+      { id: a.id, status: 'hypothesis', confidence: { reliability: 'B', credibility: 2 } },
+    ])
+
+    useGraphStore.getState().updateEntity(a.id, { confidence: undefined })
+    const saved = useGraphStore.getState().takeChanges()?.upsertEntities[0]
+    expect(saved?.confidence).toBeUndefined()
+  })
+
   it('refuses self-loops and unknown endpoints', () => {
     openEmpty()
     const a = useGraphStore.getState().addEntity('person', { x: 0, y: 0 })

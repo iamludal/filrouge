@@ -5,6 +5,7 @@ import {
   type EdgeProps,
   type InternalNode,
 } from '@xyflow/react'
+import { describeConfidence, relationLabelText } from '@/domain/assessment'
 import { cn } from '@/lib/utils'
 import type { RelationEdge as RelationEdgeType } from '@/features/graph/types'
 
@@ -38,7 +39,9 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
   const tx = to.x - ux * (CIRCLE_RADIUS + 2)
   const ty = to.y - uy * (CIRCLE_RADIUS + 2)
   const path = `M ${sx},${sy} L ${tx},${ty}`
-  const label = data?.relation.label
+  const relation = data?.relation
+  const label = relation && relationLabelText(relation.label, relation.confidence)
+  const description = relation?.confidence ? describeConfidence(relation.confidence) : undefined
 
   return (
     <>
@@ -47,7 +50,11 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
         path={path}
         markerEnd={markerEnd}
         interactionWidth={16}
-        className={cn('stroke-muted-foreground!', selected && 'stroke-primary! stroke-2!')}
+        className={cn(
+          'stroke-muted-foreground!',
+          relation?.status === 'hypothesis' && '[stroke-dasharray:6_4]',
+          selected && 'stroke-primary! stroke-2!',
+        )}
       />
       {label && (
         <EdgeLabelRenderer>
@@ -57,7 +64,7 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
               selected && 'border-primary text-foreground',
             )}
             style={{ transform: `translate(-50%, -50%) translate(${(sx + tx) / 2}px, ${(sy + ty) / 2}px)` }}
-            title={label}
+            title={description ? `${label} — ${description}` : label}
           >
             {label}
           </div>

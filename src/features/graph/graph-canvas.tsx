@@ -236,9 +236,9 @@ export function GraphCanvas() {
         fromLabel={labelOf(pendingConnection?.source)}
         toLabel={labelOf(pendingConnection?.target)}
         onOpenChange={(open) => !open && setPendingConnection(null)}
-        onSubmit={(label, directed) => {
+        onSubmit={(label, directed, status) => {
           if (pendingConnection)
-            addRelation(pendingConnection.source, pendingConnection.target, label, directed)
+            addRelation(pendingConnection.source, pendingConnection.target, label, directed, status)
         }}
       />
     </div>

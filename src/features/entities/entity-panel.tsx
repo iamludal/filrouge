@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { ENTITY_TYPES } from '@/domain/entity-types'
 import { LIMITS, type Entity } from '@/domain/schemas'
+import { AssessmentFields } from '@/features/assessment/assessment-fields'
 import { EntityTypeSelect } from '@/features/entities/entity-type-select'
 import { NotesEditor } from '@/features/entities/notes-editor'
 import { PropertiesEditor } from '@/features/entities/properties-editor'
@@ -58,6 +59,12 @@ export function EntityPanel({ entity }: { entity: Entity }) {
           onChange={(event) => updateEntity(entity.id, { label: event.target.value })}
         />
       </Field>
+      <AssessmentFields
+        idPrefix="panel-entity"
+        status={entity.status}
+        confidence={entity.confidence}
+        onChange={(patch) => updateEntity(entity.id, patch)}
+      />
       <Separator />
       <Field label="Propriétés">
         <PropertiesEditor

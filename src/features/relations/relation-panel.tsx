@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch'
 import { ENTITY_TYPES } from '@/domain/entity-types'
 import { RELATION_SUGGESTIONS } from '@/domain/relations'
 import { LIMITS, type Relation } from '@/domain/schemas'
+import { AssessmentFields } from '@/features/assessment/assessment-fields'
 import { Field } from '@/features/entities/entity-panel'
 import { SourcesSection } from '@/features/sources/sources-section'
 import { useGraphStore } from '@/store/graph-store'
@@ -63,6 +64,12 @@ export function RelationPanel({ relation }: { relation: Relation }) {
         />
         <Label htmlFor="panel-relation-directed">Orientée</Label>
       </div>
+      <AssessmentFields
+        idPrefix="panel-relation"
+        status={relation.status}
+        confidence={relation.confidence}
+        onChange={(patch) => updateRelation(relation.id, patch)}
+      />
       <Field label="Sources">
         <SourcesSection element={{ type: 'relation', id: relation.id }} />
       </Field>

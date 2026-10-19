@@ -16,6 +16,7 @@ import type {
   Position,
   Relation,
   Source,
+  Status,
 } from '@/domain/schemas'
 import type { GraphChanges } from '@/db/repositories/graph'
 import { nowIso } from '@/lib/ids'
@@ -67,7 +68,13 @@ export interface GraphState {
   addEntity: (type: EntityTypeId, position: Position, label?: string) => Entity
   updateEntity: (id: string, patch: EntityPatch) => void
   moveEntities: (positions: Record<string, Position>) => void
-  addRelation: (from: string, to: string, label: string, directed?: boolean) => Relation | null
+  addRelation: (
+    from: string,
+    to: string,
+    label: string,
+    directed?: boolean,
+    status?: Status,
+  ) => Relation | null
   updateRelation: (id: string, patch: RelationPatch) => void
   /** Removes entities (and their relations, in cascade) and relations. Sources are kept. */
   removeElements: (entityIds: string[], relationIds: string[]) => void
@@ -250,10 +257,10 @@ export const useGraphStore = create<GraphState>()((set, get) => {
         return { entities, ...touch(state, moved, []) }
       }),
 
-    addRelation: (from, to, label, directed = true) => {
+    addRelation: (from, to, label, directed = true, status) => {
       const { investigation, entities } = get()
       if (!investigation || from === to || !entities[from] || !entities[to]) return null
-      const relation = createRelation(investigation.id, from, to, label, directed)
+      const relation = createRelation(investigation.id, from, to, label, directed, status)
       set((state) => ({
         relations: { ...state.relations, [relation.id]: relation },
         selection: { entityIds: [], relationIds: [relation.id] },

@@ -21,6 +21,15 @@ describe('schemas', () => {
     )
   })
 
+  it('rejects confidence grades outside the Admiralty scale', () => {
+    const entity = createEntity(investigation.id, 'ip', { x: 0, y: 0 })
+    const grade = (reliability: string, credibility: number) =>
+      entitySchema.safeParse({ ...entity, confidence: { reliability, credibility } }).success
+    expect(grade('B', 2)).toBe(true)
+    expect(grade('G', 2)).toBe(false)
+    expect(grade('B', 7)).toBe(false)
+  })
+
   it('rejects an empty investigation name', () => {
     expect(investigationSchema.safeParse({ ...investigation, name: '   ' }).success).toBe(false)
   })

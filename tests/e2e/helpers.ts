@@ -10,7 +10,13 @@ export async function addEntityAt(page: Page, x: number, y: number, name: string
   await expect(page.locator('.react-flow__node', { hasText: name })).toBeVisible()
 }
 
-export async function connect(page: Page, from: string, to: string, relationLabel: string) {
+export async function connect(
+  page: Page,
+  from: string,
+  to: string,
+  relationLabel: string,
+  { hypothesis = true }: { hypothesis?: boolean } = {},
+) {
   const source = page.locator('.react-flow__node', { hasText: from })
   const target = page.locator('.react-flow__node', { hasText: to })
   await source.hover()
@@ -23,6 +29,7 @@ export async function connect(page: Page, from: string, to: string, relationLabe
   await page.mouse.up()
   const dialog = page.getByRole('dialog', { name: 'Nouvelle relation' })
   await dialog.getByLabel('Libellé').fill(relationLabel)
+  if (!hypothesis) await dialog.getByRole('switch', { name: 'Hypothèse' }).click()
   await dialog.getByRole('button', { name: 'Créer la relation' }).click()
   await expect(dialog).toBeHidden()
 }

@@ -54,6 +54,37 @@ describe('export format', () => {
     })
   })
 
+  it('keeps status and confidence through a round trip', async () => {
+    const { investigation, entities, relations } = sampleSnapshot()
+    const [a, b] = entities as [(typeof entities)[number], (typeof entities)[number]]
+    const snapshot = {
+      investigation,
+      entities: [
+        {
+          ...a,
+          status: 'verified' as const,
+          confidence: { reliability: 'A' as const, credibility: 1 as const },
+        },
+        { ...b, status: 'hypothesis' as const },
+      ],
+      relations: relations.map((r) => ({
+        ...r,
+        status: 'hypothesis' as const,
+        confidence: { reliability: 'D' as const, credibility: 4 as const },
+      })),
+      sources: [] as Source[],
+    }
+    const result = await parseExport(await serializeExport(snapshot))
+    expect(result.ok && result.snapshot).toEqual(snapshot)
+  })
+
+  it('rejects an imported entity graded outside the scale', async () => {
+    const snapshot = sampleSnapshot()
+    const json = JSON.parse(await serializeExport(snapshot))
+    json.entities[0].confidence = { reliability: 'G', credibility: 7 }
+    expect((await parseExport(JSON.stringify(json))).ok).toBe(false)
+  })
+
   it('rejects invalid JSON without throwing', async () => {
     expect(await parseExport('{nope')).toEqual({
       ok: false,

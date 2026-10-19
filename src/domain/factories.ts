@@ -7,6 +7,7 @@ import {
   type Position,
   type Relation,
   type Source,
+  type Status,
 } from '@/domain/schemas'
 import { newId, nowIso } from '@/lib/ids'
 
@@ -51,6 +52,7 @@ export function createRelation(
   to: string,
   label: string,
   directed = true,
+  status: Status = 'hypothesis',
 ): Relation {
   const now = nowIso()
   return {
@@ -61,7 +63,7 @@ export function createRelation(
     label: label.trim(),
     directed,
     sourceIds: [],
-    status: 'verified',
+    status,
     createdAt: now,
     updatedAt: now,
   }

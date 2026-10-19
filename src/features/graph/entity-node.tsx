@@ -1,5 +1,6 @@
 import { Handle, Position, useConnection, type NodeProps } from '@xyflow/react'
 import { memo } from 'react'
+import { describeConfidence, formatConfidence } from '@/domain/assessment'
 import { ENTITY_TYPES } from '@/domain/entity-types'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import type { EntityNode as EntityNodeType } from '@/features/graph/types'
@@ -21,12 +22,23 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
       <div
         className={cn(
           'relative flex size-12 items-center justify-center rounded-full border-2 bg-card shadow-sm transition-shadow',
+          entity.status === 'hypothesis' && 'border-dashed',
           selected && 'ring-4 ring-ring/40',
           isDropTarget && 'ring-4 ring-primary/30',
         )}
         style={{ borderColor: type.color, color: type.color }}
       >
         <EntityIcon type={entity.type} className="size-5" />
+        {entity.confidence && (
+          <span
+            role="img"
+            title={describeConfidence(entity.confidence)}
+            aria-label={describeConfidence(entity.confidence)}
+            className="absolute -top-2 -right-4 rounded-full border bg-background px-1.5 text-[10px] leading-4 font-semibold text-foreground shadow-sm"
+          >
+            {formatConfidence(entity.confidence)}
+          </span>
+        )}
         <Handle
           type="source"
           position={Position.Right}
