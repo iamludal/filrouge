@@ -154,12 +154,12 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 - [x] Base Dexie (tables `investigations`, `entities`, `relations`, `sources`, `attachments`, index par `investigationId`)
 - [x] Repositories CRUD + tests avec fake-indexeddb
 - [x] Écran d'accueil : liste des enquêtes, créer, renommer, supprimer (avec confirmation)
-- [ ] Canvas React Flow : zoom, pan, minimap, grille magnétique
-- [ ] Nœud personnalisé par type d'entité (icône, couleur, label)
-- [ ] Ajout d'entité (barre d'outils + double-clic sur le canvas)
-- [ ] Création de relation par glisser d'un nœud à l'autre, avec saisie du label
-- [ ] Panneau latéral de détail : édition du label, des propriétés, des tags et des notes Markdown (rendu assaini)
-- [ ] Suppression d'entités/relations (touche Suppr), suppression en cascade des relations orphelines
+- [x] Canvas React Flow : zoom, pan, minimap, grille magnétique
+- [x] Nœud personnalisé par type d'entité (icône, couleur, label)
+- [x] Ajout d'entité (barre d'outils + double-clic sur le canvas)
+- [x] Création de relation par glisser d'un nœud à l'autre, avec saisie du label
+- [x] Panneau latéral de détail : édition du label, des propriétés, des tags et des notes Markdown (rendu assaini)
+- [x] Suppression d'entités/relations (touche Suppr), suppression en cascade des relations orphelines
 - [x] Sauvegarde automatique debouncée de toutes les modifications, y compris les positions
 - [ ] Export / import JSON d'une enquête (format versionné, validé par Zod, rejet propre en cas d'erreur)
 

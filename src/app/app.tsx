@@ -1,6 +1,12 @@
+import { lazy, Suspense } from 'react'
 import { useRoute, routeHref } from '@/app/router'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { InvestigationsPage } from '@/features/investigations/investigations-page'
+
+// The graph editor (React Flow, Markdown…) is the heavy part: loaded on demand.
+const InvestigationPage = lazy(() =>
+  import('@/features/graph/investigation-page').then((module) => ({ default: module.InvestigationPage })),
+)
 
 export function App() {
   const route = useRoute()
@@ -14,11 +20,13 @@ export function App() {
         <ThemeToggle />
       </header>
       <main className="flex min-h-0 flex-1 flex-col overflow-auto">
-        {route.name === 'home' ? (
-          <InvestigationsPage />
-        ) : (
-          <p className="p-6 text-muted-foreground">Éditeur de graphe à venir.</p>
-        )}
+        <Suspense fallback={null}>
+          {route.name === 'investigation' ? (
+            <InvestigationPage key={route.id} id={route.id} />
+          ) : (
+            <InvestigationsPage />
+          )}
+        </Suspense>
       </main>
     </div>
   )
