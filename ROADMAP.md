@@ -142,7 +142,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 - [x] Configurer Tailwind v4, shadcn/ui, thème clair/sombre (suivi du système + bascule manuelle)
 - [x] Configurer ESLint, Prettier, Vitest, Playwright
 - [x] Ajouter une CSP stricte via `<meta http-equiv="Content-Security-Policy">` (`default-src 'self'`, pas d'`unsafe-eval`)
-- [ ] CI GitHub Actions : lint, typecheck, tests, build
+- [x] CI GitHub Actions : lint, typecheck, tests, build
 - [ ] Déploiement automatique sur GitHub Pages depuis `main`
 - [ ] Fichiers repo : `LICENSE`, `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CLAUDE.md`
 
