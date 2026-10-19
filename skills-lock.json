@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "git-commit": {
+      "source": "iamludal/skills",
+      "sourceType": "github",
+      "skillPath": "git-commit/SKILL.md",
+      "computedHash": "e2d60ed37d7663fb0b695802f8ceb3e75efa3f0f395849ec6a489c5ee0824f94"
+    }
+  }
+}
