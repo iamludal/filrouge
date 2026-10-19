@@ -16,7 +16,7 @@ test('app shell loads without CSP violations nor external requests', async ({ pa
   })
 
   await page.goto('/')
-  await expect(page.getByText('filrouge', { exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Filrouge' })).toBeVisible()
   expect(violations).toEqual([])
   expect(external).toEqual([])
 })

@@ -9,7 +9,7 @@ describe('App shell', () => {
         <App />
       </Providers>,
     )
-    expect(screen.getByText('filrouge')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Filrouge' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Changer de thème' })).toBeInTheDocument()
   })
 })

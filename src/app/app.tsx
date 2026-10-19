@@ -14,8 +14,12 @@ export function App() {
   return (
     <div className="flex h-dvh flex-col">
       <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
-        <a href={routeHref({ name: 'home' })} className="font-semibold tracking-tight">
-          filrouge
+        <a
+          href={routeHref({ name: 'home' })}
+          className="flex items-center gap-2 font-semibold tracking-tight"
+        >
+          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="size-6" />
+          Filrouge
         </a>
         <ThemeToggle />
       </header>

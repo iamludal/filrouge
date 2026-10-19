@@ -20,7 +20,7 @@ static host without server-side rewrites.
 - **THEN** the home screen is displayed
 
 #### Scenario: Back to the home screen
-- **WHEN** the user activates the "filrouge" title in the header
+- **WHEN** the user activates the "Filrouge" title in the header
 - **THEN** the home screen is displayed
 
 ### Requirement: Missing investigation
