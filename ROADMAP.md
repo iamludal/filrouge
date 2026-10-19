@@ -171,8 +171,8 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [x] CRUD des sources, rattachement à une entité ou une relation
 - [x] Pièces jointes (captures d'écran) stockées en Blob + calcul SHA-256
 - [x] Champ « lien archive.org » et date de capture
-- [ ] Niveau de confiance (code Amirauté) et statut vérifié/hypothèse
-- [ ] Rendu visuel : relations hypothétiques en pointillés, badge de confiance sur les nœuds
+- [x] Niveau de confiance (code Amirauté) et statut vérifié/hypothèse
+- [x] Rendu visuel : relations hypothétiques en pointillés, badge de confiance sur les nœuds
 - [ ] Recherche plein texte (labels, propriétés, notes) avec mise en évidence sur le graphe
 - [ ] Filtres par type, tag, statut et confiance (les éléments filtrés sont estompés)
 - [ ] Undo/redo (Cmd/Ctrl+Z, Cmd/Ctrl+Shift+Z) via zundo
