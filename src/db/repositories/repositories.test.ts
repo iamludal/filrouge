@@ -1,11 +1,18 @@
 import { FilrougeDatabase } from '@/db/dexie'
+import { attachmentsRepository } from '@/db/repositories/attachments'
 import { graphRepository } from '@/db/repositories/graph'
 import { investigationsRepository } from '@/db/repositories/investigations'
 import { createEntity, createRelation } from '@/domain/factories'
+import type { Attachment, Source } from '@/domain/schemas'
 
 function setup() {
   const db = new FilrougeDatabase(`test-${crypto.randomUUID()}`)
-  return { db, investigations: investigationsRepository(db), graph: graphRepository(db) }
+  return {
+    db,
+    investigations: investigationsRepository(db),
+    graph: graphRepository(db),
+    attachments: attachmentsRepository(db),
+  }
 }
 
 describe('investigations repository', () => {
@@ -107,5 +114,196 @@ describe('graph repository', () => {
     const foreign = createEntity(crypto.randomUUID(), 'person', { x: 0, y: 0 })
     await expect(graph.applyChanges({ ...base, upsertEntities: [foreign] })).rejects.toThrow()
     expect(await graph.listEntities(investigation.id)).toEqual([])
+  })
+})
+
+const PNG = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+const sha = (char: string) => char.repeat(64)
+
+function makeAttachment(investigationId: string, fill = 1): Attachment {
+  const bytes = new Uint8Array([...PNG, fill, fill, fill])
+  return {
+    id: crypto.randomUUID(),
+    investigationId,
+    blob: new Blob([bytes], { type: 'image/png' }),
+    mime: 'image/png',
+    size: bytes.length,
+    sha256: sha(String(fill)),
+  }
+}
+
+function makeSource(investigationId: string, attachment?: Attachment): Source {
+  return {
+    id: crypto.randomUUID(),
+    investigationId,
+    title: 'Source',
+    capturedAt: new Date().toISOString(),
+    ...(attachment ? { attachmentId: attachment.id, sha256: attachment.sha256 } : {}),
+  }
+}
+
+async function bytesOf(blob: Blob): Promise<number[]> {
+  return Array.from(new Uint8Array(await blob.arrayBuffer()))
+}
+
+describe('graph repository: sources and attachments', () => {
+  const base = (investigationId: string) => ({
+    investigationId,
+    upsertEntities: [],
+    upsertRelations: [],
+    deleteEntityIds: [],
+    deleteRelationIds: [],
+  })
+
+  it('writes a source, its screenshot and the element referencing it together', async () => {
+    const { investigations, graph, attachments } = setup()
+    const investigation = await investigations.create('Sources')
+    const attachment = makeAttachment(investigation.id)
+    const source = makeSource(investigation.id, attachment)
+    const entity = { ...createEntity(investigation.id, 'person', { x: 0, y: 0 }), sourceIds: [source.id] }
+
+    await graph.applyChanges({
+      ...base(investigation.id),
+      upsertEntities: [entity],
+      upsertSources: [source],
+      upsertAttachments: [attachment],
+    })
+
+    expect(await graph.listSources(investigation.id)).toEqual([source])
+    const stored = await attachments.get(attachment.id)
+    expect(await bytesOf(stored!.blob)).toEqual([...PNG, 1, 1, 1])
+    expect(await attachments.stats(investigation.id)).toEqual({ count: 1, totalSize: attachment.size })
+  })
+
+  it('refuses the whole batch when nothing valid can be written', async () => {
+    const { investigations, graph, db } = setup()
+    const investigation = await investigations.create('Atomique')
+    const attachment = makeAttachment(investigation.id)
+    const source = makeSource(investigation.id, attachment)
+    const entity = createEntity(investigation.id, 'person', { x: 0, y: 0 })
+
+    // Dangling source reference.
+    await expect(
+      graph.applyChanges({
+        ...base(investigation.id),
+        upsertEntities: [{ ...entity, sourceIds: [crypto.randomUUID()] }],
+        upsertSources: [source],
+        upsertAttachments: [attachment],
+      }),
+    ).rejects.toThrow()
+    // Source pointing at a screenshot that is not written.
+    await expect(graph.applyChanges({ ...base(investigation.id), upsertSources: [source] })).rejects.toThrow()
+    // Screenshot of another investigation.
+    await expect(
+      graph.applyChanges({
+        ...base(investigation.id),
+        upsertSources: [source],
+        upsertAttachments: [{ ...attachment, investigationId: crypto.randomUUID() }],
+      }),
+    ).rejects.toThrow()
+
+    expect(await db.sources.count()).toBe(0)
+    expect(await db.attachments.count()).toBe(0)
+    expect(await db.entities.count()).toBe(0)
+  })
+
+  it('deletes the screenshot with its source', async () => {
+    const { investigations, graph, db } = setup()
+    const investigation = await investigations.create('Suppression')
+    const attachment = makeAttachment(investigation.id)
+    const source = makeSource(investigation.id, attachment)
+    await graph.applyChanges({
+      ...base(investigation.id),
+      upsertSources: [source],
+      upsertAttachments: [attachment],
+    })
+
+    await graph.applyChanges({ ...base(investigation.id), deleteSourceIds: [source.id] })
+    expect(await db.sources.count()).toBe(0)
+    expect(await db.attachments.count()).toBe(0)
+  })
+
+  it('deletes the previous screenshot when a source is re-pointed or cleared', async () => {
+    const { investigations, graph, db } = setup()
+    const investigation = await investigations.create('Remplacement')
+    const first = makeAttachment(investigation.id, 1)
+    const source = makeSource(investigation.id, first)
+    await graph.applyChanges({
+      ...base(investigation.id),
+      upsertSources: [source],
+      upsertAttachments: [first],
+    })
+
+    const second = makeAttachment(investigation.id, 2)
+    await graph.applyChanges({
+      ...base(investigation.id),
+      upsertSources: [{ ...source, attachmentId: second.id, sha256: second.sha256 }],
+      upsertAttachments: [second],
+    })
+    expect((await db.attachments.toArray()).map((a) => a.id)).toEqual([second.id])
+
+    const { attachmentId: _a, sha256: _s, ...cleared } = source
+    await graph.applyChanges({ ...base(investigation.id), upsertSources: [cleared] })
+    expect(await db.attachments.count()).toBe(0)
+  })
+
+  it('refuses to delete a source still referenced by a stored element', async () => {
+    const { investigations, graph, db } = setup()
+    const investigation = await investigations.create('Références')
+    const source = makeSource(investigation.id)
+    const entity = { ...createEntity(investigation.id, 'person', { x: 0, y: 0 }), sourceIds: [source.id] }
+    await graph.applyChanges({ ...base(investigation.id), upsertEntities: [entity], upsertSources: [source] })
+
+    await expect(
+      graph.applyChanges({ ...base(investigation.id), deleteSourceIds: [source.id] }),
+    ).rejects.toThrow()
+    expect(await db.sources.count()).toBe(1)
+
+    await graph.applyChanges({
+      ...base(investigation.id),
+      upsertEntities: [{ ...entity, sourceIds: [] }],
+      deleteSourceIds: [source.id],
+    })
+    expect(await db.sources.count()).toBe(0)
+  })
+
+  it('keeps sources when the entity using them is deleted', async () => {
+    const { investigations, graph, db } = setup()
+    const investigation = await investigations.create('Orphelines')
+    const source = makeSource(investigation.id)
+    const entity = { ...createEntity(investigation.id, 'person', { x: 0, y: 0 }), sourceIds: [source.id] }
+    await graph.applyChanges({ ...base(investigation.id), upsertEntities: [entity], upsertSources: [source] })
+    await graph.applyChanges({ ...base(investigation.id), deleteEntityIds: [entity.id] })
+    expect(await db.sources.count()).toBe(1)
+  })
+})
+
+describe('investigations repository: attachments', () => {
+  it('exports and imports screenshots with identical bytes, and deletes them with the investigation', async () => {
+    const origin = setup()
+    const investigation = await origin.investigations.create('Origine')
+    const attachment = makeAttachment(investigation.id, 3)
+    const source = makeSource(investigation.id, attachment)
+    await origin.graph.applyChanges({
+      investigationId: investigation.id,
+      upsertEntities: [],
+      upsertRelations: [],
+      deleteEntityIds: [],
+      deleteRelationIds: [],
+      upsertSources: [source],
+      upsertAttachments: [attachment],
+    })
+
+    const exported = (await origin.investigations.loadExport(investigation.id))!
+    expect(exported.attachments).toHaveLength(1)
+
+    const target = setup()
+    await target.investigations.importSnapshot(exported.snapshot, exported.attachments)
+    const imported = (await target.investigations.loadExport(investigation.id))!
+    expect(imported.snapshot).toEqual(exported.snapshot)
+    expect(await bytesOf(imported.attachments[0]!.blob)).toEqual([...PNG, 3, 3, 3])
+
+    await target.investigations.remove(investigation.id)
+    expect(await target.db.attachments.count()).toBe(0)
   })
 })

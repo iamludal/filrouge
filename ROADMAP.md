@@ -168,9 +168,9 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 
 ### v0.2 — Sources, confiance, navigation
 
-- [ ] CRUD des sources, rattachement à une entité ou une relation
-- [ ] Pièces jointes (captures d'écran) stockées en Blob + calcul SHA-256
-- [ ] Champ « lien archive.org » et date de capture
+- [x] CRUD des sources, rattachement à une entité ou une relation
+- [x] Pièces jointes (captures d'écran) stockées en Blob + calcul SHA-256
+- [x] Champ « lien archive.org » et date de capture
 - [ ] Niveau de confiance (code Amirauté) et statut vérifié/hypothèse
 - [ ] Rendu visuel : relations hypothétiques en pointillés, badge de confiance sur les nœuds
 - [ ] Recherche plein texte (labels, propriétés, notes) avec mise en évidence sur le graphe
@@ -187,6 +187,7 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [ ] Extraction depuis du texte : coller un texte, détection par regex (emails, IP v4/v6, domaines, URLs, téléphones, wallets BTC/ETH), aperçu puis création sélective
 - [ ] Pivots : templates d'URL par type d'entité (ex. `https://crt.sh/?q={value}`), ouverts dans un nouvel onglet avec `rel="noopener noreferrer"`, éditables dans les paramètres
 - [ ] Palette de commandes (Cmd/Ctrl+K)
+- [ ] Captures similaires : hash perceptuel (dHash 64 bits, calculé localement) de chaque capture, signalement « Capture très proche de celle de la source X » sous un seuil de distance de Hamming, et comparaison côte à côte de deux captures (ex. un post capturé à deux dates)
 - [ ] Groupes / clusters visuels de nœuds
 
 ### v0.4 — Vues complémentaires
@@ -200,6 +201,7 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [ ] Chiffrement optionnel par enquête : AES-GCM, clé dérivée par PBKDF2 (≥ 600 000 itérations, sel aléatoire), déverrouillage par passphrase, clé gardée uniquement en mémoire
 - [ ] Verrouillage automatique après inactivité
 - [ ] Export chiffré (le JSON exporté reste chiffré)
+- [ ] Export/import ZIP (`.filrouge.zip`) : `investigation.json` + une image par capture, lues entrée par entrée pour lever la limite de 200 Mo du JSON. Limites conservées : 20 Mo par capture, nombre d'entrées et taille du JSON bornés, protection contre les zip bombs (taille décompressée vérifiée). Dépendance sans réseau (ex. fflate)
 - [ ] Export CSV (entités, relations) et GraphML (Gephi)
 - [ ] Export STIX 2.1 (bundle) pour OpenCTI/MISP
 - [ ] Rapport d'enquête Markdown et PDF (graphe, entités, sources)

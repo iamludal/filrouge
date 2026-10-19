@@ -7,6 +7,7 @@ import { ENTITY_TYPES } from '@/domain/entity-types'
 import { RELATION_SUGGESTIONS } from '@/domain/relations'
 import { LIMITS, type Relation } from '@/domain/schemas'
 import { Field } from '@/features/entities/entity-panel'
+import { SourcesSection } from '@/features/sources/sources-section'
 import { useGraphStore } from '@/store/graph-store'
 
 export function RelationPanel({ relation }: { relation: Relation }) {
@@ -62,6 +63,9 @@ export function RelationPanel({ relation }: { relation: Relation }) {
         />
         <Label htmlFor="panel-relation-directed">Orientée</Label>
       </div>
+      <Field label="Sources">
+        <SourcesSection element={{ type: 'relation', id: relation.id }} />
+      </Field>
       <Button variant="destructive" onClick={() => removeElements([], [relation.id])}>
         <Trash2 /> Supprimer la relation
       </Button>

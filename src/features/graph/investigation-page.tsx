@@ -9,6 +9,8 @@ import { useExportInvestigation } from '@/features/import-export/use-import-expo
 import { DetailPanel } from '@/features/graph/detail-panel'
 import { GraphCanvas } from '@/features/graph/graph-canvas'
 import { SaveIndicator } from '@/features/graph/save-indicator'
+import { PasteScreenshot } from '@/features/sources/paste-screenshot'
+import { SourcesLibrary } from '@/features/sources/sources-library-dialog'
 import { useGraphStore } from '@/store/graph-store'
 import { startAutosave, type Autosave } from '@/store/persistence'
 
@@ -18,7 +20,7 @@ export function InvestigationPage({ id }: { id: string }) {
   const [state, setState] = useState<LoadState>('loading')
   const autosave = useRef<Autosave | null>(null)
   const investigation = useGraphStore((s) => s.investigation)
-  const exportInvestigation = useExportInvestigation()
+  const { exportInvestigation, exportDialog } = useExportInvestigation()
 
   useEffect(() => {
     let cancelled = false
@@ -78,6 +80,7 @@ export function InvestigationPage({ id }: { id: string }) {
         <h1 className="min-w-0 truncate font-medium">{investigation.name}</h1>
         <div className="ml-auto flex items-center gap-3">
           <SaveIndicator />
+          <SourcesLibrary />
           <Button
             variant="outline"
             size="sm"
@@ -98,6 +101,8 @@ export function InvestigationPage({ id }: { id: string }) {
         </div>
         <DetailPanel />
       </div>
+      {exportDialog}
+      <PasteScreenshot />
     </div>
   )
 }

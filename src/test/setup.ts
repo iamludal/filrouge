@@ -1,5 +1,16 @@
+/// <reference types="node" />
 import '@testing-library/jest-dom/vitest'
 import 'fake-indexeddb/auto'
+import { Blob as NodeBlob } from 'node:buffer'
+
+// fake-indexeddb clones values with Node's structuredClone, which turns jsdom's Blob into a plain
+// object. Node's own Blob survives the round trip and supports arrayBuffer().
+globalThis.Blob = NodeBlob as unknown as typeof Blob
+
+// Vitest's createObjectURL only understands jsdom's Blob; object URLs are not read in tests.
+let objectUrls = 0
+URL.createObjectURL = () => `blob:filrouge-test/${++objectUrls}`
+URL.revokeObjectURL = () => {}
 
 // jsdom lacks matchMedia and ResizeObserver, both used by the UI.
 if (!window.matchMedia) {

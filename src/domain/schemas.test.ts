@@ -1,5 +1,12 @@
 import { createEntity, createInvestigation, createRelation } from '@/domain/factories'
-import { entitySchema, investigationSchema, relationSchema, sourceSchema, LIMITS } from '@/domain/schemas'
+import {
+  attachmentSchema,
+  entitySchema,
+  investigationSchema,
+  relationSchema,
+  sourceSchema,
+  LIMITS,
+} from '@/domain/schemas'
 
 describe('schemas', () => {
   const investigation = createInvestigation('  Opération Alpha  ', 'desc')
@@ -59,5 +66,43 @@ describe('schemas', () => {
     expect(
       investigationSchema.safeParse({ ...investigation, createdAt: '2026-01-01T00:00:00+02:00' }).success,
     ).toBe(false)
+  })
+
+  describe('attachments', () => {
+    const attachment = {
+      id: crypto.randomUUID(),
+      investigationId: investigation.id,
+      blob: new Blob(['x'], { type: 'image/png' }),
+      mime: 'image/png',
+      size: 1,
+      sha256: 'a'.repeat(64),
+    }
+
+    it('accepts a valid attachment, optimized or not', () => {
+      expect(attachmentSchema.safeParse(attachment).success).toBe(true)
+      expect(
+        attachmentSchema.safeParse({ ...attachment, originalSha256: 'b'.repeat(64), originalSize: 10 })
+          .success,
+      ).toBe(true)
+    })
+
+    it('rejects SVG, oversized and malformed attachments', () => {
+      expect(attachmentSchema.safeParse({ ...attachment, mime: 'image/svg+xml' }).success).toBe(false)
+      expect(attachmentSchema.safeParse({ ...attachment, size: LIMITS.attachmentBytes + 1 }).success).toBe(
+        false,
+      )
+      expect(attachmentSchema.safeParse({ ...attachment, originalSha256: 'XYZ' }).success).toBe(false)
+    })
+
+    it('rejects a malformed original hash on a source', () => {
+      const source = {
+        id: crypto.randomUUID(),
+        investigationId: investigation.id,
+        capturedAt: new Date().toISOString(),
+        originalSha256: 'nope',
+      }
+      expect(sourceSchema.safeParse(source).success).toBe(false)
+      expect(sourceSchema.safeParse({ ...source, originalSha256: 'c'.repeat(64) }).success).toBe(true)
+    })
   })
 })

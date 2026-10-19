@@ -1,4 +1,13 @@
-import { entitySchema, relationSchema, type Entity, type Relation } from '@/domain/schemas'
+import {
+  attachmentSchema,
+  entitySchema,
+  relationSchema,
+  sourceSchema,
+  type Attachment,
+  type Entity,
+  type Relation,
+  type Source,
+} from '@/domain/schemas'
 import { db as defaultDb, type FilrougeDatabase } from '@/db/dexie'
 import { nowIso } from '@/lib/ids'
 
@@ -8,6 +17,10 @@ export interface GraphChanges {
   deleteEntityIds: string[]
   upsertRelations: Relation[]
   deleteRelationIds: string[]
+  upsertSources?: Source[]
+  deleteSourceIds?: string[]
+  upsertAttachments?: Attachment[]
+  deleteAttachmentIds?: string[]
 }
 
 export function graphRepository(db: FilrougeDatabase = defaultDb) {
@@ -20,10 +33,17 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
       return db.relations.where('investigationId').equals(investigationId).toArray()
     },
 
+    async listSources(investigationId: string): Promise<Source[]> {
+      return db.sources.where('investigationId').equals(investigationId).toArray()
+    },
+
     /**
      * Applies a batch of graph edits atomically. Every record is re-validated so that a bug in
      * the UI layer can never persist malformed data. Deleting an entity also deletes the
-     * relations attached to it, even ones not listed in `deleteRelationIds`.
+     * relations attached to it, even ones not listed in `deleteRelationIds`. Deleting a source,
+     * or pointing it at another screenshot, deletes the screenshot it held. A batch that would
+     * leave an element pointing at a missing source, or a source at a missing screenshot, is
+     * refused as a whole.
      */
     async applyChanges(changes: GraphChanges): Promise<void> {
       const { investigationId } = changes
@@ -33,18 +53,96 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
       }
       const entities = changes.upsertEntities.map((entity) => belongs(entitySchema.parse(entity)))
       const relations = changes.upsertRelations.map((relation) => belongs(relationSchema.parse(relation)))
+      const sources = (changes.upsertSources ?? []).map((source) => belongs(sourceSchema.parse(source)))
+      const attachments = (changes.upsertAttachments ?? []).map((attachment) =>
+        belongs(attachmentSchema.parse(attachment)),
+      )
+      const deletedSourceIds = new Set(changes.deleteSourceIds ?? [])
+      const deletedAttachmentIds = new Set(changes.deleteAttachmentIds ?? [])
 
-      await db.transaction('rw', [db.investigations, db.entities, db.relations], async () => {
-        if (changes.deleteEntityIds.length > 0) {
-          await db.entities.bulkDelete(changes.deleteEntityIds)
-          const removed = changes.deleteEntityIds
-          await db.relations.where('from').anyOf(removed).or('to').anyOf(removed).delete()
-        }
-        if (changes.deleteRelationIds.length > 0) await db.relations.bulkDelete(changes.deleteRelationIds)
-        if (entities.length > 0) await db.entities.bulkPut(entities)
-        if (relations.length > 0) await db.relations.bulkPut(relations)
-        await db.investigations.update(investigationId, { updatedAt: nowIso() })
-      })
+      await db.transaction(
+        'rw',
+        [db.investigations, db.entities, db.relations, db.sources, db.attachments],
+        async () => {
+          const upsertedSourceIds = new Set(sources.map((source) => source.id))
+          const upsertedAttachmentIds = new Set(attachments.map((attachment) => attachment.id))
+
+          // Screenshots released by deleted or re-pointed sources.
+          const stored = await db.sources.bulkGet([...deletedSourceIds, ...upsertedSourceIds])
+          for (const previous of stored) {
+            if (!previous?.attachmentId) continue
+            const next = sources.find((source) => source.id === previous.id)
+            if (deletedSourceIds.has(previous.id) || next?.attachmentId !== previous.attachmentId) {
+              deletedAttachmentIds.add(previous.attachmentId)
+            }
+          }
+
+          // Every source reference must resolve to a source that exists after this batch.
+          const referenced = new Set<string>()
+          for (const element of [...entities, ...relations]) {
+            for (const sourceId of element.sourceIds) referenced.add(sourceId)
+          }
+          const toCheck = [...referenced].filter((id) => !upsertedSourceIds.has(id))
+          const found = await db.sources.bulkGet(toCheck)
+          toCheck.forEach((id, index) => {
+            if (!found[index] || deletedSourceIds.has(id)) throw new Error('Source introuvable')
+          })
+          if (deletedSourceIds.size > 0) {
+            const untouched = (record: { id: string; sourceIds: string[] }, touched: Set<string>) =>
+              !touched.has(record.id) && record.sourceIds.some((id) => deletedSourceIds.has(id))
+            const touchedEntities = new Set(entities.map((e) => e.id))
+            const touchedRelations = new Set(relations.map((r) => r.id))
+            const storedEntities = await db.entities
+              .where('investigationId')
+              .equals(investigationId)
+              .toArray()
+            const storedRelations = await db.relations
+              .where('investigationId')
+              .equals(investigationId)
+              .toArray()
+            const removedEntities = new Set(changes.deleteEntityIds)
+            const removedRelations = new Set(changes.deleteRelationIds)
+            const stillReferencing =
+              storedEntities.some(
+                (entity) => !removedEntities.has(entity.id) && untouched(entity, touchedEntities),
+              ) ||
+              storedRelations.some(
+                (relation) => !removedRelations.has(relation.id) && untouched(relation, touchedRelations),
+              )
+            if (stillReferencing) throw new Error('Source encore utilisée')
+          }
+
+          // Every screenshot reference must resolve to a screenshot that exists after this batch.
+          const wanted = sources.flatMap((source) =>
+            source.attachmentId && !upsertedAttachmentIds.has(source.attachmentId)
+              ? [source.attachmentId]
+              : [],
+          )
+          const present = await db.attachments.bulkGet(wanted)
+          wanted.forEach((id, index) => {
+            if (!present[index] || deletedAttachmentIds.has(id)) throw new Error('Capture introuvable')
+          })
+
+          if (changes.deleteEntityIds.length > 0) {
+            await db.entities.bulkDelete(changes.deleteEntityIds)
+            const removed = changes.deleteEntityIds
+            await db.relations.where('from').anyOf(removed).or('to').anyOf(removed).delete()
+          }
+          if (changes.deleteRelationIds.length > 0) await db.relations.bulkDelete(changes.deleteRelationIds)
+          if (deletedSourceIds.size > 0) await db.sources.bulkDelete([...deletedSourceIds])
+          if (deletedAttachmentIds.size > 0) {
+            // A re-added screenshot id wins over a deletion listed in the same batch.
+            await db.attachments.bulkDelete(
+              [...deletedAttachmentIds].filter((id) => !upsertedAttachmentIds.has(id)),
+            )
+          }
+          if (attachments.length > 0) await db.attachments.bulkPut(attachments)
+          if (sources.length > 0) await db.sources.bulkPut(sources)
+          if (entities.length > 0) await db.entities.bulkPut(entities)
+          if (relations.length > 0) await db.relations.bulkPut(relations)
+          await db.investigations.update(investigationId, { updatedAt: nowIso() })
+        },
+      )
     },
   }
 }

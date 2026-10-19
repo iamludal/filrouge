@@ -9,6 +9,7 @@ import { LIMITS, type Entity } from '@/domain/schemas'
 import { EntityTypeSelect } from '@/features/entities/entity-type-select'
 import { NotesEditor } from '@/features/entities/notes-editor'
 import { PropertiesEditor } from '@/features/entities/properties-editor'
+import { SourcesSection } from '@/features/sources/sources-section'
 import { TagsEditor } from '@/features/entities/tags-editor'
 import { useGraphStore } from '@/store/graph-store'
 
@@ -74,6 +75,9 @@ export function EntityPanel({ entity }: { entity: Entity }) {
           value={entity.notes ?? ''}
           onChange={(notes) => updateEntity(entity.id, { notes: notes || undefined })}
         />
+      </Field>
+      <Field label="Sources">
+        <SourcesSection element={{ type: 'entity', id: entity.id }} />
       </Field>
       <Separator />
       <Button variant="destructive" onClick={() => removeElements([entity.id], [])}>

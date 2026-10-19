@@ -13,7 +13,7 @@ interface InvestigationsState {
   create: (name: string, description?: string) => Promise<Investigation>
   update: (id: string, patch: { name?: string; description?: string }) => Promise<Investigation>
   remove: (id: string) => Promise<void>
-  exportJson: (id: string) => Promise<{ name: string; json: string } | null>
+  exportJson: (id: string, includeAttachments?: boolean) => Promise<{ name: string; json: string } | null>
   importJson: (text: string) => Promise<ImportResult>
 }
 
@@ -40,18 +40,23 @@ export const useInvestigationsStore = create<InvestigationsState>()((set, get) =
     await get().refresh()
   },
 
-  exportJson: async (id) => {
-    const snapshot = await repository.loadSnapshot(id)
-    return snapshot ? { name: snapshot.investigation.name, json: serializeExport(snapshot) } : null
+  exportJson: async (id, includeAttachments = true) => {
+    const exported = await repository.loadExport(id)
+    if (!exported) return null
+    const { snapshot, attachments } = exported
+    return {
+      name: snapshot.investigation.name,
+      json: await serializeExport(snapshot, includeAttachments ? attachments : []),
+    }
   },
 
   importJson: async (text) => {
-    const parsed = parseExport(text)
+    const parsed = await parseExport(text)
     if (!parsed.ok) return parsed
     // An investigation with the same id already exists: import a copy under fresh ids.
     const copied = (await repository.get(parsed.snapshot.investigation.id)) !== undefined
-    const snapshot = copied ? remapIds(parsed.snapshot) : parsed.snapshot
-    await repository.importSnapshot(snapshot)
+    const { snapshot, attachments } = copied ? remapIds(parsed) : parsed
+    await repository.importSnapshot(snapshot, attachments)
     await get().refresh()
     return { ok: true, investigation: snapshot.investigation, copied }
   },

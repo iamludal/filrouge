@@ -204,6 +204,7 @@ export function GraphCanvas() {
         minZoom={0.1}
         fitView={fitView}
         fitViewOptions={{ maxZoom: 1.2 }}
+        attributionPosition="top-right"
         aria-label="Graphe de l’enquête"
       >
         <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} />

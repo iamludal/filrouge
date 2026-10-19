@@ -1,10 +1,12 @@
 import type { EntityTypeId } from '@/domain/entity-types'
 import {
   SCHEMA_VERSION,
+  type Attachment,
   type Entity,
   type Investigation,
   type Position,
   type Relation,
+  type Source,
 } from '@/domain/schemas'
 import { newId, nowIso } from '@/lib/ids'
 
@@ -62,5 +64,35 @@ export function createRelation(
     status: 'verified',
     createdAt: now,
     updatedAt: now,
+  }
+}
+
+/** The user-editable fields of a source. */
+export type SourceFields = Partial<Pick<Source, 'title' | 'url' | 'archiveUrl' | 'note' | 'capturedAt'>>
+
+/** A source, linked to its screenshot (and carrying its fingerprints) when there is one. */
+export function createSource(
+  investigationId: string,
+  fields: SourceFields = {},
+  attachment?: Attachment,
+): Source {
+  return {
+    id: newId(),
+    investigationId,
+    ...fields,
+    capturedAt: fields.capturedAt ?? nowIso(),
+    ...attachmentLink(attachment),
+  }
+}
+
+/** The source fields mirroring a screenshot; all absent when the source has none. */
+export function attachmentLink(
+  attachment?: Attachment,
+): Pick<Source, 'attachmentId' | 'sha256' | 'originalSha256'> {
+  if (!attachment) return {}
+  return {
+    attachmentId: attachment.id,
+    sha256: attachment.sha256,
+    ...(attachment.originalSha256 ? { originalSha256: attachment.originalSha256 } : {}),
   }
 }

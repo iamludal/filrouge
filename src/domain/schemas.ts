@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { ENTITY_TYPE_IDS } from '@/domain/entity-types'
+import { IMAGE_MIME_TYPES } from '@/domain/image-format'
 
 // Zod's JIT compiles validators with `new Function`, which the CSP forbids (no 'unsafe-eval').
 z.config({ jitless: true })
@@ -18,10 +19,12 @@ export const LIMITS = {
   propertyValue: 10_000,
   properties: 200,
   sourceIds: 500,
+  attachmentBytes: 20 * 1024 * 1024,
 } as const
 
 const id = z.uuid()
 const isoDate = z.iso.datetime({ offset: false })
+const sha256 = z.string().regex(/^[a-f0-9]{64}$/)
 
 export const confidenceSchema = z.object({
   reliability: z.enum(['A', 'B', 'C', 'D', 'E', 'F']),
@@ -102,10 +105,9 @@ export const sourceSchema = z.object({
     .max(LIMITS.url)
     .optional(),
   attachmentId: id.optional(),
-  sha256: z
-    .string()
-    .regex(/^[a-f0-9]{64}$/)
-    .optional(),
+  sha256: sha256.optional(),
+  /** SHA-256 of the file as added, when the stored screenshot was optimized. */
+  originalSha256: sha256.optional(),
   note: z.string().max(LIMITS.text).optional(),
 })
 
@@ -113,9 +115,11 @@ export const attachmentSchema = z.object({
   id,
   investigationId: id,
   blob: z.instanceof(Blob),
-  mime: z.string().max(255),
-  size: z.number().int().nonnegative(),
-  sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  mime: z.enum(IMAGE_MIME_TYPES),
+  size: z.number().int().nonnegative().max(LIMITS.attachmentBytes),
+  sha256,
+  originalSha256: sha256.optional(),
+  originalSize: z.number().int().nonnegative().optional(),
 })
 
 export type Confidence = z.infer<typeof confidenceSchema>

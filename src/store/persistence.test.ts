@@ -65,4 +65,36 @@ describe('autosave', () => {
     expect(useGraphStore.getState().saveStatus).toBe('saved')
     autosave.stop()
   })
+
+  it('retries a failed save with the source and its screenshot together', async () => {
+    const { repository, investigation } = await setup()
+    const spy = vi.spyOn(repository, 'applyChanges').mockRejectedValueOnce(new Error('quota'))
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1])
+    const attachment = {
+      id: crypto.randomUUID(),
+      investigationId: investigation.id,
+      blob: new Blob([bytes], { type: 'image/png' }),
+      mime: 'image/png' as const,
+      size: bytes.length,
+      sha256: 'a'.repeat(64),
+    }
+    const autosave = startAutosave(repository, 60_000, () => {})
+    const entity = useGraphStore.getState().addEntity('person', { x: 0, y: 0 })
+    const source = useGraphStore
+      .getState()
+      .createSource({ title: 'Capture' }, attachment, { type: 'entity', id: entity.id })!
+
+    await autosave.flush()
+    expect(useGraphStore.getState().saveStatus).toBe('error')
+    expect(await repository.listSources(investigation.id)).toEqual([])
+
+    await autosave.flush()
+    expect(spy).toHaveBeenCalledTimes(2)
+    expect(useGraphStore.getState().saveStatus).toBe('saved')
+    expect(await repository.listSources(investigation.id)).toEqual([source])
+    expect(await repository.listEntities(investigation.id)).toEqual([
+      expect.objectContaining({ id: entity.id, sourceIds: [source.id] }),
+    ])
+    autosave.stop()
+  })
 })

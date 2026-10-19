@@ -32,7 +32,7 @@ export function InvestigationsPage() {
   const [creating, setCreating] = useState(false)
   const [renaming, setRenaming] = useState<Investigation | null>(null)
   const [deleting, setDeleting] = useState<Investigation | null>(null)
-  const exportInvestigation = useExportInvestigation()
+  const { exportInvestigation, exportDialog } = useExportInvestigation()
   const importer = useImportInvestigation()
 
   useEffect(() => {
@@ -126,6 +126,7 @@ export function InvestigationsPage() {
         }}
       />
 
+      {exportDialog}
       <AlertDialog open={deleting !== null} onOpenChange={(open) => !open && setDeleting(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

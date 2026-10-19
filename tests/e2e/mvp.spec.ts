@@ -1,35 +1,9 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
+import { addEntityAt, connect } from './helpers.js'
 
 const COUNT = 10
 const label = (index: number) => `Entité ${String(index).padStart(2, '0')}`
-
-async function addEntityAt(page: Page, x: number, y: number, name: string) {
-  const pane = page.locator('.react-flow__pane')
-  await pane.dblclick({ position: { x, y } })
-  const dialog = page.getByRole('dialog', { name: 'Nouvelle entité' })
-  await dialog.getByLabel('Libellé').fill(name)
-  await dialog.getByRole('button', { name: 'Ajouter', exact: true }).click()
-  await expect(dialog).toBeHidden()
-  await expect(page.locator('.react-flow__node', { hasText: name })).toBeVisible()
-}
-
-async function connect(page: Page, from: string, to: string, relationLabel: string) {
-  const source = page.locator('.react-flow__node', { hasText: from })
-  const target = page.locator('.react-flow__node', { hasText: to })
-  await source.hover()
-  const handle = await source.locator('.react-flow__handle.source').boundingBox()
-  const targetBox = await target.boundingBox()
-  if (!handle || !targetBox) throw new Error('missing geometry')
-  await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2)
-  await page.mouse.down()
-  await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + 20, { steps: 10 })
-  await page.mouse.up()
-  const dialog = page.getByRole('dialog', { name: 'Nouvelle relation' })
-  await dialog.getByLabel('Libellé').fill(relationLabel)
-  await dialog.getByRole('button', { name: 'Créer la relation' }).click()
-  await expect(dialog).toBeHidden()
-}
 
 async function exportCurrent(page: Page) {
   const downloadPromise = page.waitForEvent('download')
