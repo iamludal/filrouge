@@ -161,7 +161,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 - [x] Panneau latéral de détail : édition du label, des propriétés, des tags et des notes Markdown (rendu assaini)
 - [x] Suppression d'entités/relations (touche Suppr), suppression en cascade des relations orphelines
 - [x] Sauvegarde automatique debouncée de toutes les modifications, y compris les positions
-- [ ] Export / import JSON d'une enquête (format versionné, validé par Zod, rejet propre en cas d'erreur)
+- [x] Export / import JSON d'une enquête (format versionné, validé par Zod, rejet propre en cas d'erreur)
 
 **Critère d'acceptation** : je crée une enquête, ajoute 10 entités reliées, recharge la page,
 tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'identique.
