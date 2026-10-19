@@ -17,20 +17,20 @@ Feuille de route complète : [ROADMAP.md](./ROADMAP.md).
 
 ## Démarrer
 
-Prérequis : Node.js ≥ 22 et pnpm (via `corepack enable`).
+Prérequis : [Bun](https://bun.sh) ≥ 1.2 et Node.js ≥ 22 (utilisé par Vite, Vitest et Playwright).
 
 ```bash
-pnpm install
-pnpm dev          # http://localhost:5173
+bun install
+bun run dev       # http://localhost:5173
 ```
 
-| Commande                    | Rôle                                               |
-| --------------------------- | -------------------------------------------------- |
-| `pnpm build`                | build de production dans `dist/` (CSP injectée)    |
-| `pnpm lint` / `pnpm format` | ESLint / Prettier                                  |
-| `pnpm typecheck`            | vérification TypeScript stricte                    |
-| `pnpm test`                 | tests unitaires (Vitest)                           |
-| `pnpm test:e2e`             | tests E2E (Playwright, sur le build de production) |
+| Commande                          | Rôle                                                                  |
+| --------------------------------- | --------------------------------------------------------------------- |
+| `bun run build`                   | build de production dans `dist/` (CSP injectée)                       |
+| `bun run lint` / `bun run format` | ESLint / Prettier                                                     |
+| `bun run typecheck`               | vérification TypeScript stricte                                       |
+| `bun run test`                    | tests unitaires (Vitest ; pas `bun test`, qui lance le runner de Bun) |
+| `bun run test:e2e`                | tests E2E (Playwright, sur le build de production)                    |
 
 ## Déploiement
 
@@ -39,7 +39,7 @@ Le workflow `.github/workflows/deploy.yml` publie `dist/` sur GitHub Pages à ch
 **Utilisez un domaine (ou sous-domaine) dédié** (Settings › Pages › Custom domain). IndexedDB est isolé
 par origine : servie depuis `<user>.github.io/filrouge`, l'application partagerait son origine — donc ses
 données — avec tous les autres sites Pages du même compte. Pour un sous-chemin malgré tout, construire avec
-`FILROUGE_BASE=/filrouge/ pnpm build`.
+`FILROUGE_BASE=/filrouge/ bun run build`.
 
 ## Sécurité
 

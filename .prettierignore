@@ -1,6 +1,6 @@
 dist
 coverage
-pnpm-lock.yaml
+bun.lock
 playwright-report
 test-results
 openspec

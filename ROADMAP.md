@@ -28,7 +28,7 @@ une tâche à la fois. Chaque tâche n'est terminée que si sa « Definition of 
 | Domaine                 | Choix                                                             |
 | ----------------------- | ----------------------------------------------------------------- |
 | Build                   | Vite + React 19 + TypeScript (`strict: true`)                     |
-| Gestionnaire de paquets | pnpm                                                              |
+| Gestionnaire de paquets | Bun                                                               |
 | UI                      | Tailwind CSS v4 + shadcn/ui + lucide-react                        |
 | Graphe (rendu/édition)  | @xyflow/react (React Flow)                                        |
 | Algorithmes de graphe   | graphology (+ graphology-shortest-path, graphology-metrics)       |
@@ -126,7 +126,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 
 - [ ] Code TypeScript strict, sans `any` non justifié
 - [ ] Tests unitaires pour la logique métier (domain, repositories, lib)
-- [ ] `pnpm lint`, `pnpm typecheck` et `pnpm test` passent
+- [ ] `bun run lint`, `bun run typecheck` et `bun run test` passent
 - [ ] Aucune nouvelle requête réseau au runtime (sauf opt-in documenté)
 - [ ] Toute donnée affichée provenant de l'utilisateur ou d'un import est assainie
 - [ ] UI fonctionnelle en thème clair et sombre
@@ -138,7 +138,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 
 ### v0.0 — Fondations
 
-- [x] Initialiser le projet Vite + React + TS (strict) avec pnpm
+- [x] Initialiser le projet Vite + React + TS (strict) avec Bun
 - [x] Configurer Tailwind v4, shadcn/ui, thème clair/sombre (suivi du système + bascule manuelle)
 - [x] Configurer ESLint, Prettier, Vitest, Playwright
 - [x] Ajouter une CSP stricte via `<meta http-equiv="Content-Security-Policy">` (`default-src 'self'`, pas d'`unsafe-eval`)
@@ -146,7 +146,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 - [x] Déploiement automatique sur GitHub Pages depuis `main`
 - [x] Fichiers repo : `LICENSE`, `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CLAUDE.md`
 
-**Critère d'acceptation** : `pnpm dev` affiche une coquille d'app vide et la CI est verte.
+**Critère d'acceptation** : `bun run dev` affiche une coquille d'app vide et la CI est verte.
 
 ### v0.1 — MVP : graphe éditable et persistant
 

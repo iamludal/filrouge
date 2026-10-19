@@ -5,9 +5,9 @@
   "description": "Application web statique et local-first pour relier visuellement les trouvailles d'une enquête OSINT.",
   "license": "MIT",
   "type": "module",
-  "packageManager": "pnpm@10.34.7",
+  "packageManager": "bun@1.2.13",
   "engines": {
-    "node": ">=22"
+    "bun": ">=1.2"
   },
   "scripts": {
     "dev": "vite",

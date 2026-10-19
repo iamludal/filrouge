@@ -15,7 +15,7 @@ Lire la section « Principes non négociables » de [ROADMAP.md](./ROADMAP.md). 
 
 1. Une tâche de la roadmap à la fois, dans l'ordre.
 2. Respecter la « Definition of Done » (§5 de la roadmap).
-3. Avant de pousser : `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`.
+3. Avant de pousser : `bun run lint && bun run format:check && bun run typecheck && bun run test`.
 4. Commits au format [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`…).
 
 ## Nouvelle dépendance

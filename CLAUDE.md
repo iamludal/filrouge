@@ -3,9 +3,10 @@
 Guide pour les agents de développement travaillant sur filrouge.
 
 - Référence produit et ordre des tâches : `ROADMAP.md` (une tâche à la fois, cocher la case une fois la DoD remplie).
-- Gestionnaire de paquets : pnpm (version épinglée dans `packageManager`, via corepack).
-- Vérifications obligatoires : `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`
-  (+ `pnpm test:e2e` pour les parcours UI).
+- Gestionnaire de paquets : Bun (version épinglée dans `packageManager`). Les outils (Vite, Vitest,
+  Playwright) tournent sous Node via `bun run`. Attention : `bun test` lance le runner de Bun, pas Vitest.
+- Vérifications obligatoires : `bun run lint && bun run format:check && bun run typecheck && bun run test`
+  (+ `bun run test:e2e` pour les parcours UI).
 - Commits : Conventional Commits, un commit par tâche de la roadmap.
 
 ## Architecture
@@ -15,7 +16,7 @@ Guide pour les agents de développement travaillant sur filrouge.
 - `src/store/` : stores Zustand. L'enquête ouverte est chargée en mémoire ; les modifications sont
   persistées par une sauvegarde debouncée (`src/store/persistence.ts`).
 - `src/features/<feature>/` : composants et hooks par fonctionnalité.
-- `src/components/ui/` : composants shadcn/ui générés (`pnpm dlx shadcn@latest add <name>`).
+- `src/components/ui/` : composants shadcn/ui générés (`bunx shadcn@latest add <name>`).
 - `src/lib/` : utilitaires purs.
 
 ## Règles
