@@ -8,6 +8,10 @@ Guide pour les agents de développement travaillant sur filrouge.
 - Vérifications obligatoires : `bun run lint && bun run format:check && bun run typecheck && bun run test`
   (+ `bun run test:e2e` pour les parcours UI).
 - Commits : Conventional Commits, un commit par tâche de la roadmap.
+- Les agents n'ont pas le droit de commiter, c'est l'utilisateur qui le fait : les commits sont signés en SSH (`~/.ssh/github`, protégée par passphrase)
+  et, sans terminal pour la saisir, `git commit` reste bloqué. L'agent laisse les changements dans l'arbre
+  de travail (vérifications au vert), coche les tâches, puis propose le message de commit Conventional
+  Commits du groupe terminé. L'utilisateur commite. L'agent poursuit sans attendre le commit.
 
 ## Architecture
 
