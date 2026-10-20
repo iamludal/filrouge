@@ -63,15 +63,15 @@ persisted when the drag ends.
 
 ### Requirement: Select several elements
 The user SHALL be able to select several elements by Cmd/Ctrl-clicking them or by drawing a
-rectangle with Shift+drag. The rectangle SHALL select every entity whose circle it fully encloses,
-and the links attached to those entities.
+rectangle with Shift+drag. The rectangle SHALL select every entity whose circle or label it
+touches, even partially, and the links attached to those entities.
 
 #### Scenario: Rectangle around two linked nodes
 - **WHEN** the user Shift+drags a rectangle around linked entities A and B
 - **THEN** A, B and the link A–B are selected
 
-#### Scenario: Rectangle tight around an entity
-- **WHEN** the rectangle encloses an entity's circle, however short or long its label
+#### Scenario: Rectangle touching an entity
+- **WHEN** the rectangle covers only part of an entity's circle
 - **THEN** the entity is selected
 
 #### Scenario: Rectangle beside an entity
