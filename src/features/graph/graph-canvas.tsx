@@ -21,11 +21,13 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } fr
 import { useTheme } from '@/app/theme'
 import { Button } from '@/components/ui/button'
 import { ENTITY_TYPES } from '@/domain/entity-types'
+import type { GraphView } from '@/domain/graph-view'
 import type { Entity, Position, Relation } from '@/domain/schemas'
 import { AddEntityDialog } from '@/features/entities/add-entity-dialog'
 import { EntityNode } from '@/features/graph/entity-node'
 import { FloatingEdge } from '@/features/graph/floating-edge'
 import type { EntityNode as EntityNodeType, RelationEdge } from '@/features/graph/types'
+import { useGraphView } from '@/features/graph-search/use-graph-view'
 import { RelationDialog } from '@/features/relations/relation-dialog'
 import { useGraphStore, type Selection } from '@/store/graph-store'
 
@@ -95,9 +97,32 @@ function syncEdges(
   }))
 }
 
+/**
+ * Search results are a view of the graph, not part of it: the flags are added when rendering, and
+ * an element whose flags did not change keeps its identity so React Flow does not redraw it.
+ */
+function withViewFlags(nodes: EntityNodeType[], view: GraphView): EntityNodeType[] {
+  return nodes.map((node) => {
+    const dimmed = view.dimmedEntityIds.has(node.id)
+    const highlighted = view.searching && !dimmed
+    if (!!node.data.dimmed === dimmed && !!node.data.highlighted === highlighted) return node
+    return { ...node, data: { ...node.data, dimmed, highlighted } }
+  })
+}
+
+function withEdgeViewFlags(edges: RelationEdge[], view: GraphView): RelationEdge[] {
+  return edges.map((edge) => {
+    const dimmed = view.dimmedRelationIds.has(edge.id)
+    const highlighted = view.searching && !dimmed
+    if (!!edge.data?.dimmed === dimmed && !!edge.data?.highlighted === highlighted) return edge
+    return edge.data ? { ...edge, data: { ...edge.data, dimmed, highlighted } } : edge
+  })
+}
+
 export function GraphCanvas() {
   const entities = useGraphStore((state) => state.entities)
   const { addEntity, moveEntities, addRelation, removeElements, setSelection } = useGraphStore.getState()
+  const view = useGraphView()
   const { resolved } = useTheme()
   const { screenToFlowPosition } = useReactFlow()
 
@@ -136,6 +161,9 @@ export function GraphCanvas() {
       }),
     [],
   )
+
+  const shownNodes = useMemo(() => withViewFlags(nodes, view), [nodes, view])
+  const shownEdges = useMemo(() => withEdgeViewFlags(edges, view), [edges, view])
 
   const onNodesChange = useCallback(
     (changes: NodeChange<EntityNodeType>[]) => {
@@ -206,13 +234,17 @@ export function GraphCanvas() {
     return entity ? entity.label || ENTITY_TYPES[entity.type].label : ''
   }
 
-  const minimapColor = useMemo(() => (node: EntityNodeType) => ENTITY_TYPES[node.data.entity.type].color, [])
+  const minimapColor = useMemo(
+    () => (node: EntityNodeType) =>
+      node.data.dimmed ? 'var(--border)' : ENTITY_TYPES[node.data.entity.type].color,
+    [],
+  )
 
   return (
     <div className="size-full" onDoubleClick={onDoubleClick}>
       <ReactFlow<EntityNodeType, RelationEdge>
-        nodes={nodes}
-        edges={edges}
+        nodes={shownNodes}
+        edges={shownEdges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
@@ -241,6 +273,11 @@ export function GraphCanvas() {
             <Plus /> Entité
           </Button>
         </Panel>
+        {view.nothingMatchesFilters && (
+          <Panel position="top-center" className="pointer-events-none mt-16 text-sm text-muted-foreground">
+            Aucun élément ne correspond aux filtres.
+          </Panel>
+        )}
         {nodes.length === 0 && (
           <Panel position="top-center" className="pointer-events-none mt-16 text-sm text-muted-foreground">
             Double-cliquez sur le canevas ou utilisez « Entité » pour commencer.

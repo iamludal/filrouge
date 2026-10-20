@@ -12,9 +12,12 @@ import { DetailPanel } from '@/features/graph/detail-panel'
 import { GraphCanvas } from '@/features/graph/graph-canvas'
 import { HistoryControls } from '@/features/graph/history-controls'
 import { SaveIndicator } from '@/features/graph/save-indicator'
+import { FiltersButton } from '@/features/graph-search/filters-panel'
+import { SearchField } from '@/features/graph-search/search-field'
 import { PasteScreenshot } from '@/features/sources/paste-screenshot'
 import { SourcesLibrary } from '@/features/sources/sources-library-dialog'
 import { useGraphStore } from '@/store/graph-store'
+import { useViewStore } from '@/store/view-store'
 import { startAutosave, type Autosave } from '@/store/persistence'
 
 type LoadState = 'loading' | 'ready' | 'missing'
@@ -27,6 +30,8 @@ export function InvestigationPage({ id }: { id: string }) {
 
   useEffect(() => {
     let cancelled = false
+    // The search and filters of a previous visit never carry over.
+    useViewStore.getState().reset()
     const saver = startAutosave(undefined, undefined, () =>
       toast.error('Impossible d’enregistrer les modifications', { id: 'autosave-error' }),
     )
@@ -56,6 +61,7 @@ export function InvestigationPage({ id }: { id: string }) {
 
     return () => {
       cancelled = true
+      useViewStore.getState().reset()
       window.removeEventListener('pagehide', onHide)
       document.removeEventListener('visibilitychange', onVisibility)
       void saver
@@ -82,36 +88,38 @@ export function InvestigationPage({ id }: { id: string }) {
   if (state === 'loading' || !investigation) return null
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b px-2">
-        <Button variant="ghost" size="icon-sm" asChild>
-          <a href={routeHref({ name: 'home' })} aria-label="Retour aux enquêtes">
-            <ArrowLeft />
-          </a>
-        </Button>
-        <h1 className="min-w-0 truncate font-medium">{investigation.name}</h1>
-        <div className="ml-auto flex items-center gap-3">
-          <HistoryControls />
-          <SaveIndicator />
-          <SourcesLibrary />
-          <ExportMenu
-            onExportJson={async () => {
-              await autosave.current?.flush()
-              await exportInvestigation(id)
-            }}
-          />
+    <ReactFlowProvider>
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex h-11 shrink-0 items-center gap-2 border-b px-2">
+          <Button variant="ghost" size="icon-sm" asChild>
+            <a href={routeHref({ name: 'home' })} aria-label="Retour aux enquêtes">
+              <ArrowLeft />
+            </a>
+          </Button>
+          <h1 className="min-w-0 truncate font-medium">{investigation.name}</h1>
+          <div className="ml-auto flex items-center gap-3">
+            <SearchField />
+            <FiltersButton />
+            <HistoryControls />
+            <SaveIndicator />
+            <SourcesLibrary />
+            <ExportMenu
+              onExportJson={async () => {
+                await autosave.current?.flush()
+                await exportInvestigation(id)
+              }}
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex min-h-0 flex-1">
-        <div className="min-w-0 flex-1">
-          <ReactFlowProvider>
+        <div className="flex min-h-0 flex-1">
+          <div className="min-w-0 flex-1">
             <GraphCanvas />
-          </ReactFlowProvider>
+          </div>
+          <DetailPanel />
         </div>
-        <DetailPanel />
+        {exportDialog}
+        <PasteScreenshot />
       </div>
-      {exportDialog}
-      <PasteScreenshot />
-    </div>
+    </ReactFlowProvider>
   )
 }

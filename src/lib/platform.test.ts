@@ -18,10 +18,12 @@ describe('shortcutLabel', () => {
   it('writes the macOS shortcuts with symbols', () => {
     expect(shortcutLabel('undo', true)).toBe('⌘Z')
     expect(shortcutLabel('redo', true)).toBe('⇧⌘Z')
+    expect(shortcutLabel('search', true)).toBe('⌘F')
   })
 
   it('writes the other platforms’ shortcuts with Ctrl', () => {
     expect(shortcutLabel('undo', false)).toBe('Ctrl+Z')
     expect(shortcutLabel('redo', false)).toBe('Ctrl+Shift+Z')
+    expect(shortcutLabel('search', false)).toBe('Ctrl+F')
   })
 })

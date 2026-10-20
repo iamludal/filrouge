@@ -9,10 +9,10 @@ export function isApplePlatform(nav: NavigatorLike = navigator): boolean {
   return /mac|iphone|ipad|ipod/i.test(platform)
 }
 
-export type ShortcutAction = 'undo' | 'redo'
+export type ShortcutAction = 'undo' | 'redo' | 'search'
 
 /** The shortcut to display for an action, as written on the user's platform. */
 export function shortcutLabel(action: ShortcutAction, apple: boolean): string {
-  if (apple) return action === 'undo' ? '⌘Z' : '⇧⌘Z'
-  return action === 'undo' ? 'Ctrl+Z' : 'Ctrl+Shift+Z'
+  if (apple) return { undo: '⌘Z', redo: '⇧⌘Z', search: '⌘F' }[action]
+  return { undo: 'Ctrl+Z', redo: 'Ctrl+Shift+Z', search: 'Ctrl+F' }[action]
 }

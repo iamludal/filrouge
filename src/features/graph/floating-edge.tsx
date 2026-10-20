@@ -25,6 +25,8 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
   const { from, to, middle } = edgeSegment(measuredCircleCenter(sourceNode), measuredCircleCenter(targetNode))
   const path = `M ${from.x},${from.y} L ${to.x},${to.y}`
   const relation = data?.relation
+  const dimmed = data?.dimmed
+  const highlighted = data?.highlighted
   const label = relation && relationLabelText(relation.label, relation.confidence)
   const description = relation?.confidence ? describeConfidence(relation.confidence) : undefined
 
@@ -38,6 +40,8 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
         className={cn(
           'stroke-muted-foreground!',
           relation?.status === 'hypothesis' && '[stroke-dasharray:6_4]',
+          dimmed && 'opacity-25',
+          highlighted && !selected && 'stroke-amber-500! stroke-2!',
           selected && 'stroke-primary! stroke-2!',
         )}
       />
@@ -46,6 +50,8 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
           <div
             className={cn(
               'nodrag nopan pointer-events-none absolute max-w-40 truncate rounded-md border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground',
+              dimmed && 'opacity-25',
+              highlighted && !selected && 'border-amber-500 text-foreground',
               selected && 'border-primary text-foreground',
             )}
             style={{ transform: `translate(-50%, -50%) translate(${middle.x}px, ${middle.y}px)` }}

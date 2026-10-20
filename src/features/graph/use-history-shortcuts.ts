@@ -3,7 +3,7 @@ import { useGraphStore } from '@/store/graph-store'
 
 export type HistoryAction = 'undo' | 'redo'
 
-const DIALOGS = '[role="dialog"], [role="alertdialog"]'
+export const DIALOGS = '[role="dialog"], [role="alertdialog"]'
 const TEXT_FIELDS = 'input, textarea, select'
 
 /** Cmd/Ctrl+Z undoes; Cmd/Ctrl+Shift+Z and Ctrl+Y redo. Matched on the typed letter, so AZERTY works. */

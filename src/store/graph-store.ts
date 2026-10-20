@@ -9,6 +9,7 @@ import {
   type SourceFields,
 } from '@/domain/factories'
 import { orphanedRelationIds, sourceUsage } from '@/domain/graph'
+import type { ElementRef } from '@/domain/graph-view'
 import type {
   Attachment,
   Entity,
@@ -38,11 +39,7 @@ export type RelationPatch = Partial<
 export type SourcePatch = SourceFields
 export type SaveStatus = 'saved' | 'pending' | 'saving' | 'error'
 
-/** An entity or a relation, the two kinds of element a source can be attached to. */
-export interface ElementRef {
-  type: 'entity' | 'relation'
-  id: string
-}
+export type { ElementRef }
 
 export interface Selection {
   entityIds: string[]

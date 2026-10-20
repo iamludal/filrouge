@@ -14,18 +14,25 @@ import { cn } from '@/lib/utils'
  * match what the user sees as the entity.
  */
 export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeProps<EntityNodeType>) {
-  const { entity } = data
+  const { entity, dimmed, highlighted } = data
   const type = ENTITY_TYPES[entity.type]
   const connection = useConnection()
   const isDropTarget = connection.inProgress && connection.fromNode.id !== id
   const label = entity.label || `${type.label} sans nom`
 
   return (
-    <div className="group relative flex w-max max-w-36 flex-col items-center gap-1.5" title={label}>
+    <div
+      className={cn(
+        'group relative flex w-max max-w-36 flex-col items-center gap-1.5 transition-opacity',
+        dimmed && 'opacity-25',
+      )}
+      title={label}
+    >
       <div
         className={cn(
           'relative flex size-12 items-center justify-center rounded-full border-2 bg-card shadow-sm transition-shadow',
           entity.status === 'hypothesis' && 'border-dashed',
+          highlighted && !selected && 'ring-4 ring-amber-400/70',
           selected && 'ring-4 ring-ring/40',
           isDropTarget && 'ring-4 ring-primary/30',
         )}
