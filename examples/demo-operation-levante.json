@@ -1,0 +1,1260 @@
+{
+  "format": "filrouge.investigation",
+  "schemaVersion": 1,
+  "exportedAt": "2026-06-10T17:00:00.000Z",
+  "investigation": {
+    "id": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+    "name": "Démo — Opération Levante (traque d'un fugitif)",
+    "description": "Scénario fictif destiné à la démonstration. Personnes, comptes, organisations, domaines (`.example`), IP (plage de documentation), téléphone (plage ARCEP réservée à la fiction) et portefeuille sont inventés.\n\nDamien Verlac s'est soustrait à son contrôle judiciaire le 12 mars 2026. À partir du seul avis de recherche, la chaîne de pivots mène de la France à Tarifa (Espagne) :\n\n1. avis de recherche, puis forum moto (email, pseudo) ;\n2. annonce de vente, puis adresse BTC réutilisée sur un canal Telegram ;\n3. compte Instagram, puis photo géolocalisée (plage, van, école) ;\n4. site de l'école, puis moniteur « Dani V. » ;\n5. entourage (compagne), puis logement présumé ;\n6. transmission aux autorités.",
+    "createdAt": "2026-06-02T08:00:00.000Z",
+    "updatedAt": "2026-06-10T17:00:00.000Z",
+    "schemaVersion": 1,
+    "encrypted": false
+  },
+  "entities": [
+    {
+      "id": "038a1938-ab17-4811-b352-0892d883a5cb",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "document",
+      "label": "Avis de recherche",
+      "properties": {
+        "auteur": "Parquet de Lyon (fictif)"
+      },
+      "tags": ["point de départ"],
+      "notes": "**Point de départ.** Toute l'enquête découle de ce document : identité, photo, dernier domicile, numéro de téléphone.\n\nRègle de base : on ne pivote que sur des éléments publics, et on documente chaque étape.",
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 0,
+        "y": 120
+      },
+      "createdAt": "2026-06-02T08:00:00.000Z",
+      "updatedAt": "2026-06-02T08:00:00.000Z"
+    },
+    {
+      "id": "ac75f773-b0bd-450a-9212-e0d387746fb9",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "event",
+      "label": "Fuite du 12/03",
+      "properties": {
+        "date": "2026-03-12",
+        "lieu": "Lyon"
+      },
+      "tags": ["France"],
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 0,
+        "y": 330
+      },
+      "createdAt": "2026-06-02T08:07:00.000Z",
+      "updatedAt": "2026-06-02T08:07:00.000Z"
+    },
+    {
+      "id": "b528099f-adba-4698-9020-47add2a566c6",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "address",
+      "label": "Domicile, Lyon 7e",
+      "properties": {
+        "ville": "Lyon",
+        "pays": "France",
+        "latitude": 45.7485,
+        "longitude": 4.8467
+      },
+      "tags": ["France"],
+      "notes": "Logement vide depuis mars 2026 (selon l'avis de recherche).",
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 0,
+        "y": 540
+      },
+      "createdAt": "2026-06-02T08:14:00.000Z",
+      "updatedAt": "2026-06-02T08:14:00.000Z"
+    },
+    {
+      "id": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "person",
+      "label": "Damien Verlac",
+      "properties": {
+        "prénom": "Damien",
+        "nom": "Verlac",
+        "date de naissance": "1991-09-14",
+        "nationalité": "française"
+      },
+      "tags": ["cible", "identité initiale"],
+      "notes": "## Cible\nPersonnage **entièrement fictif**.\n\nSignes distinctifs (avis de recherche) :\n- tatouage à l'avant-bras gauche (rose des vents)\n- cicatrice au sourcil droit\n- passionné de moto et de kitesurf\n\nHypothèse de travail : départ vers un spot de kite à l'étranger.",
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 300,
+        "y": 330
+      },
+      "createdAt": "2026-06-02T08:21:00.000Z",
+      "updatedAt": "2026-06-02T08:21:00.000Z"
+    },
+    {
+      "id": "02bb14d1-7ea5-43d7-96db-c68bbef59780",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "phone",
+      "label": "+33 6 39 98 41 27",
+      "properties": {
+        "pays": "France",
+        "opérateur": "inconnu"
+      },
+      "tags": ["identité initiale"],
+      "notes": "Ligne inactive depuis mars 2026. Numéro de la plage réservée à la fiction par l'ARCEP.",
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 300,
+        "y": 80
+      },
+      "createdAt": "2026-06-02T08:28:00.000Z",
+      "updatedAt": "2026-06-02T08:28:00.000Z"
+    },
+    {
+      "id": "fb1e76de-8eb4-4ddc-a2e2-84aec05f3fde",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "email",
+      "label": "dverlac@mail.example",
+      "properties": {
+        "fournisseur": "mail.example",
+        "adresse": "dverlac@mail.example"
+      },
+      "tags": ["identité initiale", "pivot"],
+      "notes": "Trouvée en recherchant le nom et le pseudo sur les forums moto (la passion citée dans l'avis).",
+      "sourceIds": ["7bb32152-c40c-4f58-b39f-6d766df28e59"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 600,
+        "y": 80
+      },
+      "createdAt": "2026-06-02T08:35:00.000Z",
+      "updatedAt": "2026-06-02T08:35:00.000Z"
+    },
+    {
+      "id": "bfd4980a-c1e8-488c-8fff-4556de056284",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "alias",
+      "label": "dverlac_moto",
+      "properties": {
+        "plateforme": "Forum Bécanes & Co",
+        "identifiant": "dverlac_moto",
+        "url du profil": "https://forum-becanes.example/membres/dverlac_moto"
+      },
+      "tags": ["identité initiale"],
+      "sourceIds": ["7bb32152-c40c-4f58-b39f-6d766df28e59"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 900,
+        "y": 80
+      },
+      "createdAt": "2026-06-02T08:42:00.000Z",
+      "updatedAt": "2026-06-02T08:42:00.000Z"
+    },
+    {
+      "id": "32392e12-b0b3-4d2c-a3c5-f40e27849762",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "url",
+      "label": "Annonce MT-07",
+      "properties": {
+        "titre": "Vends Yamaha MT-07, paiement BTC accepté"
+      },
+      "tags": ["pivot"],
+      "notes": "Publiée le **2026-03-08**, quatre jours avant la fuite : le fugitif liquide ses biens.\n\nL'adresse BTC donnée pour le paiement devient le **pivot clé** de l'enquête.",
+      "sourceIds": ["d6dbc6d2-b590-4290-8978-e2512cb653b7"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 1200,
+        "y": 80
+      },
+      "createdAt": "2026-06-02T08:49:00.000Z",
+      "updatedAt": "2026-06-02T08:49:00.000Z"
+    },
+    {
+      "id": "fbce6f1e-4765-4c15-b0d2-3a39316ad03d",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "crypto_wallet",
+      "label": "bc1qz7m4…gdu7ksd",
+      "properties": {
+        "blockchain": "Bitcoin",
+        "adresse": "bc1qz7m4h2xk9w0r3tlv8yqfp5n6e2cj0a4gdu7ksd"
+      },
+      "tags": ["pivot"],
+      "notes": "**Réutilisation d'identifiant** : la même adresse apparaît dans l'annonce du forum (mars) et sur un canal Telegram de revente de kite (avril).\n\nUne adresse de portefeuille réutilisée est un lien fort entre deux identités en ligne.\n\n_Adresse fictive, checksum invalide._",
+      "sourceIds": [
+        "d6dbc6d2-b590-4290-8978-e2512cb653b7",
+        "46cb6afc-7ae8-40ce-9745-a0645c066cb2",
+        "08c8ced1-55f1-417f-bbd1-82c396f9768a"
+      ],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 1500,
+        "y": 80
+      },
+      "createdAt": "2026-06-03T08:56:00.000Z",
+      "updatedAt": "2026-06-03T08:56:00.000Z"
+    },
+    {
+      "id": "1f303a68-6d6c-42f7-bf22-d9438a0ace1f",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "alias",
+      "label": "Levante Rider Shop",
+      "properties": {
+        "plateforme": "Telegram",
+        "identifiant": "levanteridershop",
+        "url du profil": "https://telegram.example/levanteridershop"
+      },
+      "tags": ["identité actuelle", "Espagne"],
+      "notes": "« Levante » : vent d'est caractéristique du détroit de Gibraltar. Premier indice géographique.",
+      "sourceIds": ["08c8ced1-55f1-417f-bbd1-82c396f9768a"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 1800,
+        "y": 80
+      },
+      "createdAt": "2026-06-03T09:03:00.000Z",
+      "updatedAt": "2026-06-03T09:03:00.000Z"
+    },
+    {
+      "id": "ffa1df53-588e-4439-a59e-69dfb5045ae5",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "alias",
+      "label": "@kite_dv",
+      "properties": {
+        "plateforme": "Instagram",
+        "identifiant": "kite_dv",
+        "url du profil": "https://instagram.example/kite_dv"
+      },
+      "tags": ["identité actuelle", "Espagne"],
+      "notes": "Compte créé en avril 2026. Initiales « dv » + passion pour le kite. Visage jamais montré de face.",
+      "sourceIds": ["08c8ced1-55f1-417f-bbd1-82c396f9768a", "48a5de16-7944-4d4d-bd57-7361253885aa"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 1800,
+        "y": 340
+      },
+      "createdAt": "2026-06-04T09:10:00.000Z",
+      "updatedAt": "2026-06-04T09:10:00.000Z"
+    },
+    {
+      "id": "c35a0eb9-5972-4a66-ac67-ffd66df379e3",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "event",
+      "label": "Post du 18/05",
+      "properties": {
+        "date": "2026-05-18",
+        "lieu": "Tarifa (déduit)"
+      },
+      "tags": ["Espagne"],
+      "sourceIds": ["48a5de16-7944-4d4d-bd57-7361253885aa"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 2100,
+        "y": 340
+      },
+      "createdAt": "2026-06-04T09:17:00.000Z",
+      "updatedAt": "2026-06-04T09:17:00.000Z"
+    },
+    {
+      "id": "46e92f21-e57a-407b-9f68-17b50cff186a",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "image",
+      "label": "Photo du 18/05",
+      "properties": {
+        "source": "Instagram @kite_dv",
+        "empreinte": "non calculée (capture non jointe)"
+      },
+      "tags": ["Espagne", "géolocalisation"],
+      "notes": "Trois informations exploitables dans une seule image :\n1. le **décor** (tour de vigie, côte marocaine) donne le lieu ;\n2. le **van** à l'arrière-plan, plaque partiellement lisible `FG-4?2-KT` ;\n3. la **légende**, qui identifie l'école de kite.",
+      "sourceIds": ["48a5de16-7944-4d4d-bd57-7361253885aa", "89aed464-ccc1-4a5a-965e-3c199797911e"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 1500,
+        "y": 420
+      },
+      "createdAt": "2026-06-04T09:24:00.000Z",
+      "updatedAt": "2026-06-04T09:24:00.000Z"
+    },
+    {
+      "id": "edadd41e-3cd2-4915-bf77-2364d3f518f1",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "address",
+      "label": "Plage Los Lances",
+      "properties": {
+        "ville": "Tarifa",
+        "pays": "Espagne",
+        "latitude": 36.0335,
+        "longitude": -5.6375
+      },
+      "tags": ["Espagne", "géolocalisation"],
+      "sourceIds": ["89aed464-ccc1-4a5a-965e-3c199797911e"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 1800,
+        "y": 680
+      },
+      "createdAt": "2026-06-05T09:31:00.000Z",
+      "updatedAt": "2026-06-05T09:31:00.000Z"
+    },
+    {
+      "id": "2759e448-118c-4bee-bf48-e4de24dba037",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "person",
+      "label": "Sophie Ranc",
+      "properties": {
+        "prénom": "Sophie",
+        "nom": "Ranc",
+        "nationalité": "française"
+      },
+      "tags": ["entourage"],
+      "notes": "Compagne. Personnage **fictif**. Elle n'est pas visée par l'enquête : on n'exploite que ce qu'elle publie publiquement, sans contact.",
+      "sourceIds": ["5a6a5066-0010-4bbb-a029-66145d02d3ae"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 600,
+        "y": 580
+      },
+      "createdAt": "2026-06-04T09:38:00.000Z",
+      "updatedAt": "2026-06-04T09:38:00.000Z"
+    },
+    {
+      "id": "708c5c7c-a858-4305-b6ad-8bd0499ac372",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "alias",
+      "label": "@sophie.rnc",
+      "properties": {
+        "plateforme": "Instagram",
+        "identifiant": "sophie.rnc",
+        "url du profil": "https://instagram.example/sophie.rnc"
+      },
+      "tags": ["entourage"],
+      "sourceIds": ["5a6a5066-0010-4bbb-a029-66145d02d3ae"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 900,
+        "y": 420
+      },
+      "createdAt": "2026-06-04T09:45:00.000Z",
+      "updatedAt": "2026-06-04T09:45:00.000Z"
+    },
+    {
+      "id": "b596755a-efa3-474e-ab2d-6211b242ffde",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "vehicle",
+      "label": "Van VW gris",
+      "properties": {
+        "immatriculation": "FG-482-KT",
+        "marque": "Volkswagen",
+        "modèle": "Transporter T5"
+      },
+      "tags": ["entourage", "pivot"],
+      "notes": "Plaque complète lisible sur une photo de @sophie.rnc (août 2025) ; plaque partielle `FG-4?2-KT` sur la photo de @kite_dv. Mêmes autocollants sur la vitre arrière.",
+      "sourceIds": ["5a6a5066-0010-4bbb-a029-66145d02d3ae", "48a5de16-7944-4d4d-bd57-7361253885aa"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 1200,
+        "y": 680
+      },
+      "createdAt": "2026-06-04T09:52:00.000Z",
+      "updatedAt": "2026-06-04T09:52:00.000Z"
+    },
+    {
+      "id": "2d5e040f-0295-4966-b02a-5c6c8b040b6d",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "organization",
+      "label": "Escuela Kite Levante",
+      "properties": {
+        "pays": "Espagne",
+        "secteur": "École de kitesurf",
+        "identifiant légal": "non recherché"
+      },
+      "tags": ["Espagne"],
+      "notes": "Organisation **fictive**. Identifiée grâce à la légende de la photo du 18 mai.",
+      "sourceIds": ["48a5de16-7944-4d4d-bd57-7361253885aa", "2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 2100,
+        "y": 600
+      },
+      "createdAt": "2026-06-05T09:59:00.000Z",
+      "updatedAt": "2026-06-05T09:59:00.000Z"
+    },
+    {
+      "id": "55568a60-069b-4d87-b240-7387c77d8e07",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "domain",
+      "label": "kitelevante.example",
+      "properties": {
+        "registrar": "Registrar Example SL",
+        "date de création": "2019-02-11"
+      },
+      "tags": ["Espagne", "infrastructure"],
+      "sourceIds": ["73235d02-cf86-4926-bd68-ae60fe5396e5"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 2400,
+        "y": 600
+      },
+      "createdAt": "2026-06-05T10:06:00.000Z",
+      "updatedAt": "2026-06-05T10:06:00.000Z"
+    },
+    {
+      "id": "21150209-d0ee-4022-8505-0a6f1e006fb4",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "ip",
+      "label": "203.0.113.42",
+      "properties": {
+        "ASN": "AS64500 (documentation)",
+        "pays": "Espagne"
+      },
+      "tags": ["infrastructure"],
+      "notes": "Hébergement mutualisé. **Impasse volontaire** : l'infrastructure ne mène pas au fugitif. Elle sert à authentifier le site, pas à l'identifier.",
+      "sourceIds": ["73235d02-cf86-4926-bd68-ae60fe5396e5"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 2700,
+        "y": 600
+      },
+      "createdAt": "2026-06-05T10:13:00.000Z",
+      "updatedAt": "2026-06-05T10:13:00.000Z"
+    },
+    {
+      "id": "c13f5321-d8c6-4d9d-8210-ef1234a79461",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "url",
+      "label": "Page « Equipo »",
+      "properties": {
+        "titre": "Nuestro equipo",
+        "adresse": "https://kitelevante.example/equipo"
+      },
+      "tags": ["Espagne"],
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 2400,
+        "y": 860
+      },
+      "createdAt": "2026-06-05T10:20:00.000Z",
+      "updatedAt": "2026-06-05T10:20:00.000Z"
+    },
+    {
+      "id": "05083fc9-cb2d-445a-87df-cb29ec2f2e7e",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "alias",
+      "label": "Dani V.",
+      "properties": {
+        "plateforme": "Site de l'école",
+        "identifiant": "Dani V.",
+        "rôle": "moniteur de kitesurf"
+      },
+      "tags": ["identité actuelle", "Espagne"],
+      "notes": "« Dani » pour **Da**mien, « V. » pour **V**erlac. Arrivé « au printemps 2026 ».\n\nComparaison avec la photo de l'avis : tatouage et cicatrice concordants (voir la source « Comparaison faciale »).",
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802", "1d0d8dfb-295f-438d-bc3e-e189a33f677d"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "position": {
+        "x": 2100,
+        "y": 860
+      },
+      "createdAt": "2026-06-06T10:27:00.000Z",
+      "updatedAt": "2026-06-06T10:27:00.000Z"
+    },
+    {
+      "id": "dc49e3d6-d4b3-4aab-b280-28278f0e0615",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "email",
+      "label": "dani.v@kitelevante.example",
+      "properties": {
+        "fournisseur": "kitelevante.example"
+      },
+      "tags": ["identité actuelle"],
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 2400,
+        "y": 1100
+      },
+      "createdAt": "2026-06-06T10:34:00.000Z",
+      "updatedAt": "2026-06-06T10:34:00.000Z"
+    },
+    {
+      "id": "14658d3b-2c5f-4c43-bd9f-75ed2f5bf507",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "address",
+      "label": "Logement, Tarifa",
+      "properties": {
+        "ville": "Tarifa",
+        "pays": "Espagne",
+        "latitude": 36.0143,
+        "longitude": -5.6044
+      },
+      "tags": ["Espagne", "géolocalisation", "à vérifier"],
+      "notes": "Déduit d'une seule story de @sophie.rnc (vue depuis une terrasse). Une rue, pas un numéro : **ne pas surinterpréter**.",
+      "sourceIds": ["90cfc038-d505-4e9f-a186-17bff4770328"],
+      "confidence": {
+        "reliability": "C",
+        "credibility": 3
+      },
+      "status": "hypothesis",
+      "position": {
+        "x": 1800,
+        "y": 1000
+      },
+      "createdAt": "2026-06-07T10:41:00.000Z",
+      "updatedAt": "2026-06-07T10:41:00.000Z"
+    },
+    {
+      "id": "1694ad0e-c3d7-40be-8e2b-5b9c7b90db0f",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "type": "event",
+      "label": "Signalement",
+      "properties": {
+        "date": "2026-06-10",
+        "lieu": "Rapport transmis au service compétent"
+      },
+      "tags": ["conclusion"],
+      "notes": "## Conclusion\nRapport transmis avec : chaîne de pivots, sources archivées, cotation de chaque élément, hypothèses signalées comme telles.\n\nL'enquêteur OSINT **ne contacte pas** la cible ni son entourage, et n'intervient pas sur le terrain.",
+      "sourceIds": [],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "position": {
+        "x": 2100,
+        "y": 1100
+      },
+      "createdAt": "2026-06-10T10:48:00.000Z",
+      "updatedAt": "2026-06-10T10:48:00.000Z"
+    }
+  ],
+  "relations": [
+    {
+      "id": "3ab05959-4c05-4570-8c7a-0207cbbdf988",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "038a1938-ab17-4811-b352-0892d883a5cb",
+      "to": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "label": "vise",
+      "directed": true,
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:00:00.000Z",
+      "updatedAt": "2026-06-02T12:00:00.000Z"
+    },
+    {
+      "id": "e2a41a13-9419-4ca1-bc6f-8fa27ca617ce",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "ac75f773-b0bd-450a-9212-e0d387746fb9",
+      "to": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "label": "concerne",
+      "directed": true,
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:05:00.000Z",
+      "updatedAt": "2026-06-02T12:05:00.000Z"
+    },
+    {
+      "id": "9d65f313-2603-4ecf-80a4-4c32977cf968",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "ac75f773-b0bd-450a-9212-e0d387746fb9",
+      "to": "b528099f-adba-4698-9020-47add2a566c6",
+      "label": "situé à",
+      "directed": true,
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:10:00.000Z",
+      "updatedAt": "2026-06-02T12:10:00.000Z"
+    },
+    {
+      "id": "17aae3f5-e88f-4763-ab7c-30dc465f065c",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "to": "b528099f-adba-4698-9020-47add2a566c6",
+      "label": "domicilié à (jusqu'en mars)",
+      "directed": true,
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:15:00.000Z",
+      "updatedAt": "2026-06-02T12:15:00.000Z"
+    },
+    {
+      "id": "b167badd-0e81-4e6f-a957-dcec44a0a339",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "to": "02bb14d1-7ea5-43d7-96db-c68bbef59780",
+      "label": "utilisait",
+      "directed": true,
+      "sourceIds": ["c699b6d7-eb67-45a9-97b7-8025eb2f6fd8"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 2
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:20:00.000Z",
+      "updatedAt": "2026-06-02T12:20:00.000Z"
+    },
+    {
+      "id": "cd6b986e-8ebb-4c5e-9a4d-6b695f9705b8",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "to": "fb1e76de-8eb4-4ddc-a2e2-84aec05f3fde",
+      "label": "utilise",
+      "directed": true,
+      "sourceIds": ["7bb32152-c40c-4f58-b39f-6d766df28e59"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:25:00.000Z",
+      "updatedAt": "2026-06-02T12:25:00.000Z"
+    },
+    {
+      "id": "b41841d8-119b-4803-9eed-0e87524804e7",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "fb1e76de-8eb4-4ddc-a2e2-84aec05f3fde",
+      "to": "bfd4980a-c1e8-488c-8fff-4556de056284",
+      "label": "contact du profil",
+      "directed": true,
+      "sourceIds": ["7bb32152-c40c-4f58-b39f-6d766df28e59"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:30:00.000Z",
+      "updatedAt": "2026-06-02T12:30:00.000Z"
+    },
+    {
+      "id": "8ffbf85c-e468-47c5-80cb-0ac1f4e627aa",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "bfd4980a-c1e8-488c-8fff-4556de056284",
+      "to": "32392e12-b0b3-4d2c-a3c5-f40e27849762",
+      "label": "publie",
+      "directed": true,
+      "sourceIds": ["d6dbc6d2-b590-4290-8978-e2512cb653b7"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-02T12:35:00.000Z",
+      "updatedAt": "2026-06-02T12:35:00.000Z"
+    },
+    {
+      "id": "a82eae44-2a14-4e2f-9120-c2a3e4f6c130",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "32392e12-b0b3-4d2c-a3c5-f40e27849762",
+      "to": "fbce6f1e-4765-4c15-b0d2-3a39316ad03d",
+      "label": "demande un paiement sur",
+      "directed": true,
+      "sourceIds": ["d6dbc6d2-b590-4290-8978-e2512cb653b7"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-03T12:40:00.000Z",
+      "updatedAt": "2026-06-03T12:40:00.000Z"
+    },
+    {
+      "id": "cffa2c2c-ca0c-4aad-ab16-fe1187d958cb",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "1f303a68-6d6c-42f7-bf22-d9438a0ace1f",
+      "to": "fbce6f1e-4765-4c15-b0d2-3a39316ad03d",
+      "label": "demande un paiement sur",
+      "directed": true,
+      "sourceIds": ["08c8ced1-55f1-417f-bbd1-82c396f9768a", "46cb6afc-7ae8-40ce-9745-a0645c066cb2"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-03T12:45:00.000Z",
+      "updatedAt": "2026-06-03T12:45:00.000Z"
+    },
+    {
+      "id": "4a9d70d8-ad59-49e5-a892-5a0dd9bfc332",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "1f303a68-6d6c-42f7-bf22-d9438a0ace1f",
+      "to": "ffa1df53-588e-4439-a59e-69dfb5045ae5",
+      "label": "renvoie vers",
+      "directed": true,
+      "sourceIds": ["08c8ced1-55f1-417f-bbd1-82c396f9768a"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-03T12:50:00.000Z",
+      "updatedAt": "2026-06-03T12:50:00.000Z"
+    },
+    {
+      "id": "9e2a65ac-24b6-454c-a686-ee8d73d7e3ac",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "ffa1df53-588e-4439-a59e-69dfb5045ae5",
+      "to": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "label": "compte présumé de",
+      "directed": true,
+      "sourceIds": [
+        "08c8ced1-55f1-417f-bbd1-82c396f9768a",
+        "48a5de16-7944-4d4d-bd57-7361253885aa",
+        "5a6a5066-0010-4bbb-a029-66145d02d3ae"
+      ],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "hypothesis",
+      "createdAt": "2026-06-04T12:55:00.000Z",
+      "updatedAt": "2026-06-04T12:55:00.000Z"
+    },
+    {
+      "id": "b882d6ae-d06e-49f0-8305-9ecdad60e833",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "ffa1df53-588e-4439-a59e-69dfb5045ae5",
+      "to": "c35a0eb9-5972-4a66-ac67-ffd66df379e3",
+      "label": "auteur de",
+      "directed": true,
+      "sourceIds": ["48a5de16-7944-4d4d-bd57-7361253885aa"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-04T13:00:00.000Z",
+      "updatedAt": "2026-06-04T13:00:00.000Z"
+    },
+    {
+      "id": "10630440-1a5c-42d7-af16-7cef0cf545fd",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "c35a0eb9-5972-4a66-ac67-ffd66df379e3",
+      "to": "46e92f21-e57a-407b-9f68-17b50cff186a",
+      "label": "contient",
+      "directed": true,
+      "sourceIds": ["48a5de16-7944-4d4d-bd57-7361253885aa"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-04T13:05:00.000Z",
+      "updatedAt": "2026-06-04T13:05:00.000Z"
+    },
+    {
+      "id": "3585ac45-c1ff-4029-96b8-ac5613c28dbf",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "46e92f21-e57a-407b-9f68-17b50cff186a",
+      "to": "edadd41e-3cd2-4915-bf77-2364d3f518f1",
+      "label": "géolocalisée à",
+      "directed": true,
+      "sourceIds": ["89aed464-ccc1-4a5a-965e-3c199797911e"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T13:10:00.000Z",
+      "updatedAt": "2026-06-05T13:10:00.000Z"
+    },
+    {
+      "id": "ca1cef29-388a-4ce5-9184-448a714ffb60",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "46e92f21-e57a-407b-9f68-17b50cff186a",
+      "to": "b596755a-efa3-474e-ab2d-6211b242ffde",
+      "label": "montre (plaque partielle)",
+      "directed": true,
+      "sourceIds": ["48a5de16-7944-4d4d-bd57-7361253885aa"],
+      "confidence": {
+        "reliability": "C",
+        "credibility": 2
+      },
+      "status": "verified",
+      "createdAt": "2026-06-04T13:15:00.000Z",
+      "updatedAt": "2026-06-04T13:15:00.000Z"
+    },
+    {
+      "id": "3d69b182-f8be-44c3-9a29-77e631a7f623",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "46e92f21-e57a-407b-9f68-17b50cff186a",
+      "to": "2d5e040f-0295-4966-b02a-5c6c8b040b6d",
+      "label": "identifie en légende",
+      "directed": true,
+      "sourceIds": ["48a5de16-7944-4d4d-bd57-7361253885aa"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T13:20:00.000Z",
+      "updatedAt": "2026-06-05T13:20:00.000Z"
+    },
+    {
+      "id": "4b902ac0-53e1-4154-8611-939100e663bf",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "to": "2759e448-118c-4bee-bf48-e4de24dba037",
+      "label": "en couple avec",
+      "directed": false,
+      "sourceIds": ["5a6a5066-0010-4bbb-a029-66145d02d3ae"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "createdAt": "2026-06-04T13:25:00.000Z",
+      "updatedAt": "2026-06-04T13:25:00.000Z"
+    },
+    {
+      "id": "d5725dac-b765-4f3b-836e-35fd104f72bf",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "708c5c7c-a858-4305-b6ad-8bd0499ac372",
+      "to": "2759e448-118c-4bee-bf48-e4de24dba037",
+      "label": "compte de",
+      "directed": true,
+      "sourceIds": ["5a6a5066-0010-4bbb-a029-66145d02d3ae"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-04T13:30:00.000Z",
+      "updatedAt": "2026-06-04T13:30:00.000Z"
+    },
+    {
+      "id": "66f73fdf-da16-44e9-84bf-72dc5943d44c",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "708c5c7c-a858-4305-b6ad-8bd0499ac372",
+      "to": "ffa1df53-588e-4439-a59e-69dfb5045ae5",
+      "label": "commente « Prends soin de toi »",
+      "directed": true,
+      "sourceIds": ["5a6a5066-0010-4bbb-a029-66145d02d3ae"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-04T13:35:00.000Z",
+      "updatedAt": "2026-06-04T13:35:00.000Z"
+    },
+    {
+      "id": "2cf64bf2-46a1-496d-aa0a-999f407e9354",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "2759e448-118c-4bee-bf48-e4de24dba037",
+      "to": "b596755a-efa3-474e-ab2d-6211b242ffde",
+      "label": "possède",
+      "directed": true,
+      "sourceIds": ["5a6a5066-0010-4bbb-a029-66145d02d3ae"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "createdAt": "2026-06-04T13:40:00.000Z",
+      "updatedAt": "2026-06-04T13:40:00.000Z"
+    },
+    {
+      "id": "37b4ccb2-6be4-4285-8b77-1fe428aa9fac",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "2d5e040f-0295-4966-b02a-5c6c8b040b6d",
+      "to": "edadd41e-3cd2-4915-bf77-2364d3f518f1",
+      "label": "situé à",
+      "directed": true,
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T13:45:00.000Z",
+      "updatedAt": "2026-06-05T13:45:00.000Z"
+    },
+    {
+      "id": "4dc26818-875b-4e5c-b67b-ec5862cd6869",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "2d5e040f-0295-4966-b02a-5c6c8b040b6d",
+      "to": "55568a60-069b-4d87-b240-7387c77d8e07",
+      "label": "site officiel",
+      "directed": true,
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802", "73235d02-cf86-4926-bd68-ae60fe5396e5"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T13:50:00.000Z",
+      "updatedAt": "2026-06-05T13:50:00.000Z"
+    },
+    {
+      "id": "c87262df-e97d-47ba-b0f4-c5b9f5ba5f53",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "55568a60-069b-4d87-b240-7387c77d8e07",
+      "to": "21150209-d0ee-4022-8505-0a6f1e006fb4",
+      "label": "résout vers",
+      "directed": true,
+      "sourceIds": ["73235d02-cf86-4926-bd68-ae60fe5396e5"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T13:55:00.000Z",
+      "updatedAt": "2026-06-05T13:55:00.000Z"
+    },
+    {
+      "id": "7b215af6-d432-4e2c-a153-43e0b29c1dc3",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "55568a60-069b-4d87-b240-7387c77d8e07",
+      "to": "c13f5321-d8c6-4d9d-8210-ef1234a79461",
+      "label": "héberge",
+      "directed": true,
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T14:00:00.000Z",
+      "updatedAt": "2026-06-05T14:00:00.000Z"
+    },
+    {
+      "id": "2c8a6bf4-3c80-4208-b35e-11b9f7ed4eee",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "c13f5321-d8c6-4d9d-8210-ef1234a79461",
+      "to": "05083fc9-cb2d-445a-87df-cb29ec2f2e7e",
+      "label": "présente",
+      "directed": true,
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T14:05:00.000Z",
+      "updatedAt": "2026-06-05T14:05:00.000Z"
+    },
+    {
+      "id": "a623c52f-414c-43ef-9ba6-8494ab166cf2",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "05083fc9-cb2d-445a-87df-cb29ec2f2e7e",
+      "to": "2d5e040f-0295-4966-b02a-5c6c8b040b6d",
+      "label": "travaille pour",
+      "directed": true,
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "verified",
+      "createdAt": "2026-06-05T14:10:00.000Z",
+      "updatedAt": "2026-06-05T14:10:00.000Z"
+    },
+    {
+      "id": "6315407f-8349-4764-a95e-96e42245326d",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "05083fc9-cb2d-445a-87df-cb29ec2f2e7e",
+      "to": "dc49e3d6-d4b3-4aab-b280-28278f0e0615",
+      "label": "utilise",
+      "directed": true,
+      "sourceIds": ["2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-06T14:15:00.000Z",
+      "updatedAt": "2026-06-06T14:15:00.000Z"
+    },
+    {
+      "id": "49d4cad1-4333-4972-a1dd-e661a76b9172",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "05083fc9-cb2d-445a-87df-cb29ec2f2e7e",
+      "to": "0d5549d1-4a2b-42fb-bf83-55f0072618f5",
+      "label": "identité présumée de",
+      "directed": true,
+      "sourceIds": ["1d0d8dfb-295f-438d-bc3e-e189a33f677d", "2d07bd6e-5725-46ed-bf65-ccf02ab4a802"],
+      "confidence": {
+        "reliability": "B",
+        "credibility": 2
+      },
+      "status": "hypothesis",
+      "createdAt": "2026-06-06T14:20:00.000Z",
+      "updatedAt": "2026-06-06T14:20:00.000Z"
+    },
+    {
+      "id": "f1e1ef70-d5f3-4b16-840f-9eb4a7fff22f",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "708c5c7c-a858-4305-b6ad-8bd0499ac372",
+      "to": "14658d3b-2c5f-4c43-bd9f-75ed2f5bf507",
+      "label": "story publiée depuis",
+      "directed": true,
+      "sourceIds": ["90cfc038-d505-4e9f-a186-17bff4770328"],
+      "confidence": {
+        "reliability": "C",
+        "credibility": 3
+      },
+      "status": "hypothesis",
+      "createdAt": "2026-06-07T14:25:00.000Z",
+      "updatedAt": "2026-06-07T14:25:00.000Z"
+    },
+    {
+      "id": "167fb711-7258-4c2d-963f-2157acf91aad",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "05083fc9-cb2d-445a-87df-cb29ec2f2e7e",
+      "to": "14658d3b-2c5f-4c43-bd9f-75ed2f5bf507",
+      "label": "réside à (présumé)",
+      "directed": true,
+      "sourceIds": ["90cfc038-d505-4e9f-a186-17bff4770328"],
+      "confidence": {
+        "reliability": "C",
+        "credibility": 3
+      },
+      "status": "hypothesis",
+      "createdAt": "2026-06-07T14:30:00.000Z",
+      "updatedAt": "2026-06-07T14:30:00.000Z"
+    },
+    {
+      "id": "60869b94-f806-4d00-a7bb-fd081a1b318a",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "1694ad0e-c3d7-40be-8e2b-5b9c7b90db0f",
+      "to": "05083fc9-cb2d-445a-87df-cb29ec2f2e7e",
+      "label": "identité transmise",
+      "directed": true,
+      "sourceIds": [],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-10T14:35:00.000Z",
+      "updatedAt": "2026-06-10T14:35:00.000Z"
+    },
+    {
+      "id": "c3e62f29-5c02-46cd-8bb8-3ab5878f3b2c",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "from": "1694ad0e-c3d7-40be-8e2b-5b9c7b90db0f",
+      "to": "14658d3b-2c5f-4c43-bd9f-75ed2f5bf507",
+      "label": "localisation transmise",
+      "directed": true,
+      "sourceIds": [],
+      "confidence": {
+        "reliability": "A",
+        "credibility": 1
+      },
+      "status": "verified",
+      "createdAt": "2026-06-10T14:40:00.000Z",
+      "updatedAt": "2026-06-10T14:40:00.000Z"
+    }
+  ],
+  "sources": [
+    {
+      "id": "c699b6d7-eb67-45a9-97b7-8025eb2f6fd8",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Avis de recherche n° 2026-0312 (fictif)",
+      "url": "https://justice.example/avis-recherche/2026-0312",
+      "capturedAt": "2026-06-02T08:15:00.000Z",
+      "note": "Document officiel (fictif). Point de départ de l'enquête : identité, photo, dernier domicile et numéro connu."
+    },
+    {
+      "id": "7bb32152-c40c-4f58-b39f-6d766df28e59",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Forum Bécanes & Co — profil « dverlac_moto »",
+      "url": "https://forum-becanes.example/membres/dverlac_moto",
+      "archiveUrl": "https://archive.example/2026.06.02/forum-becanes-dverlac_moto",
+      "capturedAt": "2026-06-02T09:40:00.000Z",
+      "note": "Profil public. L'adresse email apparaît dans le champ « Contact » (visible sans connexion)."
+    },
+    {
+      "id": "d6dbc6d2-b590-4290-8978-e2512cb653b7",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Forum Bécanes & Co — annonce « Vends MT-07, paiement BTC accepté »",
+      "url": "https://forum-becanes.example/annonces/48213",
+      "archiveUrl": "https://archive.example/2026.06.02/forum-becanes-48213",
+      "capturedAt": "2026-06-02T10:05:00.000Z",
+      "note": "Annonce publiée le 2026-03-08, quatre jours avant la soustraction au contrôle judiciaire. Adresse BTC en clair dans le message."
+    },
+    {
+      "id": "46cb6afc-7ae8-40ce-9745-a0645c066cb2",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Explorateur blockchain — historique du portefeuille bc1q…7ksd",
+      "url": "https://blockchain-explorer.example/address/bc1qz7m4h2xk9w0r3tlv8yqfp5n6e2cj0a4gdu7ksd",
+      "capturedAt": "2026-06-03T14:20:00.000Z",
+      "note": "Premières entrées en mars 2026, activité régulière depuis avril 2026 (petits montants, profil de vente de matériel)."
+    },
+    {
+      "id": "08c8ced1-55f1-417f-bbd1-82c396f9768a",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Telegram — canal « Levante Rider Shop »",
+      "url": "https://telegram.example/levanteridershop",
+      "archiveUrl": "https://archive.example/2026.06.03/levanteridershop",
+      "capturedAt": "2026-06-03T15:00:00.000Z",
+      "note": "Canal de revente de matériel de kitesurf. Même adresse BTC que l'annonce du forum, et lien vers le compte Instagram @kite_dv dans la description."
+    },
+    {
+      "id": "48a5de16-7944-4d4d-bd57-7361253885aa",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Instagram — compte @kite_dv et publication du 2026-05-18",
+      "url": "https://instagram.example/kite_dv",
+      "archiveUrl": "https://archive.example/2026.06.04/instagram-kite_dv",
+      "capturedAt": "2026-06-04T11:30:00.000Z",
+      "note": "Compte créé en avril 2026, visage jamais montré de face. Publication du 18 mai : session de kite, van en arrière-plan, école identifiée en légende."
+    },
+    {
+      "id": "5a6a5066-0010-4bbb-a029-66145d02d3ae",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Instagram — compte @sophie.rnc",
+      "url": "https://instagram.example/sophie.rnc",
+      "archiveUrl": "https://archive.example/2026.06.04/instagram-sophie.rnc",
+      "capturedAt": "2026-06-04T13:10:00.000Z",
+      "note": "Compte public. Photos de couple avec Damien Verlac (2024-2025), photo du van (plaque lisible, août 2025), commentaire sous la publication de @kite_dv."
+    },
+    {
+      "id": "89aed464-ccc1-4a5a-965e-3c199797911e",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Analyse de géolocalisation de la photo du 2026-05-18",
+      "capturedAt": "2026-06-05T09:00:00.000Z",
+      "note": "Analyse interne, sans URL.\n\n- Métadonnées EXIF supprimées par la plateforme : inexploitables.\n- Repères visuels : tour de vigie, dune et relief marocain à l'horizon.\n- Concordance avec l'imagerie satellite et les vues au sol de la plage de Los Lances (Tarifa).\n- Orientation de l'ombre cohérente avec une prise de vue en fin d'après-midi."
+    },
+    {
+      "id": "2d07bd6e-5725-46ed-bf65-ccf02ab4a802",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Escuela Kite Levante — page « Equipo »",
+      "url": "https://kitelevante.example/equipo",
+      "archiveUrl": "https://archive.example/2026.06.05/kitelevante-equipo",
+      "capturedAt": "2026-06-05T10:30:00.000Z",
+      "note": "Page de l'équipe : moniteur « Dani V. », arrivé « au printemps 2026 », photo de trois quarts, email professionnel."
+    },
+    {
+      "id": "73235d02-cf86-4926-bd68-ae60fe5396e5",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "WHOIS et résolution DNS de kitelevante.example",
+      "capturedAt": "2026-06-05T11:00:00.000Z",
+      "note": "Domaine enregistré en 2019 au nom de l'école. Enregistrement A vers 203.0.113.42 (hébergeur mutualisé, Espagne). Rien de lié au fugitif : l'infrastructure confirme seulement l'authenticité du site."
+    },
+    {
+      "id": "1d0d8dfb-295f-438d-bc3e-e189a33f677d",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Comparaison faciale et morphologique (avis de recherche / page Equipo)",
+      "capturedAt": "2026-06-06T16:00:00.000Z",
+      "note": "Comparaison manuelle : tatouage visible à l'avant-bras gauche, cicatrice au sourcil droit, oreilles. Concordance forte mais photo de trois quarts : non suffisant seul."
+    },
+    {
+      "id": "90cfc038-d505-4e9f-a186-17bff4770328",
+      "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
+      "title": "Instagram — story de @sophie.rnc (capture du 2026-06-07)",
+      "capturedAt": "2026-06-07T19:45:00.000Z",
+      "note": "Story éphémère capturée avant expiration. Vue depuis une terrasse : enseigne et clocher identifiables, ce qui situe le logement dans une rue du centre de Tarifa."
+    }
+  ],
+  "attachments": []
+}
