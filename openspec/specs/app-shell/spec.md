@@ -31,6 +31,23 @@ references an investigation that does not exist in this browser.
 - **WHEN** the user opens `#/i/<id>` for an id that is not stored locally
 - **THEN** the message "Enquête introuvable dans ce navigateur." and a "Retour aux enquêtes" link are shown
 
+### Requirement: Document title
+The browser tab title SHALL be "Filrouge" on the home screen. While an investigation is open, it
+SHALL be "<investigation name> – Filrouge" (en dash) and follow renames immediately. If the name
+is blank, the title SHALL fall back to "Filrouge".
+
+#### Scenario: Home screen
+- **WHEN** the home screen is displayed
+- **THEN** the document title is "Filrouge"
+
+#### Scenario: Investigation open
+- **WHEN** the user opens the investigation "Affaire Dupont"
+- **THEN** the document title is "Affaire Dupont – Filrouge"
+
+#### Scenario: Investigation renamed
+- **WHEN** the user renames the open investigation to "Renommée"
+- **THEN** the document title becomes "Renommée – Filrouge" without reloading
+
 ### Requirement: Theme preference
 The user SHALL be able to choose a light, dark or system theme. The choice SHALL persist in this
 browser, and "system" SHALL follow the operating system's colour scheme.

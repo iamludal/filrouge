@@ -1,7 +1,10 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useRoute, routeHref } from '@/app/router'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { InvestigationsPage } from '@/features/investigations/investigations-page'
+import { useGraphStore } from '@/store/graph-store'
+
+const BRAND = 'Filrouge'
 
 // The graph editor (React Flow, Markdown…) is the heavy part: loaded on demand.
 const InvestigationPage = lazy(() =>
@@ -10,6 +13,15 @@ const InvestigationPage = lazy(() =>
 
 export function App() {
   const route = useRoute()
+  const openName = useGraphStore((state) =>
+    route.name === 'investigation' && state.investigation?.id === route.id
+      ? state.investigation.name.trim()
+      : '',
+  )
+
+  useEffect(() => {
+    document.title = openName ? `${openName} – ${BRAND}` : BRAND
+  }, [openName])
 
   return (
     <div className="flex h-dvh flex-col">
