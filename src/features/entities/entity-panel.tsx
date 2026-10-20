@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LIMITS, type Entity } from '@/domain/schemas'
 import { AssessmentFields } from '@/features/assessment/assessment-fields'
+import { AppearanceField } from '@/features/entities/appearance-field'
 import { ElementTimestamps } from '@/features/entities/element-timestamps'
 import { EntityTypeSelect } from '@/features/entities/entity-type-select'
 import { NotesEditor } from '@/features/entities/notes-editor'
@@ -79,6 +80,9 @@ export function EntityPanel({ entity }: { entity: Entity }) {
               placeholder={t.entities.unnamed(t.entityTypes[entity.type].label)}
               onChange={(event) => updateEntity(entity.id, { label: event.target.value })}
             />
+          </Field>
+          <Field label={t.appearance.field}>
+            <AppearanceField entity={entity} onChange={(patch) => updateEntity(entity.id, patch)} />
           </Field>
           <AssessmentFields
             idPrefix="panel-entity"

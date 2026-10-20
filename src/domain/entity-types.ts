@@ -1,3 +1,5 @@
+import type { EntityColorId, EntityIconId } from '@/domain/entity-appearance'
+
 export const ENTITY_TYPE_IDS = [
   'person',
   'alias',
@@ -17,86 +19,69 @@ export const ENTITY_TYPE_IDS = [
 
 export type EntityTypeId = (typeof ENTITY_TYPE_IDS)[number]
 
-/** Icon names map to lucide-react components in the UI layer; the domain stays DOM-free. */
-export type EntityIconName =
-  | 'user'
-  | 'at-sign'
-  | 'mail'
-  | 'phone'
-  | 'globe'
-  | 'server'
-  | 'link'
-  | 'building'
-  | 'map-pin'
-  | 'image'
-  | 'file-text'
-  | 'wallet'
-  | 'car'
-  | 'calendar'
-
 export interface EntityTypeDefinition {
   id: EntityTypeId
-  icon: EntityIconName
-  color: string
+  icon: EntityIconId
+  color: EntityColorId
 }
 
 export const ENTITY_TYPES: Record<EntityTypeId, EntityTypeDefinition> = {
   person: {
     id: 'person',
     icon: 'user',
-    color: '#2563eb',
+    color: 'blue',
   },
   alias: {
     id: 'alias',
     icon: 'at-sign',
-    color: '#7c3aed',
+    color: 'violet',
   },
-  email: { id: 'email', icon: 'mail', color: '#db2777' },
+  email: { id: 'email', icon: 'mail', color: 'pink' },
   phone: {
     id: 'phone',
     icon: 'phone',
-    color: '#ea580c',
+    color: 'orange',
   },
   domain: {
     id: 'domain',
     icon: 'globe',
-    color: '#0891b2',
+    color: 'cyan',
   },
-  ip: { id: 'ip', icon: 'server', color: '#0d9488' },
-  url: { id: 'url', icon: 'link', color: '#0284c7' },
+  ip: { id: 'ip', icon: 'server', color: 'teal' },
+  url: { id: 'url', icon: 'link', color: 'sky' },
   organization: {
     id: 'organization',
     icon: 'building',
-    color: '#4f46e5',
+    color: 'indigo',
   },
   address: {
     id: 'address',
     icon: 'map-pin',
-    color: '#16a34a',
+    color: 'green',
   },
   image: {
     id: 'image',
     icon: 'image',
-    color: '#ca8a04',
+    color: 'yellow',
   },
   document: {
     id: 'document',
     icon: 'file-text',
-    color: '#64748b',
+    color: 'slate',
   },
   crypto_wallet: {
     id: 'crypto_wallet',
     icon: 'wallet',
-    color: '#d97706',
+    color: 'amber',
   },
   vehicle: {
     id: 'vehicle',
     icon: 'car',
-    color: '#9333ea',
+    color: 'purple',
   },
   event: {
     id: 'event',
     icon: 'calendar',
-    color: '#dc2626',
+    color: 'red',
   },
 }

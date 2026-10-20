@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ENTITY_COLORS } from '@/domain/entity-appearance'
 import { createInvestigation } from '@/domain/factories'
 import { DetailPanel } from '@/features/graph/detail-panel'
 import { useGraphStore } from '@/store/graph-store'
@@ -71,5 +72,14 @@ describe('DetailPanel selection states', () => {
     const { ac } = setup()
     act(() => useGraphStore.getState().setSelection({ entityIds: [], relationIds: [ac.id] }))
     expect(screen.getByLabelText(/^Créée le /)).toBeInTheDocument()
+  })
+
+  it("heads the panel with the entity's own icon and colour", () => {
+    const { a } = setup()
+    act(() => useGraphStore.getState().updateEntity(a.id, { color: 'red', icon: 'skull' }))
+    act(() => useGraphStore.getState().setSelection({ entityIds: [a.id], relationIds: [] }))
+    const heading = screen.getByRole('heading', { name: 'Personne' })
+    expect(heading).toHaveStyle({ color: ENTITY_COLORS.red })
+    expect(heading.querySelector('svg')).toHaveClass('lucide-skull')
   })
 })

@@ -396,4 +396,32 @@ describe('graph store history', () => {
     store().undo()
     expect(store().entities[a.id]?.toolChecks).toBeUndefined()
   })
+
+  it('undoes a colour change, restoring the previous value and date', () => {
+    openEmpty()
+    const a = store().addEntity('person', { x: 0, y: 0 }, 'Alice')
+    const before = store().entities[a.id]
+    advance(5_000)
+    store().updateEntity(a.id, { color: 'red' })
+    expect(store().entities[a.id]?.color).toBe('red')
+
+    store().undo()
+    expect(store().entities[a.id]).toEqual(before)
+    expect(store().entities[a.id]).not.toHaveProperty('color')
+  })
+
+  it('undoes the important mark', () => {
+    openEmpty()
+    const a = store().addEntity('person', { x: 0, y: 0 }, 'Alice')
+    advance(5_000)
+    store().updateEntity(a.id, { important: true })
+    advance(5_000)
+    store().updateEntity(a.id, { important: undefined })
+    expect(store().entities[a.id]).not.toHaveProperty('important')
+
+    store().undo()
+    expect(store().entities[a.id]?.important).toBe(true)
+    store().undo()
+    expect(store().entities[a.id]).not.toHaveProperty('important')
+  })
 })

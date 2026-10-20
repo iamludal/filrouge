@@ -2,7 +2,8 @@ import { ChevronUp, X } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 import { useId, useRef, useState, type PointerEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { ENTITY_TYPES, type EntityTypeId } from '@/domain/entity-types'
+import { entityAppearance } from '@/domain/entity-appearance'
+import { type EntityTypeId } from '@/domain/entity-types'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import { DetailContent } from '@/features/graph/detail-content'
 import { cn } from '@/lib/utils'
@@ -23,7 +24,12 @@ function useSelectionSummary() {
       if (count === 0) return null
       const entity = entityIds.length === 1 && count === 1 ? state.entities[entityIds[0]!] : undefined
       if (entity) {
-        return { kind: 'entity' as const, typeId: entity.type, label: entity.label }
+        return {
+          kind: 'entity' as const,
+          typeId: entity.type,
+          label: entity.label,
+          ...entityAppearance(entity),
+        }
       }
       const relation = relationIds.length === 1 && count === 1 ? state.relations[relationIds[0]!] : undefined
       if (relation) {
@@ -139,9 +145,9 @@ function DrawerShell() {
               <>
                 <span
                   className="flex shrink-0 items-center gap-1.5 font-semibold"
-                  style={{ color: ENTITY_TYPES[summary.typeId].color }}
+                  style={{ color: summary.color }}
                 >
-                  <EntityIcon type={summary.typeId} className="size-4" />
+                  <EntityIcon icon={summary.icon} className="size-4" />
                   {t.entityTypes[summary.typeId].label}
                 </span>
                 <span className="truncate">

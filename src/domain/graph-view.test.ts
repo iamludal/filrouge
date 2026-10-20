@@ -4,6 +4,7 @@ import {
   computeGraphView,
   EMPTY_FILTERS,
   entityHaystack,
+  importantCount,
   normalizeText,
   searchTerms,
   tagOptions,
@@ -291,6 +292,62 @@ describe('combining criteria and relations', () => {
         includeUngraded: false,
       }),
     ).toBe(3)
+  })
+})
+
+describe('importance criterion', () => {
+  const important = (label: string) => ({ ...entity(label), important: true })
+
+  it('dims the entities that are not marked important', () => {
+    const a = important('A')
+    const b = entity('B')
+    const c = { ...entity('C'), important: false }
+    expect(dimmedEntities([a, b, c], { importantOnly: true })).toEqual(ids(b, c))
+    expect(dimmedEntities([a, b, c], { importantOnly: false })).toEqual([])
+  })
+
+  it('dims a relation between an important and an unmarked entity', () => {
+    const a = important('A')
+    const b = entity('B')
+    const c = important('C')
+    const lost = createRelation(inv, a.id, b.id, 'l')
+    const kept = createRelation(inv, a.id, c.id, 'k')
+    const v = filtered([a, b, c], { importantOnly: true }, [lost, kept])
+    expect([...v.dimmedEntityIds]).toEqual([b.id])
+    expect([...v.dimmedRelationIds]).toEqual([lost.id])
+  })
+
+  it('combines with a type', () => {
+    const importantEmail = { ...important('IE'), type: 'email' as const }
+    const plainEmail = { ...entity('E'), type: 'email' as const }
+    const importantPerson = important('IP')
+    expect(
+      dimmedEntities([importantEmail, plainEmail, importantPerson], {
+        types: ['email'],
+        importantOnly: true,
+      }),
+    ).toEqual(ids(plainEmail, importantPerson))
+  })
+
+  it('counts the important entities', () => {
+    const list = [important('A'), entity('B'), important('C')]
+    expect(importantCount(Object.fromEntries(list.map((e) => [e.id, e])))).toBe(2)
+  })
+
+  it('counts as the sixth criterion', () => {
+    expect(activeCriteriaCount({ ...EMPTY_FILTERS, importantOnly: true })).toBe(1)
+    expect(
+      activeCriteriaCount({
+        types: ['email'],
+        tags: ['x'],
+        entityStatus: 'verified',
+        relationStatus: 'verified',
+        minReliability: 'B',
+        minCredibility: null,
+        includeUngraded: true,
+        importantOnly: true,
+      }),
+    ).toBe(6)
   })
 })
 

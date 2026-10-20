@@ -131,4 +131,34 @@ describe('FiltersButton', () => {
 
     expect(await screen.findByRole('checkbox', { name: 'Email (0)' })).toBeChecked()
   })
+
+  it('lists the importance criterion with the number of important entities', async () => {
+    load((id) => [
+      { ...at(id, 'person'), important: true },
+      { ...at(id, 'email'), important: true },
+      at(id, 'domain'),
+    ])
+    const user = await openPanel()
+    const group = screen.getByRole('group', { name: 'Importance' })
+    const box = within(group).getByRole('checkbox', { name: 'Entités importantes uniquement (2)' })
+    expect(box).not.toBeChecked()
+
+    await user.click(box)
+    expect(useViewStore.getState().filters.importantOnly).toBe(true)
+    expect(box).toBeChecked()
+    expect(screen.getByRole('button', { name: /Filtres/ })).toHaveTextContent('1')
+  })
+
+  it('counts the importance criterion with the others and resets it', async () => {
+    load((id) => [{ ...at(id, 'person'), important: true }, at(id, 'email')])
+    const user = await openPanel()
+    await user.click(screen.getByRole('checkbox', { name: 'Email (1)' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Entités importantes uniquement (1)' }))
+    expect(screen.getByRole('button', { name: /Filtres/ })).toHaveTextContent('2')
+
+    await user.click(screen.getByRole('button', { name: 'Réinitialiser les filtres' }))
+    expect(useViewStore.getState().filters.importantOnly).toBe(false)
+    await user.click(screen.getByRole('button', { name: /Filtres/ }))
+    expect(screen.getByRole('checkbox', { name: 'Entités importantes uniquement (1)' })).not.toBeChecked()
+  })
 })

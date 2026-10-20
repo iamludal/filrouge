@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ENTITY_COLOR_IDS, ENTITY_ICON_IDS } from '@/domain/entity-appearance'
 import { ENTITY_TYPE_IDS } from '@/domain/entity-types'
 import { IMAGE_MIME_TYPES } from '@/domain/image-format'
 
@@ -35,6 +36,10 @@ export const confidenceSchema = z.object({
 export const statusSchema = z.enum(['verified', 'hypothesis'])
 
 export const entityTypeIdSchema = z.enum(ENTITY_TYPE_IDS)
+
+export const entityColorIdSchema = z.enum(ENTITY_COLOR_IDS)
+
+export const entityIconIdSchema = z.enum(ENTITY_ICON_IDS)
 
 /** Property values are restricted to JSON primitives: no nested structure to render. */
 export const propertyValueSchema = z.union([
@@ -75,6 +80,12 @@ export const entitySchema = z.object({
   investigationId: id,
   type: entityTypeIdSchema,
   label: z.string().max(LIMITS.label),
+  /** Palette colour replacing the type's; absent when the type's colour is used. */
+  color: entityColorIdSchema.optional(),
+  /** Icon replacing the type's; absent when the type's icon is used. */
+  icon: entityIconIdSchema.optional(),
+  /** Marked by the investigator as important; absent when not marked. */
+  important: z.boolean().optional(),
   properties: propertiesSchema,
   tags: z.array(z.string().trim().min(1).max(LIMITS.tag)).max(LIMITS.tags),
   notes: z.string().max(LIMITS.text).optional(),

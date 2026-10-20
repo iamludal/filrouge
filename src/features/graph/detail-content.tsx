@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ENTITY_TYPES } from '@/domain/entity-types'
+import { entityAppearance } from '@/domain/entity-appearance'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import { EntityPanel } from '@/features/entities/entity-panel'
 import { RelationPanel } from '@/features/relations/relation-panel'
@@ -25,14 +25,12 @@ export function DetailContent({ hideHeading = false }: { hideHeading?: boolean }
   const count = selection.entityIds.length + selection.relationIds.length
 
   if (entity) {
+    const appearance = entityAppearance(entity)
     return (
       <>
         {!hideHeading && (
-          <h2
-            className="mb-4 flex items-center gap-2 font-semibold"
-            style={{ color: ENTITY_TYPES[entity.type].color }}
-          >
-            <EntityIcon type={entity.type} className="size-4" />
+          <h2 className="mb-4 flex items-center gap-2 font-semibold" style={{ color: appearance.color }}>
+            <EntityIcon icon={appearance.icon} className="size-4" />
             <span className="min-w-0 wrap-anywhere">{t.entityTypes[entity.type].label}</span>
           </h2>
         )}

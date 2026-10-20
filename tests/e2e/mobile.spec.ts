@@ -433,3 +433,33 @@ test.describe('pivot tools', () => {
     await noHorizontalScroll(page)
   })
 })
+
+test.describe('entity appearance', () => {
+  test('fits the icon picker in the screen with 44 px targets, from the expanded drawer', async ({
+    page,
+  }) => {
+    await createInvestigation(page, 'Apparence mobile')
+    await addEntityAt(page, 100, 150, 'Alice')
+    await node(page, 'Alice').tap()
+    await handle(page).click()
+    await expect(handle(page)).toHaveAttribute('aria-expanded', 'true')
+
+    await drawer(page)
+      .getByRole('button', { name: /^Icône ?:/ })
+      .click()
+    const cells = page.getByRole('radiogroup', { name: 'Icône' }).getByRole('radio')
+    await expect(cells).toHaveCount(45)
+    for (let index = 0; index < 45; index++) {
+      const cell = cells.nth(index)
+      await cell.scrollIntoViewIfNeeded()
+      const box = (await cell.boundingBox())!
+      // Sub-pixel rounding after scrolling: 44 px is reported as 43.99998.
+      expect(box.width, `icône ${index}`).toBeGreaterThanOrEqual(43.9)
+      expect(box.height, `icône ${index}`).toBeGreaterThanOrEqual(43.9)
+    }
+    await noHorizontalScroll(page)
+
+    await page.getByRole('radio', { name: 'Crâne' }).tap()
+    await expect(node(page, 'Alice').locator('svg.lucide-skull')).toBeVisible()
+  })
+})

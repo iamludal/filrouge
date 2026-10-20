@@ -334,10 +334,13 @@ export const useGraphStore = create<GraphState>()(
             set((state) => {
               const current = state.entities[id]
               if (!current) return state
-              return {
-                entities: { ...state.entities, [id]: { ...current, ...patch, updatedAt: nowIso() } },
-                ...touch(state, [id], []),
+              const entity: Entity = { ...current, ...patch, updatedAt: nowIso() }
+              // A cleared field is dropped rather than stored as `undefined`, so an entity without
+              // a custom colour, icon or mark is saved and exported as before.
+              for (const key of Object.keys(patch) as (keyof EntityPatch)[]) {
+                if (patch[key] === undefined) delete entity[key]
               }
+              return { entities: { ...state.entities, [id]: entity }, ...touch(state, [id], []) }
             }),
           ),
 

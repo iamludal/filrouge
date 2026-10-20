@@ -9,8 +9,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { CREDIBILITY_VALUES, RELIABILITY_VALUES } from '@/domain/assessment'
-import { ENTITY_TYPES, type EntityTypeId } from '@/domain/entity-types'
-import { activeCriteriaCount, tagOptions, typeOptions, type GraphFilters } from '@/domain/graph-view'
+import { typeAppearance } from '@/domain/entity-appearance'
+import { type EntityTypeId } from '@/domain/entity-types'
+import {
+  activeCriteriaCount,
+  importantCount,
+  tagOptions,
+  typeOptions,
+  type GraphFilters,
+} from '@/domain/graph-view'
 import type { Status } from '@/domain/schemas'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import { useI18n } from '@/i18n/locale'
@@ -130,6 +137,7 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
   const { setFilters, resetFilters } = useViewStore.getState()
   const types = typeOptions(entities, filters.types)
   const tags = tagOptions(entities, filters.tags, locale)
+  const important = importantCount(entities)
   const active = activeCriteriaCount(filters)
 
   return (
@@ -148,8 +156,8 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
             checked={filters.types.includes(type)}
             onChange={(checked) => setFilters({ types: toggled<EntityTypeId>(filters.types, type, checked) })}
           >
-            <span style={{ color: ENTITY_TYPES[type].color }}>
-              <EntityIcon type={type} className="size-3.5" />
+            <span style={{ color: typeAppearance(type).color }}>
+              <EntityIcon icon={typeAppearance(type).icon} className="size-3.5" />
             </span>
             <span>{`${t.entityTypes[type].label} (${count})`}</span>
           </CheckboxRow>
@@ -236,6 +244,16 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
           onChange={(includeUngraded) => setFilters({ includeUngraded })}
         >
           {t.filters.includeUngraded}
+        </CheckboxRow>
+      </Criterion>
+
+      <Criterion title={t.filters.importance}>
+        <CheckboxRow
+          id="filter-important"
+          checked={filters.importantOnly}
+          onChange={(importantOnly) => setFilters({ importantOnly })}
+        >
+          <span>{`${t.filters.importantOnly} (${important})`}</span>
         </CheckboxRow>
       </Criterion>
     </div>

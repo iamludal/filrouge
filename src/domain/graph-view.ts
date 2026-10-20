@@ -26,6 +26,8 @@ export interface GraphFilters {
   /** Worst credibility still accepted ("au moins 2"); `null` accepts every grade. */
   minCredibility: Exclude<Credibility, 6> | null
   includeUngraded: boolean
+  /** Keep only the entities marked important. */
+  importantOnly: boolean
 }
 
 export const EMPTY_FILTERS: GraphFilters = {
@@ -36,6 +38,7 @@ export const EMPTY_FILTERS: GraphFilters = {
   minReliability: null,
   minCredibility: null,
   includeUngraded: true,
+  importantOnly: false,
 }
 
 const RELIABILITY_ORDER = 'ABCDEF'
@@ -44,7 +47,7 @@ function isConfidenceActive(filters: GraphFilters): boolean {
   return filters.minReliability !== null || filters.minCredibility !== null || !filters.includeUngraded
 }
 
-/** How many of the five criteria are set. */
+/** How many of the six criteria are set. */
 export function activeCriteriaCount(filters: GraphFilters): number {
   return [
     filters.types.length > 0,
@@ -52,6 +55,7 @@ export function activeCriteriaCount(filters: GraphFilters): number {
     filters.entityStatus !== null,
     filters.relationStatus !== null,
     isConfidenceActive(filters),
+    filters.importantOnly,
   ].filter(Boolean).length
 }
 
@@ -66,12 +70,13 @@ function passesConfidence(confidence: Confidence | undefined, filters: GraphFilt
   return !minCredibility || confidence.credibility <= minCredibility
 }
 
-/** Type, tag, entity status and confidence apply to an entity. */
+/** Type, tag, entity status, confidence and importance apply to an entity. */
 export function passesFilters(entity: Entity, filters: GraphFilters): boolean {
   if (filters.types.length > 0 && !filters.types.includes(entity.type)) return false
   if (filters.tags.length > 0 && !entity.tags.some((tag) => filters.tags.includes(tag.toLowerCase())))
     return false
   if (filters.entityStatus && entity.status !== filters.entityStatus) return false
+  if (filters.importantOnly && !entity.important) return false
   return passesConfidence(entity.confidence, filters)
 }
 
@@ -97,6 +102,11 @@ export function typeOptions(
     type,
     count: counts.get(type) ?? 0,
   }))
+}
+
+/** How many entities are marked important. */
+export function importantCount(entities: Readonly<Record<string, Entity>>): number {
+  return Object.values(entities).filter((entity) => entity.important).length
 }
 
 export interface TagOption {

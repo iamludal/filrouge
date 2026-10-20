@@ -1,4 +1,4 @@
-import { ENTITY_TYPES } from '@/domain/entity-types'
+import { ENTITY_COLORS, typeAppearance } from '@/domain/entity-appearance'
 import { fr } from '@/i18n/messages/fr'
 import { circleCenter, edgeSegment } from '@/domain/graph-geometry'
 import { createEntity, createRelation } from '@/domain/factories'
@@ -12,12 +12,22 @@ function entity(
   label: string,
   x: number,
   y: number,
-  extra: { type?: Entity['type']; status?: Status; confidence?: Confidence } = {},
+  extra: {
+    type?: Entity['type']
+    status?: Status
+    confidence?: Confidence
+    color?: Entity['color']
+    icon?: Entity['icon']
+    important?: boolean
+  } = {},
 ): Entity {
   return {
     ...createEntity(INV, extra.type ?? 'person', { x, y }, label),
     status: extra.status ?? 'verified',
     confidence: extra.confidence,
+    ...(extra.color ? { color: extra.color } : {}),
+    ...(extra.icon ? { icon: extra.icon } : {}),
+    ...(extra.important ? { important: true } : {}),
   }
 }
 
@@ -72,9 +82,9 @@ describe('renderGraphSvg', () => {
     const { doc } = draw([a, b])
     const circle = (id: string) => doc.querySelector(`[data-entity="${id}"] circle`)
     expect(circle(a.id)?.getAttribute('stroke-dasharray')).toBeTruthy()
-    expect(circle(a.id)?.getAttribute('stroke')).toBe(ENTITY_TYPES.email.color)
+    expect(circle(a.id)?.getAttribute('stroke')).toBe(typeAppearance('email').color)
     expect(circle(b.id)?.getAttribute('stroke-dasharray')).toBeNull()
-    expect(circle(b.id)?.getAttribute('stroke')).toBe(ENTITY_TYPES.domain.color)
+    expect(circle(b.id)?.getAttribute('stroke')).toBe(typeAppearance('domain').color)
   })
 
   it('shows the grade badge of a graded entity only', () => {
@@ -83,6 +93,57 @@ describe('renderGraphSvg', () => {
     const { doc } = draw([graded, plain])
     expect(texts(doc)).toContain('B2')
     expect(doc.querySelectorAll(`[data-entity="${plain.id}"] text`)).toHaveLength(1)
+  })
+
+  it("draws the entity's own colour and icon in place of the type's", () => {
+    const styled = entity('A', 0, 0, { color: 'red', icon: 'skull' })
+    const plain = entity('B', 300, 0)
+    const { doc } = draw([styled, plain])
+    const of = (e: Entity) => doc.querySelector(`[data-entity="${e.id}"]`)!
+    expect(of(styled).querySelector('circle')?.getAttribute('stroke')).toBe(ENTITY_COLORS.red)
+    const icon = of(styled).querySelector('svg')!
+    expect(icon.getAttribute('class')).toContain('lucide-skull')
+    expect(icon.getAttribute('stroke')).toBe(ENTITY_COLORS.red)
+    expect(of(plain).querySelector('svg')?.getAttribute('class')).toContain('lucide-user')
+    expect(of(plain).querySelector('circle')?.getAttribute('stroke')).toBe(typeAppearance('person').color)
+  })
+
+  it('draws a flag badge on an important entity only', () => {
+    const important = entity('A', 0, 0, { important: true })
+    const plain = entity('B', 300, 0)
+    const { doc } = draw([important, plain])
+    expect(doc.querySelectorAll(`[data-entity="${important.id}"] [data-flag]`)).toHaveLength(1)
+    expect(doc.querySelectorAll(`[data-entity="${plain.id}"] [data-flag]`)).toHaveLength(0)
+    expect(
+      doc.querySelector(`[data-entity="${important.id}"] [data-flag] svg`)?.getAttribute('class'),
+    ).toContain('lucide-flag')
+  })
+
+  it('keeps the flag of an entity alone at the top left inside the image bounds', () => {
+    const { doc } = draw([entity('A', 0, 0, { important: true })])
+    const [x, y, width, height] = doc.documentElement.getAttribute('viewBox')!.split(' ').map(Number)
+    const flag = doc.querySelector('[data-flag] circle')!
+    const cx = Number(flag.getAttribute('cx'))
+    const cy = Number(flag.getAttribute('cy'))
+    const r = Number(flag.getAttribute('r'))
+    expect(cx - r).toBeGreaterThanOrEqual(x!)
+    expect(cy - r).toBeGreaterThanOrEqual(y!)
+    expect(cx + r).toBeLessThanOrEqual(x! + width!)
+    expect(cy + r).toBeLessThanOrEqual(y! + height!)
+  })
+
+  it('widens the image so a flag never lies outside it', () => {
+    const plain = draw([entity('A', 0, 0)])
+    const flagged = draw([entity('A', 0, 0, { important: true })])
+    expect(flagged.width).toBeGreaterThan(plain.width)
+  })
+
+  it('draws the grade and the flag badges of the same entity apart', () => {
+    const both = entity('A', 0, 0, { important: true, confidence: { reliability: 'B', credibility: 2 } })
+    const { doc } = draw([both])
+    const flag = doc.querySelector('[data-flag] circle')!
+    const grade = doc.querySelector(`[data-entity="${both.id}"] rect`)!
+    expect(Number(grade.getAttribute('x'))).toBeGreaterThan(Number(flag.getAttribute('cx')) + 8)
   })
 
   it('cuts a long entity label to 23 characters and an ellipsis', () => {

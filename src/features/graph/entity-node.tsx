@@ -1,7 +1,8 @@
 import { Handle, Position, useConnection, type NodeProps } from '@xyflow/react'
+import { Flag } from 'lucide-react'
 import { memo } from 'react'
 import { describeConfidence, formatConfidence } from '@/domain/assessment'
-import { ENTITY_TYPES } from '@/domain/entity-types'
+import { entityAppearance } from '@/domain/entity-appearance'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import type { EntityNode as EntityNodeType } from '@/features/graph/types'
 import { cn } from '@/lib/utils'
@@ -26,7 +27,7 @@ const TOUCH_HIT_AREA =
 export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeProps<EntityNodeType>) {
   const { entity, dimmed, highlighted } = data
   const { t } = useI18n()
-  const type = ENTITY_TYPES[entity.type]
+  const appearance = entityAppearance(entity)
   const connection = useConnection()
   const isDropTarget = connection.inProgress && connection.fromNode.id !== id
   const label = entityName(t, entity)
@@ -47,9 +48,19 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
           selected && 'ring-4 ring-ring/40',
           isDropTarget && 'ring-4 ring-primary/30',
         )}
-        style={{ borderColor: type.color, color: type.color }}
+        style={{ borderColor: appearance.color, color: appearance.color }}
       >
-        <EntityIcon type={entity.type} className="size-5" />
+        <EntityIcon icon={appearance.icon} className="size-5" />
+        {entity.important && (
+          <span
+            role="img"
+            title={t.appearance.important}
+            aria-label={t.appearance.important}
+            className="absolute -top-2 -left-2 flex size-4 items-center justify-center rounded-full border bg-background text-red-600 shadow-sm"
+          >
+            <Flag aria-hidden className="size-2.5 fill-current" />
+          </span>
+        )}
         {entity.confidence && (
           <span
             role="img"

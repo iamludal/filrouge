@@ -12,8 +12,12 @@ export const ENTITY_LABEL_FONT = `500 12px ${EXPORT_FONT_FAMILY}`
 export const BADGE_FONT = `600 10px ${EXPORT_FONT_FAMILY}`
 export const EDGE_LABEL_FONT = `400 11px ${EXPORT_FONT_FAMILY}`
 
-/** Offsets from the circle, as drawn on the canvas (badge: -top-2 -right-4, h 16). */
+/**
+ * Offsets from the circle, as drawn on the canvas (grade badge: -top-2 -right-4, h 16; important
+ * flag: -top-2 -left-2, 16 square).
+ */
 const BADGE_HEIGHT = 16
+export const FLAG_SIZE = 16
 const BADGE_PADDING = 6
 const LABEL_TOP = 54
 const LABEL_CENTER_Y = 62
@@ -35,6 +39,8 @@ export interface NodeLayout {
   labelY: number
   unnamed: boolean
   badge?: { text: string; box: Box }
+  /** Flag badge of an important entity. */
+  flag?: Box
 }
 
 export interface EdgeLayout {
@@ -80,6 +86,10 @@ export function layoutGraph(
       const right = center.x + CIRCLE_RADIUS + 16
       node.badge = { text, box: { x: right - width, y: top - 8, width, height: BADGE_HEIGHT } }
       boxes.push(node.badge.box)
+    }
+    if (entity.important) {
+      node.flag = { x: center.x - CIRCLE_RADIUS - 8, y: top - 8, width: FLAG_SIZE, height: FLAG_SIZE }
+      boxes.push(node.flag)
     }
     return node
   })

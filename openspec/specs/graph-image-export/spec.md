@@ -51,10 +51,11 @@ background whatever the active theme.
 - **THEN** the image background is white and the labels are dark
 
 ### Requirement: Entity drawing
-Each entity SHALL be drawn as on the canvas: a circle bordered with its type's colour holding its
-type's icon, its label below (or "<type label> sans nom" when empty), a dashed border when it is a
-hypothesis and a solid one when verified, and its grade (e.g. "B2") in a badge when graded. A label
-longer than 24 characters SHALL be cut to its first 23 characters followed by "…".
+Each entity SHALL be drawn as on the canvas: a circle bordered with the entity's colour holding the
+entity's icon (its custom ones, otherwise its type's, see entity-appearance), its label below (or
+"<type label> sans nom" when empty), a dashed border when it is a hypothesis and a solid one when
+verified, its grade (e.g. "B2") in a badge when graded, and a flag badge when it is important. A
+label longer than 24 characters SHALL be cut to its first 23 characters followed by "…".
 
 #### Scenario: Unlabelled entity
 - **WHEN** the graph holds a "Personne" entity with an empty label and the user exports the SVG
@@ -71,6 +72,14 @@ longer than 24 characters SHALL be cut to its first 23 characters followed by "�
 #### Scenario: Long label
 - **WHEN** an entity's label is "Société anonyme des transports réunis" and the user exports the SVG
 - **THEN** the SVG holds the text "Société anonyme des tra…" and not the full label
+
+#### Scenario: Styled entity
+- **WHEN** a "Personne" entity has the custom colour "Rouge" and the custom icon "Crâne" and the user exports the SVG
+- **THEN** that entity's circle stroke and icon use the palette red, and the icon drawn is the skull, not the person icon
+
+#### Scenario: Important entity
+- **WHEN** entity A is important, entity B is not, and the user exports the SVG
+- **THEN** a flag badge is drawn at the top left of A's circle and none next to B's, and the badge lies inside the image bounds
 
 ### Requirement: Relation drawing
 Each relation SHALL be drawn as a straight line between the circles of its two entities, with an

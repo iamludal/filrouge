@@ -21,7 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } fr
 import { useTheme } from '@/app/theme'
 import { useIsNarrow } from '@/app/use-media-query'
 import { Button } from '@/components/ui/button'
-import { ENTITY_TYPES } from '@/domain/entity-types'
+import { entityAppearance } from '@/domain/entity-appearance'
 import type { GraphView } from '@/domain/graph-view'
 import type { Entity, Position, Relation } from '@/domain/schemas'
 import { AddEntityDialog } from '@/features/entities/add-entity-dialog'
@@ -243,7 +243,7 @@ export function GraphCanvas() {
 
   const minimapColor = useMemo(
     () => (node: EntityNodeType) =>
-      node.data.dimmed ? 'var(--border)' : ENTITY_TYPES[node.data.entity.type].color,
+      node.data.dimmed ? 'var(--border)' : entityAppearance(node.data.entity).color,
     [],
   )
 

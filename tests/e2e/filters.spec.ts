@@ -185,6 +185,29 @@ test('the badge counts the criteria and the reset clears them', async ({ page })
   for (const name of ['Alice', 'Bob', 'Courriel']) await shown(page, name)
 })
 
+test('filtering on important entities, alone and with a type', async ({ page }) => {
+  await buildGraph(page)
+  await node(page, 'Bob').click()
+  await panel(page).getByRole('button', { name: 'Important' }).click()
+  await node(page, 'Courriel').click()
+  await panel(page).getByRole('button', { name: 'Important' }).click()
+  await saved(page)
+
+  const filters = await openFilters(page)
+  await filters.getByRole('checkbox', { name: 'Entités importantes uniquement (2)' }).click()
+  await dimmed(page, 'Alice')
+  await shown(page, 'Bob')
+  await shown(page, 'Courriel')
+  await linkDimmed(page, 'connaît') // Alice, one of its ends, is dimmed
+  await linkShown(page, 'utilise')
+  await expect(filtersButton(page)).toContainText('1')
+
+  await filters.getByRole('checkbox', { name: 'Email (1)' }).click()
+  await dimmed(page, 'Bob')
+  await shown(page, 'Courriel')
+  await expect(filtersButton(page)).toContainText('2')
+})
+
 test('search results are taken among the elements that pass the filters', async ({ page }) => {
   await buildGraph(page)
   await node(page, 'Bob').click()

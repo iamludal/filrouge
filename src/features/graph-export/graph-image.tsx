@@ -1,5 +1,6 @@
+import { Flag } from 'lucide-react'
 import { CIRCLE_RADIUS } from '@/domain/graph-geometry'
-import { ENTITY_TYPES } from '@/domain/entity-types'
+import { entityAppearance } from '@/domain/entity-appearance'
 import { ENTITY_ICONS } from '@/features/entities/entity-icons'
 import { EXPORT_FONT_FAMILY } from '@/features/graph-export/measure-text'
 import type { GraphLayout } from '@/features/graph-export/graph-layout'
@@ -10,8 +11,10 @@ const PALETTE = {
   text: '#0a0a0a',
   muted: '#737373',
   border: '#e5e5e5',
+  flag: '#dc2626',
 }
 const ICON_SIZE = 20
+const FLAG_ICON_SIZE = 10
 
 /** Standalone drawing of an investigation graph: shapes and text only, no external reference. */
 export function GraphImage({ title, layout }: { title: string; layout: GraphLayout }) {
@@ -81,9 +84,9 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
       </g>
 
       <g data-layer="nodes">
-        {nodes.map(({ entity, center, label, labelY, unnamed, badge }) => {
-          const type = ENTITY_TYPES[entity.type]
-          const Icon = ENTITY_ICONS[entity.type]
+        {nodes.map(({ entity, center, label, labelY, unnamed, badge, flag }) => {
+          const appearance = entityAppearance(entity)
+          const Icon = ENTITY_ICONS[appearance.icon]
           return (
             <g key={entity.id} data-entity={entity.id}>
               <circle
@@ -91,7 +94,7 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
                 cy={center.y}
                 r={CIRCLE_RADIUS - 1}
                 fill={PALETTE.background}
-                stroke={type.color}
+                stroke={appearance.color}
                 strokeWidth={2}
                 strokeDasharray={entity.status === 'hypothesis' ? '4 3' : undefined}
               />
@@ -100,7 +103,7 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
                 y={center.y - ICON_SIZE / 2}
                 width={ICON_SIZE}
                 height={ICON_SIZE}
-                color={type.color}
+                color={appearance.color}
               />
               <text
                 x={center.x}
@@ -137,6 +140,25 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
                     {badge.text}
                   </text>
                 </>
+              )}
+              {flag && (
+                <g data-flag="important">
+                  <circle
+                    cx={flag.x + flag.width / 2}
+                    cy={flag.y + flag.height / 2}
+                    r={flag.width / 2}
+                    fill={PALETTE.background}
+                    stroke={PALETTE.border}
+                  />
+                  <Flag
+                    x={flag.x + (flag.width - FLAG_ICON_SIZE) / 2}
+                    y={flag.y + (flag.height - FLAG_ICON_SIZE) / 2}
+                    width={FLAG_ICON_SIZE}
+                    height={FLAG_ICON_SIZE}
+                    color={PALETTE.flag}
+                    fill={PALETTE.flag}
+                  />
+                </g>
               )}
             </g>
           )

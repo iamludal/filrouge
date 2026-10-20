@@ -2,15 +2,23 @@ import { ReactFlowProvider, type NodeProps } from '@xyflow/react'
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createEntity } from '@/domain/factories'
-import type { Confidence, Status } from '@/domain/schemas'
+import { ENTITY_COLORS } from '@/domain/entity-appearance'
+import type { Confidence, Entity, Status } from '@/domain/schemas'
 import { EntityNode } from '@/features/graph/entity-node'
 import type { EntityNode as EntityNodeType, ViewFlags } from '@/features/graph/types'
 
-function renderNode(status: Status, confidence?: Confidence, flags: ViewFlags = {}, selected = false) {
+function renderNode(
+  status: Status,
+  confidence?: Confidence,
+  flags: ViewFlags = {},
+  selected = false,
+  extra: Partial<Entity> = {},
+) {
   const entity = {
     ...createEntity(crypto.randomUUID(), 'person', { x: 0, y: 0 }, 'Alice'),
     status,
     confidence,
+    ...extra,
   }
   const props = {
     id: entity.id,
@@ -81,5 +89,33 @@ describe('EntityNode', () => {
     expect(screen.getByLabelText('Créer une relation depuis Alice').className).not.toContain(
       'pointer-coarse:before:size-11',
     )
+  })
+
+  it("draws the type's colour and icon by default", () => {
+    renderNode('verified')
+    expect(circle()).toHaveStyle({ borderColor: ENTITY_COLORS.blue, color: ENTITY_COLORS.blue })
+    expect(circle().querySelector('svg')).toHaveClass('lucide-user')
+  })
+
+  it("draws the entity's own colour and icon in place of the type's", () => {
+    renderNode('verified', undefined, {}, false, { color: 'red', icon: 'skull' })
+    expect(circle()).toHaveStyle({ borderColor: ENTITY_COLORS.red, color: ENTITY_COLORS.red })
+    expect(circle().querySelector('svg')).toHaveClass('lucide-skull')
+  })
+
+  it('shows a flag badge named Important only on an important entity', () => {
+    renderNode('verified')
+    expect(screen.queryByRole('img', { name: 'Important' })).not.toBeInTheDocument()
+    cleanup()
+    renderNode('verified', undefined, {}, false, { important: true })
+    expect(screen.getByRole('img', { name: 'Important' })).toBeInTheDocument()
+  })
+
+  it('shows the grade and the flag badges together, on opposite sides of the circle', () => {
+    renderNode('verified', { reliability: 'B', credibility: 2 }, {}, false, { important: true })
+    const flag = screen.getByRole('img', { name: 'Important' })
+    const grade = screen.getByText('B2')
+    expect(flag).toHaveClass('-left-2')
+    expect(grade).toHaveClass('-right-4')
   })
 })

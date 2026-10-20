@@ -189,6 +189,50 @@ describe('export format', () => {
     })
   })
 
+  describe('appearance', () => {
+    const styled = () => {
+      const snapshot = sampleSnapshot()
+      const [a, ...others] = snapshot.entities
+      return {
+        ...snapshot,
+        entities: [{ ...a!, color: 'red', icon: 'skull', important: true } as const, ...others],
+      }
+    }
+
+    it('round-trips colour, icon and importance', async () => {
+      const snapshot = styled()
+      const json = await serializeExport(snapshot)
+      expect(JSON.parse(json).entities[0]).toMatchObject({ color: 'red', icon: 'skull', important: true })
+      expect(await parseExport(json)).toEqual({ ok: true, snapshot, attachments: [] })
+    })
+
+    it('exports an unstyled entity without the fields', async () => {
+      const json = JSON.parse(await serializeExport(sampleSnapshot()))
+      for (const key of ['color', 'icon', 'important']) expect(json.entities[0]).not.toHaveProperty(key)
+    })
+
+    it('keeps the appearance when importing as a copy', () => {
+      const { snapshot } = remapIds({ snapshot: styled(), attachments: [] })
+      expect(snapshot.entities[0]).toMatchObject({ color: 'red', icon: 'skull', important: true })
+    })
+
+    it('accepts a file written before the fields existed', async () => {
+      const result = await parseExport(await serializeExport(sampleSnapshot()))
+      expect(result.ok).toBe(true)
+    })
+
+    it.each([
+      ['color', '#ff0000'],
+      ['icon', 'flag'],
+      ['important', 'yes'],
+    ])('refuses an unknown %s, naming the field', async (field, value) => {
+      const json = JSON.parse(await serializeExport(styled()))
+      json.entities[0][field] = value
+      const result = await parseExport(JSON.stringify(json))
+      expect(!result.ok && result.errors[0]).toMatchObject({ path: `entities.0.${field}` })
+    })
+  })
+
   it('remaps every id while preserving references', async () => {
     const snapshot = sampleSnapshot()
     const { snapshot: copy } = remapIds({ snapshot, attachments: [] })

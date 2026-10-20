@@ -1,7 +1,7 @@
-import type { EntityTypeId } from '@/domain/entity-types'
+import type { EntityIconId } from '@/domain/entity-appearance'
 import { ENTITY_ICONS } from '@/features/entities/entity-icons'
 
-export function EntityIcon({ type, className }: { type: EntityTypeId; className?: string }) {
-  const Icon = ENTITY_ICONS[type]
+export function EntityIcon({ icon, className }: { icon: EntityIconId; className?: string }) {
+  const Icon = ENTITY_ICONS[icon]
   return <Icon className={className} aria-hidden />
 }

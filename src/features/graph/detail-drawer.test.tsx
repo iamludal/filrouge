@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ENTITY_COLORS } from '@/domain/entity-appearance'
 import { createInvestigation } from '@/domain/factories'
 import { DetailDrawer } from '@/features/graph/detail-drawer'
 import { useGraphStore } from '@/store/graph-store'
@@ -131,5 +132,14 @@ describe('DetailDrawer', () => {
     select({ entityIds: [], relationIds: [relation.id] })
     expect(handle()).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByRole('heading', { name: 'Relation' })).toBeVisible()
+  })
+
+  it('summarises a styled entity with its own colour and icon', () => {
+    const { jean } = setup()
+    act(() => useGraphStore.getState().updateEntity(jean.id, { color: 'red', icon: 'skull' }))
+    select({ entityIds: [jean.id], relationIds: [] })
+    const type = within(handle()).getByText('Personne')
+    expect(type).toHaveStyle({ color: ENTITY_COLORS.red })
+    expect(type.querySelector('svg')).toHaveClass('lucide-skull')
   })
 })

@@ -55,6 +55,22 @@ describe('autosave', () => {
     autosave.stop()
   })
 
+  it('saves the appearance and reads it back, including after clearing it', async () => {
+    const { repository, investigation, investigations } = await setup()
+    const autosave = startAutosave(repository, 60_000)
+    const a = useGraphStore.getState().addEntity('person', { x: 0, y: 0 }, 'Alice')
+    useGraphStore.getState().updateEntity(a.id, { color: 'red', icon: 'skull', important: true })
+    await autosave.flush()
+    const saved = (await investigations.loadSnapshot(investigation.id))?.entities[0]
+    expect(saved).toMatchObject({ color: 'red', icon: 'skull', important: true })
+
+    useGraphStore.getState().updateEntity(a.id, { color: undefined, icon: undefined, important: undefined })
+    await autosave.flush()
+    const cleared = (await investigations.loadSnapshot(investigation.id))?.entities[0]
+    for (const key of ['color', 'icon', 'important']) expect(cleared).not.toHaveProperty(key)
+    autosave.stop()
+  })
+
   it('flushes immediately on demand', async () => {
     const { repository, investigation } = await setup()
     const autosave = startAutosave(repository, 60_000)

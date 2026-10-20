@@ -69,6 +69,28 @@ test('exports the whole graph as SVG, including unsaved edits, whatever the view
   expect(svg).not.toMatch(/\bhref\b/)
 })
 
+test('draws the colour, the icon and the important flag of a styled entity in the SVG', async ({ page }) => {
+  await buildGraph(page)
+  await node(page, 'Bob').click()
+  const panel = page.getByRole('complementary')
+  await panel.getByRole('button', { name: /^Couleur ?:/ }).click()
+  await page.getByRole('radio', { name: 'Rouge' }).click()
+  await panel.getByRole('button', { name: /^Icône ?:/ }).click()
+  await page.getByRole('radio', { name: 'Crâne' }).click()
+  await panel.getByRole('button', { name: 'Important' }).click()
+
+  const { bytes } = await exportImage(page, 'SVG')
+  const svg = bytes.toString('utf8')
+  // One chunk per entity: the text before the first `data-entity` is the header and the edges.
+  const chunks = svg.split('data-entity=').slice(1)
+  expect(chunks).toHaveLength(3)
+  const bob = chunks.find((chunk) => chunk.includes('>Bob<'))!
+  expect(bob).toContain('stroke="#dc2626"')
+  expect(bob).toContain('lucide-skull')
+  expect(bob).toContain('data-flag="important"')
+  expect(svg.match(/data-flag=/g)).toHaveLength(1)
+})
+
 test('exports a PNG of the whole graph, white and independent of theme and selection', async ({ page }) => {
   await buildGraph(page)
   const { bytes: svgBytes } = await exportImage(page, 'SVG')

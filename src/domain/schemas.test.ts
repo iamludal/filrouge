@@ -30,6 +30,24 @@ describe('schemas', () => {
     expect(grade('B', 7)).toBe(false)
   })
 
+  it('accepts entities without appearance fields and with valid ones', () => {
+    const entity = createEntity(investigation.id, 'person', { x: 0, y: 0 })
+    expect(entitySchema.safeParse(entity).success).toBe(true)
+    expect(entitySchema.safeParse({ ...entity, color: 'red', icon: 'skull', important: true }).success).toBe(
+      true,
+    )
+    expect(entitySchema.safeParse({ ...entity, important: false }).success).toBe(true)
+  })
+
+  it('rejects unknown colours, unknown icons and a non-boolean importance', () => {
+    const entity = createEntity(investigation.id, 'person', { x: 0, y: 0 })
+    expect(entitySchema.safeParse({ ...entity, color: '#ff0000' }).success).toBe(false)
+    expect(entitySchema.safeParse({ ...entity, color: 'chartreuse' }).success).toBe(false)
+    expect(entitySchema.safeParse({ ...entity, icon: 'flag' }).success).toBe(false)
+    expect(entitySchema.safeParse({ ...entity, icon: '<script>' }).success).toBe(false)
+    expect(entitySchema.safeParse({ ...entity, important: 'yes' }).success).toBe(false)
+  })
+
   it('rejects an empty investigation name', () => {
     expect(investigationSchema.safeParse({ ...investigation, name: '   ' }).success).toBe(false)
   })
