@@ -56,9 +56,9 @@ export function SourcesSection({ element }: { element: ElementRef }) {
   }
 
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       {attached.length > 0 && (
-        <ul className="grid gap-1" aria-label="Sources attachées">
+        <ul className="grid grid-cols-1 gap-1" aria-label="Sources attachées">
           {attached.map((source) => (
             <li key={source.id} className="flex items-center gap-1">
               <button
@@ -66,7 +66,7 @@ export function SourcesSection({ element }: { element: ElementRef }) {
                 className="flex min-w-0 flex-1 items-center gap-1.5 rounded px-1 py-0.5 text-left text-sm hover:bg-accent"
                 onClick={() => setEditing(source)}
               >
-                <span className="min-w-0 truncate">{sourceDisplayName(source)}</span>
+                <span className="min-w-0 wrap-anywhere">{sourceDisplayName(source)}</span>
                 {source.attachmentId && <Paperclip className="size-3.5 shrink-0" aria-label="Avec capture" />}
               </button>
               <Button

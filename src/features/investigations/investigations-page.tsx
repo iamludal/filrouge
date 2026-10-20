@@ -62,7 +62,7 @@ export function InvestigationsPage() {
         </div>
       )}
 
-      <ul className="grid gap-3" aria-label="Liste des enquêtes">
+      <ul className="grid grid-cols-1 gap-3" aria-label="Liste des enquêtes">
         {items.map((investigation) => (
           <li
             key={investigation.id}

@@ -8,7 +8,7 @@ export function NotesEditor({ value, onChange }: { value: string; onChange: (val
   const [preview, setPreview] = useState(value.length > 0)
 
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       <div className="flex justify-end gap-1">
         <Button variant={preview ? 'ghost' : 'secondary'} size="xs" onClick={() => setPreview(false)}>
           Écrire

@@ -34,14 +34,15 @@ export function PropertiesEditor({ properties, suggestions, onChange }: Properti
   }
 
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-3">
+      {/* Name above its value, so that neither is squeezed in a narrow panel. */}
       {entries.map(([key, value]) => (
-        <div key={key} className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)_auto] gap-1.5">
+        <div key={key} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-1.5 gap-y-1">
           <Input
             aria-label="Nom de la propriété"
             defaultValue={key}
             maxLength={LIMITS.propertyKey}
-            className="h-8 text-xs text-muted-foreground"
+            className="h-7 border-transparent bg-transparent px-1.5 text-xs font-medium text-muted-foreground hover:border-input md:text-xs dark:bg-transparent"
             onBlur={(event) => {
               const next = event.target.value.trim()
               if (next === key) return
@@ -52,13 +53,6 @@ export function PropertiesEditor({ properties, suggestions, onChange }: Properti
               onChange(renameKey(properties, key, next))
             }}
           />
-          <Input
-            aria-label={`Valeur de ${key}`}
-            value={display(value)}
-            maxLength={LIMITS.propertyValue}
-            className="h-8 text-xs"
-            onChange={(event) => onChange({ ...properties, [key]: event.target.value })}
-          />
           <Button
             variant="ghost"
             size="icon-sm"
@@ -67,6 +61,13 @@ export function PropertiesEditor({ properties, suggestions, onChange }: Properti
           >
             <X />
           </Button>
+          <Input
+            aria-label={`Valeur de ${key}`}
+            value={display(value)}
+            maxLength={LIMITS.propertyValue}
+            className="col-span-2 h-8 text-xs"
+            onChange={(event) => onChange({ ...properties, [key]: event.target.value })}
+          />
         </div>
       ))}
       <form

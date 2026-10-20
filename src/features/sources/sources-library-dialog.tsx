@@ -57,7 +57,7 @@ export function SourcesLibraryDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+        <DialogContent className="max-h-[90vh] overflow-y-auto *:min-w-0 sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Sources de l’enquête</DialogTitle>
             <DialogDescription>
@@ -71,7 +71,7 @@ export function SourcesLibraryDialog({
               {list.map((source) => (
                 <li key={source.id} className="flex items-center gap-2 rounded border px-2 py-1.5">
                   <div className="grid min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5 text-sm">
+                    <span className="flex min-w-0 items-center gap-1.5 text-sm">
                       <span className="truncate">{sourceDisplayName(source)}</span>
                       {source.attachmentId && (
                         <Paperclip className="size-3.5 shrink-0" aria-label="Avec capture" />

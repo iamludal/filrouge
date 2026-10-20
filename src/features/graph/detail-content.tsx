@@ -6,8 +6,11 @@ import { EntityPanel } from '@/features/entities/entity-panel'
 import { RelationPanel } from '@/features/relations/relation-panel'
 import { useGraphStore } from '@/store/graph-store'
 
-/** What the detail panel shows for the current selection, in the side panel and in the drawer. */
-export function DetailContent() {
+/**
+ * What the detail panel shows for the current selection, in the side panel and in the drawer.
+ * `hideHeading` drops the entity type title when the caller already shows it (the drawer bar).
+ */
+export function DetailContent({ hideHeading = false }: { hideHeading?: boolean }) {
   const selection = useGraphStore((state) => state.selection)
   const entity = useGraphStore((state) =>
     state.selection.entityIds.length === 1 ? state.entities[state.selection.entityIds[0]!] : undefined,
@@ -22,13 +25,15 @@ export function DetailContent() {
   if (entity) {
     return (
       <>
-        <h2
-          className="mb-4 flex items-center gap-2 font-semibold"
-          style={{ color: ENTITY_TYPES[entity.type].color }}
-        >
-          <EntityIcon type={entity.type} className="size-4" />
-          {ENTITY_TYPES[entity.type].label}
-        </h2>
+        {!hideHeading && (
+          <h2
+            className="mb-4 flex items-center gap-2 font-semibold"
+            style={{ color: ENTITY_TYPES[entity.type].color }}
+          >
+            <EntityIcon type={entity.type} className="size-4" />
+            <span className="min-w-0 wrap-anywhere">{ENTITY_TYPES[entity.type].label}</span>
+          </h2>
+        )}
         <EntityPanel key={entity.id} entity={entity} />
       </>
     )
@@ -45,7 +50,7 @@ export function DetailContent() {
 
   if (count > 1) {
     return (
-      <div className="grid gap-3">
+      <div className="grid grid-cols-1 gap-3">
         <p className="text-sm text-muted-foreground">
           {count} éléments sélectionnés. Suppr pour les supprimer.
         </p>

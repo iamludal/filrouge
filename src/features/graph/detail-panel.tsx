@@ -5,7 +5,7 @@ export function DetailPanel() {
   return (
     <aside
       aria-label="Panneau de détail"
-      className="flex w-80 shrink-0 flex-col overflow-y-auto border-l bg-background p-4"
+      className="flex w-80 shrink-0 flex-col overflow-x-hidden overflow-y-auto border-l bg-background p-4"
     >
       <DetailContent />
     </aside>

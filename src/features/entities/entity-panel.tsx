@@ -25,7 +25,7 @@ export function Field({
   children: ReactNode
 }) {
   return (
-    <div className="grid gap-1.5">
+    <div className="grid grid-cols-1 gap-1.5">
       <Label htmlFor={htmlFor} className="text-xs text-muted-foreground uppercase">
         {label}
       </Label>
@@ -43,7 +43,7 @@ export function EntityPanel({ entity }: { entity: Entity }) {
   )
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <ElementTimestamps createdAt={entity.createdAt} updatedAt={entity.updatedAt} />
       <Field label="Type" htmlFor="panel-entity-type">
         <EntityTypeSelect
@@ -89,7 +89,11 @@ export function EntityPanel({ entity }: { entity: Entity }) {
         <SourcesSection element={{ type: 'entity', id: entity.id }} />
       </Field>
       <Separator />
-      <Button variant="destructive" onClick={() => removeElements([entity.id], [])}>
+      <Button
+        variant="destructive"
+        className="h-auto min-h-8 py-1.5 whitespace-normal"
+        onClick={() => removeElements([entity.id], [])}
+      >
         <Trash2 /> Supprimer l’entité
         {relationCount > 0 && ` et ${relationCount} relation${relationCount > 1 ? 's' : ''}`}
       </Button>

@@ -15,16 +15,19 @@ export function TagsEditor({ tags, onChange }: { tags: string[]; onChange: (tags
   }
 
   return (
-    <div className="grid gap-2">
+    <div className="grid grid-cols-1 gap-2">
       {tags.length > 0 && (
         <ul className="flex flex-wrap gap-1" aria-label="Tags">
           {tags.map((tag) => (
-            <li key={tag}>
-              <Badge variant="secondary" className="gap-1 pr-1">
+            <li key={tag} className="max-w-full">
+              <Badge
+                variant="secondary"
+                className="h-auto max-w-full gap-1 pr-1 wrap-anywhere whitespace-normal"
+              >
                 {tag}
                 <button
                   type="button"
-                  className="rounded-sm opacity-60 hover:opacity-100 focus-visible:opacity-100"
+                  className="shrink-0 rounded-sm opacity-60 hover:opacity-100 focus-visible:opacity-100"
                   aria-label={`Retirer le tag ${tag}`}
                   onClick={() => onChange(tags.filter((t) => t !== tag))}
                 >

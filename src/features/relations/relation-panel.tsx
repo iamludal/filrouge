@@ -21,12 +21,12 @@ export function RelationPanel({ relation }: { relation: Relation }) {
   const name = (entity: typeof from) => (entity ? entity.label || ENTITY_TYPES[entity.type].label : '?')
 
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <ElementTimestamps createdAt={relation.createdAt} updatedAt={relation.updatedAt} />
       <div className="flex items-center gap-2 text-sm">
         <button
           type="button"
-          className="min-w-0 truncate font-medium hover:underline"
+          className="min-w-0 text-left font-medium wrap-anywhere hover:underline"
           onClick={() => setSelection({ entityIds: [relation.from], relationIds: [] })}
         >
           {name(from)}
@@ -38,7 +38,7 @@ export function RelationPanel({ relation }: { relation: Relation }) {
         )}
         <button
           type="button"
-          className="min-w-0 truncate font-medium hover:underline"
+          className="min-w-0 text-left font-medium wrap-anywhere hover:underline"
           onClick={() => setSelection({ entityIds: [relation.to], relationIds: [] })}
         >
           {name(to)}

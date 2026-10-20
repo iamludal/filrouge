@@ -160,7 +160,7 @@ function DrawerShell() {
         hidden={!expanded}
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pt-0"
       >
-        <DetailContent />
+        <DetailContent hideHeading />
       </div>
     </section>
   )

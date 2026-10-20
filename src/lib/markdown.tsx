@@ -18,7 +18,7 @@ const components: Components = {
  */
 export function SafeMarkdown({ children }: { children: string }) {
   return (
-    <div className="prose-sm space-y-2 break-words [&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_h1]:text-lg [&_h1]:font-semibold [&_h2]:font-semibold [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5">
+    <div className="prose-sm min-w-0 space-y-2 wrap-anywhere [&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_h1]:text-lg [&_h1]:font-semibold [&_h2]:font-semibold [&_ol]:list-decimal [&_ol]:pl-5 [&_pre]:whitespace-pre-wrap [&_ul]:list-disc [&_ul]:pl-5">
       <Markdown
         skipHtml
         disallowedElements={['img']}
