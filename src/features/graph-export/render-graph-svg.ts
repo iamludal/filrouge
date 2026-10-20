@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot } from 'react-dom/client'
+import type { EntityTypeId } from '@/domain/entity-types'
 import type { Entity, Relation } from '@/domain/schemas'
 import { GraphImage } from '@/features/graph-export/graph-image'
 import { layoutGraph } from '@/features/graph-export/graph-layout'
@@ -22,13 +23,16 @@ export function renderGraphSvg({
   entities,
   relations,
   measureText = browserMeasureText,
+  unnamedLabel,
 }: {
   name: string
   entities: Record<string, Entity>
   relations: Record<string, Relation>
   measureText?: MeasureText
+  /** Names an entity without label, e.g. "Personne sans nom". */
+  unnamedLabel: (type: EntityTypeId) => string
 }): GraphSvg {
-  const layout = layoutGraph(entities, relations, measureText)
+  const layout = layoutGraph(entities, relations, measureText, unnamedLabel)
   const host = document.createElement('div')
   const root = createRoot(host)
   try {

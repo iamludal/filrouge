@@ -2,10 +2,12 @@ import { ChevronUp, X } from 'lucide-react'
 import { useShallow } from 'zustand/react/shallow'
 import { useId, useRef, useState, type PointerEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { ENTITY_TYPES } from '@/domain/entity-types'
+import { ENTITY_TYPES, type EntityTypeId } from '@/domain/entity-types'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import { DetailContent } from '@/features/graph/detail-content'
 import { cn } from '@/lib/utils'
+import { useI18n } from '@/i18n/locale'
+import { entityName } from '@/i18n/names'
 import { useGraphStore } from '@/store/graph-store'
 
 /** A vertical drag longer than this expands, collapses or closes the drawer. */
@@ -21,19 +23,19 @@ function useSelectionSummary() {
       if (count === 0) return null
       const entity = entityIds.length === 1 && count === 1 ? state.entities[entityIds[0]!] : undefined
       if (entity) {
-        const type = ENTITY_TYPES[entity.type]
-        return { kind: 'entity' as const, type, label: entity.label || `${type.label} sans nom` }
+        return { kind: 'entity' as const, typeId: entity.type, label: entity.label }
       }
       const relation = relationIds.length === 1 && count === 1 ? state.relations[relationIds[0]!] : undefined
       if (relation) {
-        const name = (id: string) => {
-          const end = state.entities[id]
-          return end ? end.label || `${ENTITY_TYPES[end.type].label} sans nom` : ''
-        }
+        const from = state.entities[relation.from]
+        const to = state.entities[relation.to]
         return {
           kind: 'relation' as const,
           label: relation.label,
-          ends: `${name(relation.from)} → ${name(relation.to)}`,
+          fromType: from?.type,
+          fromLabel: from?.label ?? '',
+          toType: to?.type,
+          toLabel: to?.label ?? '',
         }
       }
       return { kind: 'many' as const, count }
@@ -54,7 +56,10 @@ export function DetailDrawer() {
 }
 
 function DrawerShell() {
+  const { t } = useI18n()
   const summary = useSelectionSummary()
+  const endName = (type: EntityTypeId | undefined, label: string) =>
+    type ? entityName(t, { type, label }) : ''
   const bodyId = useId()
   const [expanded, setExpanded] = useState(false)
   const [offset, setOffset] = useState<number | null>(null)
@@ -104,7 +109,7 @@ function DrawerShell() {
 
   return (
     <section
-      aria-label="Panneau de détail"
+      aria-label={t.detail.panelLabel}
       style={offset ? { transform: `translateY(${offset}px)` } : undefined}
       className={cn(
         'absolute inset-x-0 bottom-0 z-20 flex flex-col rounded-t-xl border-t bg-background shadow-[0_-4px_12px_rgb(0_0_0/0.12)]',
@@ -117,7 +122,7 @@ function DrawerShell() {
           type="button"
           aria-expanded={expanded}
           aria-controls={bodyId}
-          aria-label={expanded ? 'Replier le panneau' : 'Déplier le panneau'}
+          aria-label={expanded ? t.detail.collapse : t.detail.expand}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerEnd}
@@ -134,24 +139,32 @@ function DrawerShell() {
               <>
                 <span
                   className="flex shrink-0 items-center gap-1.5 font-semibold"
-                  style={{ color: summary.type.color }}
+                  style={{ color: ENTITY_TYPES[summary.typeId].color }}
                 >
-                  <EntityIcon type={summary.type.id} className="size-4" />
-                  {summary.type.label}
+                  <EntityIcon type={summary.typeId} className="size-4" />
+                  {t.entityTypes[summary.typeId].label}
                 </span>
-                <span className="truncate">{summary.label}</span>
+                <span className="truncate">
+                  {entityName(t, { type: summary.typeId, label: summary.label })}
+                </span>
               </>
             )}
             {summary.kind === 'relation' && (
               <>
-                <span className="shrink-0 font-semibold">{summary.label || 'Relation'}</span>
-                <span className="truncate text-muted-foreground">{summary.ends}</span>
+                <span className="shrink-0 font-semibold">{summary.label || t.detail.relation}</span>
+                <span className="truncate text-muted-foreground">{`${endName(summary.fromType, summary.fromLabel)} → ${endName(summary.toType, summary.toLabel)}`}</span>
               </>
             )}
-            {summary.kind === 'many' && <span>{summary.count} éléments sélectionnés</span>}
+            {summary.kind === 'many' && <span>{t.detail.selectedCount(summary.count)}</span>}
           </span>
         </button>
-        <Button variant="ghost" size="icon" className="size-11 shrink-0" aria-label="Fermer" onClick={close}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-11 shrink-0"
+          aria-label={t.detail.close}
+          onClick={close}
+        >
           <X />
         </Button>
       </div>

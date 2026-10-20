@@ -1,5 +1,4 @@
 import {
-  SOURCE_ERRORS,
   fromLocalInput,
   isHttpUrl,
   sourceDisplayName,
@@ -10,10 +9,10 @@ import {
 const valid = { title: 'T', url: '', archiveUrl: '', capturedAt: '2026-03-03T14:05', note: '' }
 
 describe('sourceDisplayName', () => {
-  it('prefers the title, then the URL host, then a placeholder', () => {
+  it('prefers the title, then the URL host, then nothing', () => {
     expect(sourceDisplayName({ title: 'Profil', url: 'https://exemple.fr/p' })).toBe('Profil')
     expect(sourceDisplayName({ title: '  ', url: 'https://exemple.fr/page' })).toBe('exemple.fr')
-    expect(sourceDisplayName({})).toBe('Source sans titre')
+    expect(sourceDisplayName({})).toBeUndefined()
   })
 })
 
@@ -50,19 +49,15 @@ describe('validateSourceForm', () => {
   })
 
   it('refuses an empty source', () => {
-    expect(validateSourceForm({ ...valid, title: '  ' }, false)).toEqual({ form: SOURCE_ERRORS.empty })
+    expect(validateSourceForm({ ...valid, title: '  ' }, false)).toEqual({ form: 'empty' })
   })
 
   it('flags non-http URLs and archive links', () => {
-    expect(validateSourceForm({ ...valid, url: 'javascript:alert(1)' }, false).url).toBe(
-      'URL invalide (http ou https)',
-    )
-    expect(validateSourceForm({ ...valid, archiveUrl: 'ftp://x' }, false).archiveUrl).toBe(
-      'URL invalide (http ou https)',
-    )
+    expect(validateSourceForm({ ...valid, url: 'javascript:alert(1)' }, false).url).toBe('invalidUrl')
+    expect(validateSourceForm({ ...valid, archiveUrl: 'ftp://x' }, false).archiveUrl).toBe('invalidUrl')
   })
 
   it('flags an invalid capture date', () => {
-    expect(validateSourceForm({ ...valid, capturedAt: '' }, false).capturedAt).toBe(SOURCE_ERRORS.date)
+    expect(validateSourceForm({ ...valid, capturedAt: '' }, false).capturedAt).toBe('invalidDate')
   })
 })

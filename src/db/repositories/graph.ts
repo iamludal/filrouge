@@ -47,7 +47,7 @@ export function graphRepository(db: FilrougeDatabase = defaultDb) {
     async applyChanges(changes: GraphChanges): Promise<void> {
       const { investigationId } = changes
       const belongs = <T extends { investigationId: string }>(record: T) => {
-        if (record.investigationId !== investigationId) throw new Error('Enregistrement d’une autre enquête')
+        if (record.investigationId !== investigationId) throw new Error(`Enregistrement d'une autre enquête`)
         return record
       }
       const entities = changes.upsertEntities.map((entity) => belongs(entitySchema.parse(entity)))

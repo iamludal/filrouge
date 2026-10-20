@@ -5,6 +5,8 @@ import { ENTITY_TYPES } from '@/domain/entity-types'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import type { EntityNode as EntityNodeType } from '@/features/graph/types'
 import { cn } from '@/lib/utils'
+import { useI18n } from '@/i18n/locale'
+import { entityName } from '@/i18n/names'
 
 /*
  * On touch screens the 12px dot is far too small for a finger: a selected node's handle gets an
@@ -23,10 +25,11 @@ const TOUCH_HIT_AREA =
  */
 export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeProps<EntityNodeType>) {
   const { entity, dimmed, highlighted } = data
+  const { t } = useI18n()
   const type = ENTITY_TYPES[entity.type]
   const connection = useConnection()
   const isDropTarget = connection.inProgress && connection.fromNode.id !== id
-  const label = entity.label || `${type.label} sans nom`
+  const label = entityName(t, entity)
 
   return (
     <div
@@ -50,8 +53,8 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
         {entity.confidence && (
           <span
             role="img"
-            title={describeConfidence(entity.confidence)}
-            aria-label={describeConfidence(entity.confidence)}
+            title={describeConfidence(entity.confidence, t.assessment)}
+            aria-label={describeConfidence(entity.confidence, t.assessment)}
             className="absolute -top-2 -right-4 rounded-full border bg-background px-1.5 text-[10px] leading-4 font-semibold text-foreground shadow-sm"
           >
             {formatConfidence(entity.confidence)}
@@ -60,7 +63,7 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
         <Handle
           type="source"
           position={Position.Right}
-          aria-label={`Créer une relation depuis ${label}`}
+          aria-label={t.graph.createRelationFrom(label)}
           className={cn(
             'size-3! border-2! border-background! bg-primary! opacity-0 transition-opacity group-hover:opacity-100',
             selected && ['opacity-100', TOUCH_HIT_AREA],

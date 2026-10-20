@@ -3,8 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { ENTITY_TYPES } from '@/domain/entity-types'
-import { RELATION_SUGGESTIONS } from '@/domain/relations'
+import { useI18n } from '@/i18n/locale'
 import { LIMITS, type Relation } from '@/domain/schemas'
 import { AssessmentFields } from '@/features/assessment/assessment-fields'
 import { ElementTimestamps } from '@/features/entities/element-timestamps'
@@ -13,12 +12,13 @@ import { SourcesSection } from '@/features/sources/sources-section'
 import { useGraphStore } from '@/store/graph-store'
 
 export function RelationPanel({ relation }: { relation: Relation }) {
+  const { t } = useI18n()
   const updateRelation = useGraphStore((state) => state.updateRelation)
   const removeElements = useGraphStore((state) => state.removeElements)
   const setSelection = useGraphStore((state) => state.setSelection)
   const from = useGraphStore((state) => state.entities[relation.from])
   const to = useGraphStore((state) => state.entities[relation.to])
-  const name = (entity: typeof from) => (entity ? entity.label || ENTITY_TYPES[entity.type].label : '?')
+  const name = (entity: typeof from) => (entity ? entity.label || t.entityTypes[entity.type].label : '?')
 
   return (
     <div className="grid grid-cols-1 gap-4">
@@ -44,7 +44,7 @@ export function RelationPanel({ relation }: { relation: Relation }) {
           {name(to)}
         </button>
       </div>
-      <Field label="Libellé" htmlFor="panel-relation-label">
+      <Field label={t.relations.label} htmlFor="panel-relation-label">
         <Input
           id="panel-relation-label"
           value={relation.label}
@@ -53,7 +53,7 @@ export function RelationPanel({ relation }: { relation: Relation }) {
           onChange={(event) => updateRelation(relation.id, { label: event.target.value })}
         />
         <datalist id="panel-relation-suggestions">
-          {RELATION_SUGGESTIONS.map((suggestion) => (
+          {t.relations.suggestions.map((suggestion) => (
             <option key={suggestion} value={suggestion} />
           ))}
         </datalist>
@@ -64,7 +64,7 @@ export function RelationPanel({ relation }: { relation: Relation }) {
           checked={relation.directed}
           onCheckedChange={(directed) => updateRelation(relation.id, { directed })}
         />
-        <Label htmlFor="panel-relation-directed">Orientée</Label>
+        <Label htmlFor="panel-relation-directed">{t.relations.directed}</Label>
       </div>
       <AssessmentFields
         idPrefix="panel-relation"
@@ -72,11 +72,11 @@ export function RelationPanel({ relation }: { relation: Relation }) {
         confidence={relation.confidence}
         onChange={(patch) => updateRelation(relation.id, patch)}
       />
-      <Field label="Sources">
+      <Field label={t.entities.sources}>
         <SourcesSection element={{ type: 'relation', id: relation.id }} />
       </Field>
       <Button variant="destructive" onClick={() => removeElements([], [relation.id])}>
-        <Trash2 /> Supprimer la relation
+        <Trash2 /> {t.relations.delete}
       </Button>
     </div>
   )

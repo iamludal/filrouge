@@ -22,12 +22,14 @@ import { SearchField } from '@/features/graph-search/search-field'
 import { SourcesLibraryDialog } from '@/features/sources/sources-library-dialog'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
+import { useI18n } from '@/i18n/locale'
 
 /**
  * The graph toolbar on narrow screens: the essentials stay in the bar, everything else lives in the
- * "Plus d’actions" menu. A new toolbar action must be added to this menu too.
+ * "Plus d'actions" menu. A new toolbar action must be added to this menu too.
  */
 export function CompactGraphToolbar({ name, onExportJson }: { name: string; onExportJson: () => void }) {
+  const { t } = useI18n()
   const [searching, setSearching] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [sourcesOpen, setSourcesOpen] = useState(false)
@@ -48,13 +50,13 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
           <SearchField fullWidth />
           <Button variant="ghost" size="icon" className="size-11 shrink-0" onClick={closeSearch}>
             <X />
-            <span className="sr-only">Fermer la recherche</span>
+            <span className="sr-only">{t.graph.toolbar.closeSearch}</span>
           </Button>
         </>
       ) : (
         <>
           <Button variant="ghost" size="icon" className="size-11 shrink-0" asChild>
-            <a href={routeHref({ name: 'home' })} aria-label="Retour aux enquêtes">
+            <a href={routeHref({ name: 'home' })} aria-label={t.graph.backHome}>
               <ArrowLeft />
             </a>
           </Button>
@@ -64,7 +66,7 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
             variant="ghost"
             size="icon"
             className="size-11 shrink-0"
-            aria-label="Rechercher dans le graphe"
+            aria-label={t.graph.toolbar.search}
             onClick={() => setSearching(true)}
           >
             <Search />
@@ -76,7 +78,7 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
                 variant="ghost"
                 size="icon"
                 className="relative size-11 shrink-0"
-                aria-label="Plus d’actions"
+                aria-label={t.graph.toolbar.moreActions}
               >
                 <Ellipsis />
                 {activeFilters > 0 && (
@@ -90,10 +92,10 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem disabled={!canRedo} onSelect={() => useGraphStore.getState().redo()}>
-                <Redo2 /> Rétablir
+                <Redo2 /> {t.graph.toolbar.redo}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setFiltersOpen(true)}>
-                <ListFilter /> Filtres
+                <ListFilter /> {t.graph.toolbar.filters}
                 {activeFilters > 0 && (
                   <Badge variant="secondary" className="ml-auto">
                     {activeFilters}
@@ -101,11 +103,11 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => setSourcesOpen(true)}>
-                <Paperclip /> Sources ({sourceCount})
+                <Paperclip /> {t.graph.toolbar.sources(sourceCount)}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuLabel>Exporter</DropdownMenuLabel>
+                <DropdownMenuLabel>{t.graph.toolbar.export}</DropdownMenuLabel>
                 <DropdownMenuItem onSelect={onExportJson}>JSON</DropdownMenuItem>
                 <DropdownMenuItem disabled={empty} onSelect={exportPng}>
                   PNG

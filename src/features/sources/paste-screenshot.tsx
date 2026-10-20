@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { SourceFormDialog } from '@/features/sources/source-form-dialog'
 import { useGraphStore, type ElementRef, type Selection } from '@/store/graph-store'
-
-const HINT = 'Sélectionnez une entité ou une relation pour y coller une capture'
+import { useI18n } from '@/i18n/locale'
 
 /** The selected element, when exactly one entity or one relation is selected. */
 function singleSelection({ entityIds, relationIds }: Selection): ElementRef | null {
@@ -24,6 +23,7 @@ function isEditable(target: EventTarget | null): boolean {
  * for the selected element. Text pastes and pastes into fields or open dialogs are left alone.
  */
 export function PasteScreenshot() {
+  const hint = useI18n().t.sources.pasteHint
   const [pasted, setPasted] = useState<{ file: File; element: ElementRef } | null>(null)
 
   useEffect(() => {
@@ -35,11 +35,11 @@ export function PasteScreenshot() {
       event.preventDefault()
       const element = singleSelection(useGraphStore.getState().selection)
       if (element) setPasted({ file: image, element })
-      else toast.info(HINT)
+      else toast.info(hint)
     }
     document.addEventListener('paste', onPaste)
     return () => document.removeEventListener('paste', onPaste)
-  }, [])
+  }, [hint])
 
   if (!pasted) return null
   return (

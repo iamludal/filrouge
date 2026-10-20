@@ -4,8 +4,10 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { normalizeTags } from '@/domain/graph'
 import { LIMITS } from '@/domain/schemas'
+import { useI18n } from '@/i18n/locale'
 
 export function TagsEditor({ tags, onChange }: { tags: string[]; onChange: (tags: string[]) => void }) {
+  const { t } = useI18n()
   const [draft, setDraft] = useState('')
 
   const commit = () => {
@@ -17,7 +19,7 @@ export function TagsEditor({ tags, onChange }: { tags: string[]; onChange: (tags
   return (
     <div className="grid grid-cols-1 gap-2">
       {tags.length > 0 && (
-        <ul className="flex flex-wrap gap-1" aria-label="Tags">
+        <ul className="flex flex-wrap gap-1" aria-label={t.entities.tagsEditor.listLabel}>
           {tags.map((tag) => (
             <li key={tag} className="max-w-full">
               <Badge
@@ -28,8 +30,8 @@ export function TagsEditor({ tags, onChange }: { tags: string[]; onChange: (tags
                 <button
                   type="button"
                   className="shrink-0 rounded-sm opacity-60 hover:opacity-100 focus-visible:opacity-100"
-                  aria-label={`Retirer le tag ${tag}`}
-                  onClick={() => onChange(tags.filter((t) => t !== tag))}
+                  aria-label={t.entities.tagsEditor.remove(tag)}
+                  onClick={() => onChange(tags.filter((other) => other !== tag))}
                 >
                   <X className="size-3" />
                 </button>
@@ -39,8 +41,8 @@ export function TagsEditor({ tags, onChange }: { tags: string[]; onChange: (tags
         </ul>
       )}
       <Input
-        aria-label="Ajouter des tags"
-        placeholder="Ajouter un tag (Entrée)"
+        aria-label={t.entities.tagsEditor.addLabel}
+        placeholder={t.entities.tagsEditor.placeholder}
         value={draft}
         maxLength={LIMITS.tag * 5}
         className="h-8 text-xs"

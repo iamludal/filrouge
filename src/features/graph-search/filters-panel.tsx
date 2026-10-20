@@ -8,11 +8,12 @@ import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { CREDIBILITY, RELIABILITY } from '@/domain/assessment'
+import { CREDIBILITY_VALUES, RELIABILITY_VALUES } from '@/domain/assessment'
 import { ENTITY_TYPES, type EntityTypeId } from '@/domain/entity-types'
 import { activeCriteriaCount, tagOptions, typeOptions, type GraphFilters } from '@/domain/graph-view'
 import type { Status } from '@/domain/schemas'
 import { EntityIcon } from '@/features/entities/entity-icon'
+import { useI18n } from '@/i18n/locale'
 import { cn } from '@/lib/utils'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
@@ -102,6 +103,7 @@ function StatusToggle({
   value: Status | null
   onChange: (value: Status | null) => void
 }) {
+  const { t } = useI18n()
   return (
     <Criterion title={label}>
       <ToggleGroup
@@ -113,9 +115,9 @@ function StatusToggle({
         value={value ?? ANY}
         onValueChange={(next) => next && onChange(next === ANY ? null : (next as Status))}
       >
-        <ToggleGroupItem value={ANY}>Tous</ToggleGroupItem>
-        <ToggleGroupItem value="verified">Vérifiés</ToggleGroupItem>
-        <ToggleGroupItem value="hypothesis">Hypothèses</ToggleGroupItem>
+        <ToggleGroupItem value={ANY}>{t.filters.all}</ToggleGroupItem>
+        <ToggleGroupItem value="verified">{t.filters.verified}</ToggleGroupItem>
+        <ToggleGroupItem value="hypothesis">{t.filters.hypotheses}</ToggleGroupItem>
       </ToggleGroup>
     </Criterion>
   )
@@ -123,21 +125,22 @@ function StatusToggle({
 
 /** `withReset` adds a reset button, for the dialog: the popover has its own next to the toolbar button. */
 function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; withReset?: boolean }) {
+  const { locale, t } = useI18n()
   const entities = useGraphStore((state) => state.entities)
   const { setFilters, resetFilters } = useViewStore.getState()
   const types = typeOptions(entities, filters.types)
-  const tags = tagOptions(entities, filters.tags)
+  const tags = tagOptions(entities, filters.tags, locale)
   const active = activeCriteriaCount(filters)
 
   return (
     <div className="grid max-h-[min(32rem,70vh)] gap-4 overflow-y-auto p-1">
       {withReset && (
         <Button variant="outline" size="sm" disabled={active === 0} onClick={resetFilters}>
-          <RotateCcw /> Réinitialiser
+          <RotateCcw /> {t.filters.reset}
         </Button>
       )}
 
-      <Criterion title="Type">
+      <Criterion title={t.filters.type}>
         {types.map(({ type, count }) => (
           <CheckboxRow
             key={type}
@@ -148,14 +151,14 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
             <span style={{ color: ENTITY_TYPES[type].color }}>
               <EntityIcon type={type} className="size-3.5" />
             </span>
-            <span>{`${ENTITY_TYPES[type].label} (${count})`}</span>
+            <span>{`${t.entityTypes[type].label} (${count})`}</span>
           </CheckboxRow>
         ))}
       </Criterion>
 
-      <Criterion title="Tag">
+      <Criterion title={t.filters.tag}>
         {tags.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Aucun tag dans cette enquête</p>
+          <p className="text-sm text-muted-foreground">{t.filters.noTags}</p>
         ) : (
           <div className="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto p-0.5">
             {tags.map(({ key, label, count }) => (
@@ -172,19 +175,19 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
       </Criterion>
 
       <StatusToggle
-        label="Statut des entités"
+        label={t.filters.entityStatus}
         value={filters.entityStatus}
         onChange={(entityStatus) => setFilters({ entityStatus })}
       />
       <StatusToggle
-        label="Statut des relations"
+        label={t.filters.relationStatus}
         value={filters.relationStatus}
         onChange={(relationStatus) => setFilters({ relationStatus })}
       />
 
-      <Criterion title="Confiance">
+      <Criterion title={t.filters.confidence}>
         <Label htmlFor="filter-reliability" className="font-normal">
-          Fiabilité au moins
+          {t.filters.minReliability}
         </Label>
         <Select
           value={filters.minReliability ?? ANY}
@@ -196,16 +199,16 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ANY}>Toutes</SelectItem>
-            {RELIABILITY.filter((grade) => grade.value !== 'F').map((grade) => (
-              <SelectItem key={grade.value} value={grade.value}>
-                {grade.value} — {grade.label}
+            <SelectItem value={ANY}>{t.filters.any}</SelectItem>
+            {RELIABILITY_VALUES.filter((value) => value !== 'F').map((value) => (
+              <SelectItem key={value} value={value}>
+                {value} — {t.assessment.reliability[value].label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <Label htmlFor="filter-credibility" className="font-normal">
-          Crédibilité au moins
+          {t.filters.minCredibility}
         </Label>
         <Select
           value={filters.minCredibility ? String(filters.minCredibility) : ANY}
@@ -219,10 +222,10 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={ANY}>Toutes</SelectItem>
-            {CREDIBILITY.filter((grade) => grade.value !== 6).map((grade) => (
-              <SelectItem key={grade.value} value={String(grade.value)}>
-                {grade.value} — {grade.label}
+            <SelectItem value={ANY}>{t.filters.any}</SelectItem>
+            {CREDIBILITY_VALUES.filter((value) => value !== 6).map((value) => (
+              <SelectItem key={value} value={String(value)}>
+                {value} — {t.assessment.credibility[value].label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -232,7 +235,7 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
           checked={filters.includeUngraded}
           onChange={(includeUngraded) => setFilters({ includeUngraded })}
         >
-          Inclure les éléments non cotés
+          {t.filters.includeUngraded}
         </CheckboxRow>
       </Criterion>
     </div>
@@ -244,6 +247,7 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
  * a cross to clear them all.
  */
 export function FiltersButton() {
+  const { t } = useI18n()
   const filters = useViewStore((state) => state.filters)
   const active = activeCriteriaCount(filters)
 
@@ -252,7 +256,7 @@ export function FiltersButton() {
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className={cn(active > 0 && 'rounded-r-none')}>
-            <ListFilter /> Filtres
+            <ListFilter /> {t.graph.toolbar.filters}
             {active > 0 && <Badge variant="secondary">{active}</Badge>}
           </Button>
         </PopoverTrigger>
@@ -265,8 +269,8 @@ export function FiltersButton() {
           variant="outline"
           size="icon-sm"
           className="rounded-l-none border-l-0"
-          aria-label="Réinitialiser les filtres"
-          title="Réinitialiser les filtres"
+          aria-label={t.filters.resetAll}
+          title={t.filters.resetAll}
           onClick={useViewStore.getState().resetFilters}
         >
           <X />
@@ -284,13 +288,14 @@ export function FiltersDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
+  const { t } = useI18n()
   const filters = useViewStore((state) => state.filters)
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Filtres</DialogTitle>
-          <DialogDescription>Les éléments qui ne correspondent pas sont estompés.</DialogDescription>
+          <DialogTitle>{t.graph.toolbar.filters}</DialogTitle>
+          <DialogDescription>{t.filters.dialogDescription}</DialogDescription>
         </DialogHeader>
         <FiltersForm filters={filters} withReset />
       </DialogContent>

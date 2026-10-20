@@ -3,18 +3,21 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { LIMITS } from '@/domain/schemas'
 import { SafeMarkdown } from '@/lib/markdown'
+import { useI18n } from '@/i18n/locale'
 
 export function NotesEditor({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const { t } = useI18n()
+  const texts = t.entities.notesEditor
   const [preview, setPreview] = useState(value.length > 0)
 
   return (
     <div className="grid grid-cols-1 gap-2">
       <div className="flex justify-end gap-1">
         <Button variant={preview ? 'ghost' : 'secondary'} size="xs" onClick={() => setPreview(false)}>
-          Écrire
+          {texts.write}
         </Button>
         <Button variant={preview ? 'secondary' : 'ghost'} size="xs" onClick={() => setPreview(true)}>
-          Aperçu
+          {texts.preview}
         </Button>
       </div>
       {preview ? (
@@ -26,16 +29,16 @@ export function NotesEditor({ value, onChange }: { value: string; onChange: (val
           {value ? (
             <SafeMarkdown>{value}</SafeMarkdown>
           ) : (
-            <span className="text-muted-foreground">Aucune note.</span>
+            <span className="text-muted-foreground">{texts.none}</span>
           )}
         </div>
       ) : (
         <Textarea
-          aria-label="Notes (Markdown)"
+          aria-label={texts.label}
           value={value}
           maxLength={LIMITS.text}
           rows={8}
-          placeholder="Notes en Markdown…"
+          placeholder={texts.placeholder}
           className="font-mono text-xs"
           onChange={(event) => onChange(event.target.value)}
         />

@@ -123,7 +123,7 @@ describe('ExportMenu', () => {
     vi.mocked(svgToPng).mockRejectedValue(new Error('boom'))
     await choose('PNG')
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Exporter' }))
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Impossible d’exporter l’image'))
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith(`Impossible d'exporter l'image`))
     expect(downloadBlob).not.toHaveBeenCalled()
   })
 })

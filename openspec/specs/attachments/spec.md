@@ -79,7 +79,7 @@ clipboard. By default the stored bytes SHALL be exactly those of the original fi
 - **THEN** the source form shows exactly H
 
 #### Scenario: Copy the fingerprint
-- **WHEN** the user clicks "Copier l’empreinte"
+- **WHEN** the user clicks "Copier l'empreinte"
 - **THEN** the 64-character SHA-256 is copied to the clipboard and "Empreinte copiée" is shown
 
 ### Requirement: Duplicate screenshot warning
@@ -132,15 +132,15 @@ offered optimization.
 ### Requirement: Original fingerprint of an optimized screenshot
 An optimized screenshot SHALL keep the SHA-256 and size of the original file beside those of the
 stored image. The form SHALL show "Capture optimisée" with both fingerprints, the original one
-labelled "Empreinte d’origine".
+labelled "Empreinte d'origine".
 
 #### Scenario: Both fingerprints
 - **WHEN** the user saves a source with an optimized screenshot whose original file has SHA-256 H
-- **THEN** the form shows "Capture optimisée", "Empreinte d’origine" H, and the SHA-256 of the stored image, different from H
+- **THEN** the form shows "Capture optimisée", "Empreinte d'origine" H, and the SHA-256 of the stored image, different from H
 
 #### Scenario: Original fingerprint without the image
 - **WHEN** that source is exported without screenshots and re-imported
-- **THEN** the source still shows "Empreinte d’origine" H
+- **THEN** the source still shows "Empreinte d'origine" H
 
 ### Requirement: Screenshot stays local
 Screenshots SHALL be stored only in this browser and displayed without any network request.

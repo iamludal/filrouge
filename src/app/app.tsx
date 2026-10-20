@@ -1,11 +1,11 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useRoute, routeHref } from '@/app/router'
 import { GithubLink } from '@/components/github-link'
+import { LanguageMenu } from '@/components/language-menu'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { InvestigationsPage } from '@/features/investigations/investigations-page'
 import { useGraphStore } from '@/store/graph-store'
-
-const BRAND = 'Filrouge'
+import { useI18n } from '@/i18n/locale'
 
 // The graph editor (React Flow, Markdown…) is the heavy part: loaded on demand.
 const InvestigationPage = lazy(() =>
@@ -13,6 +13,7 @@ const InvestigationPage = lazy(() =>
 )
 
 export function App() {
+  const { t } = useI18n()
   const route = useRoute()
   const openName = useGraphStore((state) =>
     route.name === 'investigation' && state.investigation?.id === route.id
@@ -21,8 +22,8 @@ export function App() {
   )
 
   useEffect(() => {
-    document.title = openName ? `${openName} – ${BRAND}` : BRAND
-  }, [openName])
+    document.title = openName ? `${openName} – ${t.common.brand}` : t.common.brand
+  }, [openName, t])
 
   return (
     <div className="flex h-dvh flex-col">
@@ -32,10 +33,11 @@ export function App() {
           className="flex items-center gap-2 font-semibold tracking-tight"
         >
           <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="size-6" />
-          Filrouge
+          {t.common.brand}
         </a>
         <div className="flex items-center gap-1">
           <GithubLink />
+          <LanguageMenu />
           <ThemeToggle />
         </div>
       </header>

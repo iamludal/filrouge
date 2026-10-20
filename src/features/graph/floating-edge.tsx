@@ -9,6 +9,7 @@ import { describeConfidence, relationLabelText } from '@/domain/assessment'
 import { CIRCLE_CENTER_Y, edgeSegment } from '@/domain/graph-geometry'
 import { cn } from '@/lib/utils'
 import type { RelationEdge as RelationEdgeType } from '@/features/graph/types'
+import { useI18n } from '@/i18n/locale'
 
 /** React Flow nodes are as wide as their content, so the circle is centred on the measured width. */
 function measuredCircleCenter(node: InternalNode) {
@@ -18,6 +19,7 @@ function measuredCircleCenter(node: InternalNode) {
 
 /** Straight edge between the two entity circles, independent of handle positions. */
 export function FloatingEdge({ id, source, target, markerEnd, selected, data }: EdgeProps<RelationEdgeType>) {
+  const { t } = useI18n()
   const sourceNode = useInternalNode(source)
   const targetNode = useInternalNode(target)
   if (!sourceNode || !targetNode) return null
@@ -28,7 +30,7 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
   const dimmed = data?.dimmed
   const highlighted = data?.highlighted
   const label = relation && relationLabelText(relation.label, relation.confidence)
-  const description = relation?.confidence ? describeConfidence(relation.confidence) : undefined
+  const description = relation?.confidence ? describeConfidence(relation.confidence, t.assessment) : undefined
 
   return (
     <>

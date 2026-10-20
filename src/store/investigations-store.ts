@@ -1,10 +1,10 @@
 import { create } from 'zustand'
-import { parseExport, remapIds, serializeExport } from '@/domain/export-format'
+import { parseExport, remapIds, serializeExport, type ImportError } from '@/domain/export-format'
 import type { Investigation } from '@/domain/schemas'
 import { investigations as repository } from '@/db/repositories/investigations'
 
 export type ImportResult =
-  { ok: true; investigation: Investigation; copied: boolean } | { ok: false; errors: string[] }
+  { ok: true; investigation: Investigation; copied: boolean } | { ok: false; errors: ImportError[] }
 
 interface InvestigationsState {
   items: Investigation[]

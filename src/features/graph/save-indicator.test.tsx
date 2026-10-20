@@ -5,7 +5,7 @@ import { useGraphStore } from '@/store/graph-store'
 const STATUSES = [
   ['saved', 'Enregistré'],
   ['saving', 'Enregistrement…'],
-  ['error', 'Échec de l’enregistrement'],
+  ['error', `Échec de l'enregistrement`],
 ] as const
 
 describe('SaveIndicator', () => {

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { useI18n } from '@/i18n/locale'
 
 const REPOSITORY_URL = 'https://github.com/iamludal/filrouge'
 
@@ -12,14 +13,15 @@ function GithubMark() {
 }
 
 export function GithubLink() {
+  const { t } = useI18n()
   return (
     <Button variant="ghost" size="icon" asChild>
       <a
         href={REPOSITORY_URL}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Code source sur GitHub"
-        title="Code source sur GitHub"
+        aria-label={t.app.githubLink}
+        title={t.app.githubLink}
       >
         <GithubMark />
       </a>

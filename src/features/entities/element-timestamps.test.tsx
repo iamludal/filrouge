@@ -2,7 +2,10 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ElementTimestamps } from '@/features/entities/element-timestamps'
-import { formatDate, formatDateTimeFull } from '@/lib/format'
+import { fr } from '@/i18n/messages/fr'
+import { createFormatters } from '@/lib/format'
+
+const { formatDate, formatDateTimeFull } = createFormatters('fr', fr.common.units)
 
 const CREATED = '2026-10-20T12:32:05.000Z'
 const EDITED = '2026-10-21T08:10:44.000Z'

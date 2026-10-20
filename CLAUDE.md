@@ -26,6 +26,7 @@ Guide pour les agents de développement travaillant sur filrouge.
 ## Règles
 
 - Jamais `dangerouslySetInnerHTML` (règle ESLint) ; Markdown via `src/lib/markdown.tsx` uniquement.
+- Tout texte affiché à l'utilisateur passe par `src/i18n/` (dictionnaires `fr` et `en`, `useI18n()`), jamais en dur dans un composant ; ajouter la clé dans les deux langues (le typecheck échoue sinon). Le domaine renvoie des identifiants ou des codes, l'interface les traduit. Le contenu des enquêtes n'est jamais traduit.
 - Aucune requête réseau au runtime ; la CSP (dans `vite.config.ts`) doit rester stricte.
 - Ne jamais logguer le contenu d'une enquête (`no-console` actif, sauf warn/error).
 - Toute donnée importée passe par un schéma Zod avant d'atteindre le store.

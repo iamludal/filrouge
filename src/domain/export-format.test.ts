@@ -7,7 +7,7 @@ import {
   serializeExport,
 } from '@/domain/export-format'
 import { createEntity, createInvestigation, createRelation } from '@/domain/factories'
-import { SCHEMA_VERSION, type Attachment, type Source } from '@/domain/schemas'
+import { LIMITS, SCHEMA_VERSION, type Attachment, type Source } from '@/domain/schemas'
 import { sha256Hex } from '@/lib/hash'
 
 function sampleSnapshot() {
@@ -88,7 +88,7 @@ describe('export format', () => {
   it('rejects invalid JSON without throwing', async () => {
     expect(await parseExport('{nope')).toEqual({
       ok: false,
-      errors: ['Le fichier n’est pas un JSON valide'],
+      errors: [{ code: 'invalidJson' }],
     })
   })
 
@@ -97,7 +97,7 @@ describe('export format', () => {
     expect((await parseExport(JSON.stringify({ ...json, format: 'other' }))).ok).toBe(false)
     const newer = await parseExport(JSON.stringify({ ...json, schemaVersion: SCHEMA_VERSION + 1 }))
     expect(newer.ok).toBe(false)
-    if (!newer.ok) expect(newer.errors[0]).toMatch(/plus récente/)
+    if (!newer.ok) expect(newer.errors[0]).toEqual({ code: 'newerVersion', value: SCHEMA_VERSION + 1 })
   })
 
   it('rejects files larger than the import limit', async () => {
@@ -125,10 +125,23 @@ describe('export format', () => {
     )
     expect(result.ok).toBe(false)
     if (!result.ok) {
-      expect(result.errors.join('\n')).toMatch(/Identifiant dupliqué/)
-      expect(result.errors.join('\n')).toMatch(/Enquête incohérente/)
-      expect(result.errors.join('\n')).toMatch(/Entité inconnue/)
+      expect(result.errors.map((error) => error.code)).toContain('duplicateId')
+      expect(result.errors.map((error) => error.code)).toContain('inconsistentInvestigation')
+      expect(result.errors.map((error) => error.code)).toContain('unknownEntity')
     }
+  })
+
+  it('reports an entity with too many properties by code, with the limit', async () => {
+    const json = JSON.parse(await serializeExport(sampleSnapshot()))
+    json.entities[0].properties = Object.fromEntries(
+      Array.from({ length: LIMITS.properties + 1 }, (_, index) => [`k${index}`, 'v']),
+    )
+    const result = await parseExport(JSON.stringify(json))
+    expect(!result.ok && result.errors[0]).toMatchObject({
+      code: 'tooManyProperties',
+      path: 'entities.0.properties',
+      value: LIMITS.properties,
+    })
   })
 
   it('remaps every id while preserving references', async () => {
@@ -199,7 +212,7 @@ describe('export with attachments', () => {
     const file = await buildExport(snapshot, [attachment])
     const result = await parseExport(JSON.stringify({ ...file, attachments: [] }))
     expect(result.ok).toBe(false)
-    if (!result.ok) expect(result.errors.join('\n')).toMatch(/Capture inconnue/)
+    if (!result.ok) expect(result.errors.map((error) => error.code)).toContain('unknownAttachment')
   })
 
   it('rejects tampered base64, a mismatched size and a mismatched fingerprint', async () => {
@@ -210,7 +223,7 @@ describe('export with attachments', () => {
       parseExport(JSON.stringify({ ...file, attachments: [{ ...entry, ...patch }] }))
 
     const invalid = await attempt({ data: '***' })
-    expect(!invalid.ok && invalid.errors[0]).toMatch(/base64 invalide/)
+    expect(!invalid.ok && invalid.errors[0]).toMatchObject({ code: 'invalidBase64' })
 
     // Same length, different bytes: only the fingerprint can tell.
     const swapped = entry.data.slice(0, -4) + 'AAAA'
@@ -218,10 +231,10 @@ describe('export with attachments', () => {
     expect(tampered.ok).toBe(false)
 
     const size = await attempt({ size: entry.size + 1 })
-    expect(!size.ok && size.errors[0]).toMatch(/Taille incohérente/)
+    expect(!size.ok && size.errors[0]).toMatchObject({ code: 'sizeMismatch' })
 
     const sha = await attempt({ sha256: 'f'.repeat(64) })
-    expect(!sha.ok && sha.errors[0]).toMatch(/Empreinte incohérente/)
+    expect(!sha.ok && sha.errors[0]).toMatchObject({ code: 'hashMismatch' })
   })
 
   it('rejects an attachment whose fingerprint differs from its source', async () => {
@@ -229,7 +242,7 @@ describe('export with attachments', () => {
     const file = await buildExport(snapshot, [attachment])
     const sources = [{ ...file.sources[0]!, sha256: 'e'.repeat(64) }]
     const result = await parseExport(JSON.stringify({ ...file, sources }))
-    expect(!result.ok && result.errors[0]).toMatch(/différente de celle de la source/)
+    expect(!result.ok && result.errors[0]).toMatchObject({ code: 'sourceHashMismatch' })
   })
 
   it('rejects disguised content declared as PNG', async () => {
@@ -243,7 +256,7 @@ describe('export with attachments', () => {
       sha256: await sha256Hex(svg),
     }
     const result = await parseExport(JSON.stringify({ ...file, attachments: [entry] }))
-    expect(!result.ok && result.errors[0]).toMatch(/Format d’image incohérent/)
+    expect(!result.ok && result.errors[0]).toMatchObject({ code: 'mimeMismatch' })
   })
 
   it('rejects an SVG mime type and files from schemaVersion 2', async () => {

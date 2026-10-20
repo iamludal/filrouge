@@ -38,19 +38,19 @@ horizontally, and the content SHALL not overflow the viewport width.
 ### Requirement: Compact graph toolbar
 On narrow screens, the graph toolbar SHALL show only the "Retour aux enquêtes" link, the
 investigation name, the save status as an icon, a "Rechercher dans le graphe" button, an "Annuler"
-button and a "Plus d’actions" menu button. The menu SHALL hold "Rétablir", "Filtres", "Sources" and
+button and a "Plus d'actions" menu button. The menu SHALL hold "Rétablir", "Filtres", "Sources" and
 the export formats "JSON", "PNG" and "SVG".
 
 #### Scenario: Toolbar on a phone
 - **WHEN** an investigation is opened in a 412 px wide viewport
-- **THEN** the toolbar shows the name, "Rechercher dans le graphe", "Annuler" and "Plus d’actions", and no "Filtres", "Sources" or "Exporter" button
+- **THEN** the toolbar shows the name, "Rechercher dans le graphe", "Annuler" and "Plus d'actions", and no "Filtres", "Sources" or "Exporter" button
 
 #### Scenario: Overflow menu
-- **WHEN** the user taps "Plus d’actions"
+- **WHEN** the user taps "Plus d'actions"
 - **THEN** a menu lists "Rétablir", "Filtres", "Sources", "JSON", "PNG" and "SVG"
 
 #### Scenario: Export from the menu
-- **WHEN** the user taps "Plus d’actions" then "SVG"
+- **WHEN** the user taps "Plus d'actions" then "SVG"
 - **THEN** an SVG file of the graph is downloaded
 
 #### Scenario: Save status as an icon
@@ -58,12 +58,12 @@ the export formats "JSON", "PNG" and "SVG".
 - **THEN** the save status is shown as an icon whose accessible name is "Enregistrement…"
 
 ### Requirement: Active filters signalled on the menu button
-On narrow screens, the "Plus d’actions" button SHALL show a dot while at least one filter criterion
+On narrow screens, the "Plus d'actions" button SHALL show a dot while at least one filter criterion
 is active, and the "Filtres" menu entry SHALL show the number of active criteria.
 
 #### Scenario: One filter active
 - **WHEN** the type "Email" is checked in the filters on a narrow screen
-- **THEN** the "Plus d’actions" button shows a dot and the "Filtres" menu entry shows "1"
+- **THEN** the "Plus d'actions" button shows a dot and the "Filtres" menu entry shows "1"
 
 ### Requirement: Detail drawer
 On narrow screens the detail panel SHALL be a drawer anchored to the bottom of the screen instead
@@ -159,7 +159,7 @@ SHALL be at least 44 × 44 CSS pixels.
 
 #### Scenario: Toolbar buttons
 - **WHEN** an investigation is opened in a 412 px wide viewport
-- **THEN** "Retour aux enquêtes", "Rechercher dans le graphe", "Annuler" and "Plus d’actions" each measure at least 44 × 44 px
+- **THEN** "Retour aux enquêtes", "Rechercher dans le graphe", "Annuler" and "Plus d'actions" each measure at least 44 × 44 px
 
 ### Requirement: Dialogs fit the viewport
 Every dialog SHALL fit within the viewport width from 360 px up, leaving a margin on each side,

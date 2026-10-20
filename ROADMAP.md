@@ -183,6 +183,7 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [x] Mise en page responsive mobile et tablette (dès 360 px de large, mise en page étroite sous le breakpoint `md`) : barre d'outils du graphe compactée (recherche dépliable, Annuler, menu « Plus d'actions » avec Rétablir, Filtres, Sources et exports), panneau de détail en tiroir ancré en bas, non modal, masqué sans sélection, réduit (résumé de la sélection) ou déplié (éditeur complet) au toucher ou au glisser de sa poignée, minimap masquée, bouton « Supprimer la sélection » pour la sélection multiple, cibles tactiles ≥ 44 px, dialogues contenus dans l'écran, aucun défilement horizontal. Tests E2E Playwright sur un viewport mobile (`devices['Pixel 7']`)
 - [x] Gestes tactiles sur le canvas : pan à un doigt et zoom au pincement, appui long sur le canvas pour ajouter une entité (équivalent du double-clic), création de relation au doigt depuis la poignée d'une entité sélectionnée (zone tactile de 44 px)
 - [x] Dates de création et de dernière modification des entités et relations, affichées dans le panneau de détail (et le tiroir mobile) ; le déplacement d'un nœud ne compte pas comme une modification (OpenSpec `add-element-timestamps`)
+- [x] Internationalisation FR/EN : interface en français et en anglais, langue détectée depuis la langue du navigateur ou du système (repli sur l'anglais), menu de langue dans l'en-tête, choix persisté dans ce navigateur, dates, nombres et tailles formatés selon la langue, vocabulaire OSINT usuel (échelle de l'Amirauté OTAN) ; le contenu des enquêtes n'est jamais traduit et le format d'export reste inchangé (OpenSpec `add-i18n`)
 - [ ] Layouts automatiques (force, hiérarchique, radial) via elkjs dans un Web Worker
 - [ ] Plus court chemin entre deux entités sélectionnées (graphology), mis en évidence
 - [ ] Mise en évidence des voisins à N sauts
@@ -217,7 +218,6 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 
 ### Idées post-1.0 (non prioritaires)
 
-- Internationalisation FR/EN
 - Rendu Sigma.js pour les très gros graphes (> 5 000 nœuds)
 - Import depuis Maltego (.mtgx) et OSINTracker
 - Comparaison de deux enquêtes / détection d'entités communes

@@ -2,8 +2,9 @@ import { Paperclip } from 'lucide-react'
 import { useMemo, useState, type KeyboardEvent } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { sourceDisplayName } from '@/domain/sources'
 import { useGraphStore, type ElementRef } from '@/store/graph-store'
+import { useSourceName } from '@/features/sources/use-source-name'
+import { useI18n } from '@/i18n/locale'
 
 interface SourcePickerDialogProps {
   open: boolean
@@ -22,6 +23,8 @@ export function SourcePickerDialog(props: SourcePickerDialogProps) {
 }
 
 function SourcePicker({ onOpenChange, element }: SourcePickerDialogProps) {
+  const { t } = useI18n()
+  const sourceName = useSourceName()
   const sources = useGraphStore((state) => state.sources)
   const attachedIds = useGraphStore((state) =>
     element.type === 'entity'
@@ -39,9 +42,9 @@ function SourcePicker({ onOpenChange, element }: SourcePickerDialogProps) {
       .filter((source) => !attached.has(source.id))
       .filter(
         (source) =>
-          !needle || `${sourceDisplayName(source)} ${source.url ?? ''}`.toLocaleLowerCase().includes(needle),
+          !needle || `${sourceName(source)} ${source.url ?? ''}`.toLocaleLowerCase().includes(needle),
       )
-  }, [sources, attachedIds, query])
+  }, [sources, attachedIds, query, sourceName])
 
   const choose = (index: number) => {
     const source = candidates[index]
@@ -66,16 +69,16 @@ function SourcePicker({ onOpenChange, element }: SourcePickerDialogProps) {
   return (
     <div className="grid gap-3">
       <DialogHeader>
-        <DialogTitle>Source existante</DialogTitle>
-        <DialogDescription>Choisissez une source de l’enquête à rattacher.</DialogDescription>
+        <DialogTitle>{t.sources.picker.title}</DialogTitle>
+        <DialogDescription>{t.sources.picker.description}</DialogDescription>
       </DialogHeader>
       <Input
         autoFocus
         role="combobox"
         aria-expanded
         aria-controls="source-picker-list"
-        aria-label="Filtrer les sources"
-        placeholder="Filtrer par titre ou URL"
+        aria-label={t.sources.picker.filterLabel}
+        placeholder={t.sources.picker.filterPlaceholder}
         value={query}
         onChange={(event) => {
           setQuery(event.target.value)
@@ -86,7 +89,7 @@ function SourcePicker({ onOpenChange, element }: SourcePickerDialogProps) {
       <ul
         id="source-picker-list"
         role="listbox"
-        aria-label="Sources"
+        aria-label={t.sources.picker.listLabel}
         className="grid max-h-64 gap-1 overflow-y-auto"
       >
         {candidates.map((source, index) => (
@@ -99,15 +102,17 @@ function SourcePicker({ onOpenChange, element }: SourcePickerDialogProps) {
               }`}
               onClick={() => choose(index)}
             >
-              <span className="min-w-0 flex-1 truncate">{sourceDisplayName(source)}</span>
-              {source.attachmentId && <Paperclip className="size-3.5 shrink-0" aria-label="Avec capture" />}
+              <span className="min-w-0 flex-1 truncate">{sourceName(source)}</span>
+              {source.attachmentId && (
+                <Paperclip className="size-3.5 shrink-0" aria-label={t.sources.withScreenshot} />
+              )}
             </button>
           </li>
         ))}
       </ul>
       {candidates.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          {query.trim() ? 'Aucune source ne correspond.' : 'Aucune autre source dans cette enquête.'}
+          {query.trim() ? t.sources.picker.noMatch : t.sources.picker.none}
         </p>
       )}
     </div>

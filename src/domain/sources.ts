@@ -1,13 +1,10 @@
 import { LIMITS, type Source } from '@/domain/schemas'
 
-export const SOURCE_ERRORS = {
-  url: 'URL invalide (http ou https)',
-  date: 'Date de capture invalide',
-  empty: 'Renseignez au moins un titre, une URL ou une capture',
-} as const
+/** Why a source form cannot be saved; the UI turns each code into a message. */
+export type SourceErrorCode = 'invalidUrl' | 'invalidDate' | 'empty'
 
-/** Title, else the URL's host name, else a placeholder. Used wherever a source is listed. */
-export function sourceDisplayName(source: Pick<Source, 'title' | 'url'>): string {
+/** Title, else the URL's host name, else `undefined` (the UI shows its "untitled" placeholder). */
+export function sourceDisplayName(source: Pick<Source, 'title' | 'url'>): string | undefined {
   const title = source.title?.trim()
   if (title) return title
   if (source.url) {
@@ -17,7 +14,7 @@ export function sourceDisplayName(source: Pick<Source, 'title' | 'url'>): string
       // Falls through: a stored URL is validated, but never trust it for display.
     }
   }
-  return 'Source sans titre'
+  return undefined
 }
 
 /** True for an `http` or `https` URL of at most 2,048 characters. */
@@ -55,10 +52,10 @@ export interface SourceFormValues {
 }
 
 export interface SourceFormErrors {
-  url?: string
-  archiveUrl?: string
-  capturedAt?: string
-  form?: string
+  url?: SourceErrorCode
+  archiveUrl?: SourceErrorCode
+  capturedAt?: SourceErrorCode
+  form?: SourceErrorCode
 }
 
 /** Checks the form as typed; an empty object means it can be saved. */
@@ -66,15 +63,9 @@ export function validateSourceForm(values: SourceFormValues, hasScreenshot: bool
   const errors: SourceFormErrors = {}
   const url = values.url.trim()
   const archiveUrl = values.archiveUrl.trim()
-  if (url && !isHttpUrl(url)) errors.url = SOURCE_ERRORS.url
-  if (archiveUrl && !isHttpUrl(archiveUrl)) errors.archiveUrl = SOURCE_ERRORS.url
-  if (fromLocalInput(values.capturedAt) === null) errors.capturedAt = SOURCE_ERRORS.date
-  if (!values.title.trim() && !url && !hasScreenshot) errors.form = SOURCE_ERRORS.empty
+  if (url && !isHttpUrl(url)) errors.url = 'invalidUrl'
+  if (archiveUrl && !isHttpUrl(archiveUrl)) errors.archiveUrl = 'invalidUrl'
+  if (fromLocalInput(values.capturedAt) === null) errors.capturedAt = 'invalidDate'
+  if (!values.title.trim() && !url && !hasScreenshot) errors.form = 'empty'
   return errors
-}
-
-/** "Non utilisée", "1 utilisation", "3 utilisations". */
-export function usageLabel(count: number): string {
-  if (count === 0) return 'Non utilisée'
-  return `${count} utilisation${count > 1 ? 's' : ''}`
 }

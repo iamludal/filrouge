@@ -3,14 +3,15 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import {
-  CREDIBILITY,
-  RELIABILITY,
+  CREDIBILITY_VALUES,
+  RELIABILITY_VALUES,
   formatConfidence,
   withCredibility,
   withReliability,
 } from '@/domain/assessment'
 import type { Confidence, Status } from '@/domain/schemas'
 import { Field } from '@/features/entities/entity-panel'
+import { useI18n } from '@/i18n/locale'
 
 /** A full-width trigger whose value wraps instead of being clipped in a narrow panel. */
 const WRAPPING_TRIGGER =
@@ -27,6 +28,7 @@ interface AssessmentFieldsProps {
 
 /** Status switch and Admiralty grade of an entity or a relation. */
 export function AssessmentFields({ idPrefix, status, confidence, onChange }: AssessmentFieldsProps) {
+  const { t } = useI18n()
   return (
     <div className="grid grid-cols-1 gap-4">
       <div className="flex items-center gap-2">
@@ -35,9 +37,9 @@ export function AssessmentFields({ idPrefix, status, confidence, onChange }: Ass
           checked={status === 'hypothesis'}
           onCheckedChange={(checked) => onChange({ status: checked ? 'hypothesis' : 'verified' })}
         />
-        <Label htmlFor={`${idPrefix}-hypothesis`}>Hypothèse</Label>
+        <Label htmlFor={`${idPrefix}-hypothesis`}>{t.assessment.hypothesis}</Label>
       </div>
-      <Field label="Fiabilité de la source" htmlFor={`${idPrefix}-reliability`}>
+      <Field label={t.assessment.reliabilityField} htmlFor={`${idPrefix}-reliability`}>
         <Select
           value={confidence?.reliability ?? ''}
           onValueChange={(value) =>
@@ -45,18 +47,18 @@ export function AssessmentFields({ idPrefix, status, confidence, onChange }: Ass
           }
         >
           <SelectTrigger id={`${idPrefix}-reliability`} className={WRAPPING_TRIGGER}>
-            <SelectValue placeholder="Non évaluée" />
+            <SelectValue placeholder={t.assessment.unrated} />
           </SelectTrigger>
           <SelectContent>
-            {RELIABILITY.map((grade) => (
-              <SelectItem key={grade.value} value={grade.value}>
-                {grade.value} — {grade.label}
+            {RELIABILITY_VALUES.map((value) => (
+              <SelectItem key={value} value={value}>
+                {value} — {t.assessment.reliability[value].label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </Field>
-      <Field label="Crédibilité de l’information" htmlFor={`${idPrefix}-credibility`}>
+      <Field label={t.assessment.credibilityField} htmlFor={`${idPrefix}-credibility`}>
         <Select
           value={confidence ? String(confidence.credibility) : ''}
           onValueChange={(value) =>
@@ -64,12 +66,12 @@ export function AssessmentFields({ idPrefix, status, confidence, onChange }: Ass
           }
         >
           <SelectTrigger id={`${idPrefix}-credibility`} className={WRAPPING_TRIGGER}>
-            <SelectValue placeholder="Non évaluée" />
+            <SelectValue placeholder={t.assessment.unrated} />
           </SelectTrigger>
           <SelectContent>
-            {CREDIBILITY.map((grade) => (
-              <SelectItem key={grade.value} value={String(grade.value)}>
-                {grade.value} — {grade.label}
+            {CREDIBILITY_VALUES.map((value) => (
+              <SelectItem key={value} value={String(value)}>
+                {value} — {t.assessment.credibility[value].label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -77,9 +79,9 @@ export function AssessmentFields({ idPrefix, status, confidence, onChange }: Ass
       </Field>
       {confidence && (
         <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-          <span>Cotation : {formatConfidence(confidence)}</span>
+          <span>{t.assessment.rating(formatConfidence(confidence))}</span>
           <Button variant="outline" size="sm" onClick={() => onChange({ confidence: undefined })}>
-            Effacer la cotation
+            {t.assessment.clear}
           </Button>
         </div>
       )}

@@ -13,16 +13,12 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { findDuplicateSource } from '@/domain/graph'
 import { LIMITS, type Attachment, type Source } from '@/domain/schemas'
-import {
-  fromLocalInput,
-  sourceDisplayName,
-  toLocalInput,
-  validateSourceForm,
-  type SourceFormErrors,
-} from '@/domain/sources'
+import { fromLocalInput, toLocalInput, validateSourceForm, type SourceFormErrors } from '@/domain/sources'
+import { useSourceName } from '@/features/sources/use-source-name'
+import { useI18n } from '@/i18n/locale'
 import { canOptimize, optimizeAttachment } from '@/features/sources/optimize-image'
 import { ScreenshotField } from '@/features/sources/screenshot-field'
-import { intakeScreenshot } from '@/features/sources/screenshot'
+import { intakeScreenshot, type ScreenshotError } from '@/features/sources/screenshot'
 import { useStoredAttachment } from '@/features/sources/use-attachment'
 import { nowIso } from '@/lib/ids'
 import { useGraphStore, type ElementRef } from '@/store/graph-store'
@@ -38,11 +34,6 @@ interface SourceFormDialogProps {
   initialFile?: Blob
   onSaved?: (source: Source) => void
 }
-
-const OPTIMIZE_NOTICES = {
-  'no-gain': 'Optimisation sans gain, original conservé',
-  unavailable: 'Optimisation indisponible, original conservé',
-} as const
 
 export function SourceFormDialog(props: SourceFormDialogProps) {
   return (
@@ -77,6 +68,8 @@ function SourceForm({
   onSaved,
   onOpenExisting,
 }: SourceFormDialogProps & { onOpenExisting: (source: Source) => void }) {
+  const { t } = useI18n()
+  const sourceName = useSourceName()
   const investigationId = useGraphStore((state) => state.investigation?.id)
   const createSource = useGraphStore((state) => state.createSource)
   const updateSource = useGraphStore((state) => state.updateSource)
@@ -94,9 +87,9 @@ function SourceForm({
   const [optimizeOn, setOptimizeOn] = useState(false)
   const [optimizing, setOptimizing] = useState(false)
   const [optimized, setOptimized] = useState<Attachment | null>(null)
-  const [optimizeNotice, setOptimizeNotice] = useState<string | null>(null)
+  const [optimizeNotice, setOptimizeNotice] = useState<'no-gain' | 'unavailable' | null>(null)
   const [ignoredDuplicate, setIgnoredDuplicate] = useState<string | null>(null)
-  const [screenshotError, setScreenshotError] = useState<string | null>(null)
+  const [screenshotError, setScreenshotError] = useState<ScreenshotError | null>(null)
   const [errors, setErrors] = useState<SourceFormErrors>({})
 
   // What gets saved: the optimized image when the option is on, else the file as added.
@@ -141,7 +134,7 @@ function SourceForm({
       setOptimized(result.attachment)
       setOptimizeOn(true)
     } else {
-      setOptimizeNotice(OPTIMIZE_NOTICES[result.reason])
+      setOptimizeNotice(result.reason)
     }
   }
 
@@ -194,10 +187,10 @@ function SourceForm({
   return (
     <form onSubmit={handleSubmit} onPaste={handlePaste} className="grid gap-4" noValidate>
       <DialogHeader>
-        <DialogTitle>{source ? 'Modifier la source' : 'Nouvelle source'}</DialogTitle>
-        <DialogDescription>Les captures restent dans ce navigateur.</DialogDescription>
+        <DialogTitle>{source ? t.sources.form.editTitle : t.sources.form.newTitle}</DialogTitle>
+        <DialogDescription>{t.sources.form.description}</DialogDescription>
       </DialogHeader>
-      <Field id="source-title" label="Titre">
+      <Field id="source-title" label={t.sources.form.title}>
         <Input
           id="source-title"
           value={title}
@@ -206,7 +199,7 @@ function SourceForm({
           autoFocus
         />
       </Field>
-      <Field id="source-url" label="URL" error={errors.url}>
+      <Field id="source-url" label={t.sources.form.url} error={errors.url && t.sources.errors[errors.url]}>
         <Input
           id="source-url"
           value={url}
@@ -216,7 +209,11 @@ function SourceForm({
           onChange={(event) => setUrl(event.target.value)}
         />
       </Field>
-      <Field id="source-archive" label="Lien d’archive (archive.org…)" error={errors.archiveUrl}>
+      <Field
+        id="source-archive"
+        label={t.sources.form.archive}
+        error={errors.archiveUrl && t.sources.errors[errors.archiveUrl]}
+      >
         <Input
           id="source-archive"
           value={archiveUrl}
@@ -226,7 +223,11 @@ function SourceForm({
           onChange={(event) => setArchiveUrl(event.target.value)}
         />
       </Field>
-      <Field id="source-captured" label="Date de capture" error={errors.capturedAt}>
+      <Field
+        id="source-captured"
+        label={t.sources.form.capturedAt}
+        error={errors.capturedAt && t.sources.errors[errors.capturedAt]}
+      >
         <Input
           id="source-captured"
           type="datetime-local"
@@ -234,7 +235,7 @@ function SourceForm({
           onChange={(event) => setCapturedAt(event.target.value)}
         />
       </Field>
-      <Field id="source-note" label="Note">
+      <Field id="source-note" label={t.sources.form.note}>
         <Textarea
           id="source-note"
           value={note}
@@ -272,10 +273,10 @@ function SourceForm({
       />
       {showDuplicate && (
         <div role="alert" className="grid gap-2 rounded-md border border-amber-500 p-3 text-sm">
-          <p>Cette capture est déjà présente dans la source « {sourceDisplayName(duplicate)} »</p>
+          <p>{t.sources.form.duplicate(sourceName(duplicate))}</p>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" size="sm" onClick={() => onOpenExisting(duplicate)}>
-              Ouvrir la source existante
+              {t.sources.form.openExisting}
             </Button>
             {attachTo && !source && (
               <Button
@@ -287,7 +288,7 @@ function SourceForm({
                   onOpenChange(false)
                 }}
               >
-                Rattacher cette source
+                {t.sources.form.attachExisting}
               </Button>
             )}
             <Button
@@ -296,21 +297,21 @@ function SourceForm({
               size="sm"
               onClick={() => setIgnoredDuplicate(intake?.sha256 ?? null)}
             >
-              Ajouter quand même
+              {t.sources.form.addAnyway}
             </Button>
           </div>
         </div>
       )}
       {errors.form && (
         <p role="alert" className="text-sm text-destructive">
-          {errors.form}
+          {t.sources.errors[errors.form]}
         </p>
       )}
       <DialogFooter>
         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-          Annuler
+          {t.common.cancel}
         </Button>
-        <Button type="submit">Enregistrer</Button>
+        <Button type="submit">{t.common.save}</Button>
       </DialogFooter>
     </form>
   )

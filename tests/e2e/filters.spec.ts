@@ -41,7 +41,7 @@ async function grade(page: Page, name: string, reliability: string, credibility:
   await node(page, name).click()
   await panel(page).getByRole('combobox', { name: 'Fiabilité de la source' }).click()
   await page.getByRole('option', { name: reliability }).click()
-  await panel(page).getByRole('combobox', { name: 'Crédibilité de l’information' }).click()
+  await panel(page).getByRole('combobox', { name: `Crédibilité de l'information` }).click()
   await page.getByRole('option', { name: credibility }).click()
 }
 

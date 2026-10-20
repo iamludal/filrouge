@@ -36,21 +36,21 @@ describe('CompactGraphToolbar', () => {
     expect(screen.getByRole('status', { name: 'Enregistré' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Rechercher dans le graphe' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Annuler' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Plus d’actions' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: `Plus d'actions` })).toBeInTheDocument()
     for (const name of [/Filtres/, /Sources/, 'Exporter', 'Rétablir'])
       expect(screen.queryByRole('button', { name })).not.toBeInTheDocument()
   })
 
   it('lists the other actions in the overflow menu', async () => {
     const { user } = setup()
-    await user.click(screen.getByRole('button', { name: 'Plus d’actions' }))
+    await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
     for (const name of ['Rétablir', 'Filtres', 'Sources (0)', 'JSON', 'PNG', 'SVG'])
       expect(await screen.findByRole('menuitem', { name })).toBeInTheDocument()
   })
 
   it('exports JSON from the menu', async () => {
     const { user, onExportJson } = setup()
-    await user.click(screen.getByRole('button', { name: 'Plus d’actions' }))
+    await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
     await user.click(await screen.findByRole('menuitem', { name: 'JSON' }))
     expect(onExportJson).toHaveBeenCalledOnce()
   })
@@ -62,7 +62,7 @@ describe('CompactGraphToolbar', () => {
     })
     await user.click(await screen.findByRole('button', { name: 'Annuler' }))
     expect(Object.keys(useGraphStore.getState().entities)).toHaveLength(0)
-    await user.click(screen.getByRole('button', { name: 'Plus d’actions' }))
+    await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
     await user.click(await screen.findByRole('menuitem', { name: 'Rétablir' }))
     expect(Object.keys(useGraphStore.getState().entities)).toHaveLength(1)
   })
@@ -84,7 +84,7 @@ describe('CompactGraphToolbar', () => {
 
   it('opens the filters in a dialog', async () => {
     const { user } = setup()
-    await user.click(screen.getByRole('button', { name: 'Plus d’actions' }))
+    await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
     await user.click(await screen.findByRole('menuitem', { name: 'Filtres' }))
     expect(await screen.findByRole('dialog', { name: 'Filtres' })).toBeInTheDocument()
   })
@@ -94,7 +94,7 @@ describe('CompactGraphToolbar', () => {
     expect(screen.queryByTestId('filters-dot')).not.toBeInTheDocument()
     act(() => useViewStore.getState().setFilters({ types: ['email'] }))
     expect(screen.getByTestId('filters-dot')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Plus d’actions' }))
+    await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
     expect(await screen.findByRole('menuitem', { name: /^Filtres\s*1$/ })).toBeInTheDocument()
   })
 })

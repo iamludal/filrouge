@@ -151,9 +151,9 @@ limits, and the dialog SHALL show that reduced size marked "(limitée)".
 - **THEN** the PNG is 16,384 × 819 pixels
 
 ### Requirement: Export failure
-When the image cannot be produced, the application SHALL show the error "Impossible d’exporter
-l’image" and SHALL NOT download any file.
+When the image cannot be produced, the application SHALL show the error "Impossible d'exporter
+l'image" and SHALL NOT download any file.
 
 #### Scenario: Rendering fails
 - **WHEN** the user confirms the PNG dialog and the browser fails to render the PNG
-- **THEN** the error "Impossible d’exporter l’image" is shown and no file is downloaded
+- **THEN** the error "Impossible d'exporter l'image" is shown and no file is downloaded

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { LIMITS, type PropertyValue } from '@/domain/schemas'
+import { useI18n } from '@/i18n/locale'
 
 interface PropertiesEditorProps {
   properties: Record<string, PropertyValue>
@@ -22,6 +23,8 @@ function renameKey(properties: Record<string, PropertyValue>, from: string, to: 
 }
 
 export function PropertiesEditor({ properties, suggestions, onChange }: PropertiesEditorProps) {
+  const { t } = useI18n()
+  const texts = t.entities.propertiesEditor
   const [newKey, setNewKey] = useState('')
   const entries = Object.entries(properties)
   const missingSuggestions = suggestions.filter((key) => !(key in properties))
@@ -39,7 +42,7 @@ export function PropertiesEditor({ properties, suggestions, onChange }: Properti
       {entries.map(([key, value]) => (
         <div key={key} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-1.5 gap-y-1">
           <Input
-            aria-label="Nom de la propriété"
+            aria-label={texts.name}
             defaultValue={key}
             maxLength={LIMITS.propertyKey}
             className="h-7 border-transparent bg-transparent px-1.5 text-xs font-medium text-muted-foreground hover:border-input md:text-xs dark:bg-transparent"
@@ -56,13 +59,13 @@ export function PropertiesEditor({ properties, suggestions, onChange }: Properti
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label={`Supprimer la propriété ${key}`}
+            aria-label={texts.remove(key)}
             onClick={() => onChange(Object.fromEntries(entries.filter(([k]) => k !== key)))}
           >
             <X />
           </Button>
           <Input
-            aria-label={`Valeur de ${key}`}
+            aria-label={texts.value(key)}
             value={display(value)}
             maxLength={LIMITS.propertyValue}
             className="col-span-2 h-8 text-xs"
@@ -78,14 +81,14 @@ export function PropertiesEditor({ properties, suggestions, onChange }: Properti
         }}
       >
         <Input
-          aria-label="Nouvelle propriété"
-          placeholder="Nouvelle propriété"
+          aria-label={texts.newLabel}
+          placeholder={texts.newLabel}
           value={newKey}
           maxLength={LIMITS.propertyKey}
           onChange={(event) => setNewKey(event.target.value)}
           className="h-8 text-xs"
         />
-        <Button type="submit" variant="outline" size="icon-sm" aria-label="Ajouter la propriété">
+        <Button type="submit" variant="outline" size="icon-sm" aria-label={texts.add}>
           <Plus />
         </Button>
       </form>

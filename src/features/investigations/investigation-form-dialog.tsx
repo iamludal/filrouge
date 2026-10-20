@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { LIMITS } from '@/domain/schemas'
+import { useI18n } from '@/i18n/locale'
 
 interface InvestigationFormDialogProps {
   open: boolean
@@ -40,6 +41,7 @@ function InvestigationForm({
   onSubmit,
   onOpenChange,
 }: InvestigationFormDialogProps) {
+  const { t } = useI18n()
   const [name, setName] = useState(initial?.name ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
   const [busy, setBusy] = useState(false)
@@ -60,10 +62,10 @@ function InvestigationForm({
     <form onSubmit={handleSubmit} className="grid gap-4">
       <DialogHeader>
         <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>Les données restent dans ce navigateur.</DialogDescription>
+        <DialogDescription>{t.home.form.description}</DialogDescription>
       </DialogHeader>
       <div className="grid gap-2">
-        <Label htmlFor="investigation-name">Nom</Label>
+        <Label htmlFor="investigation-name">{t.home.form.name}</Label>
         <Input
           id="investigation-name"
           value={name}
@@ -74,7 +76,7 @@ function InvestigationForm({
         />
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="investigation-description">Description (optionnelle)</Label>
+        <Label htmlFor="investigation-description">{t.home.form.descriptionLabel}</Label>
         <Textarea
           id="investigation-description"
           value={description}
@@ -85,7 +87,7 @@ function InvestigationForm({
       </div>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-          Annuler
+          {t.common.cancel}
         </Button>
         <Button type="submit" disabled={busy || !name.trim()}>
           {submitLabel}

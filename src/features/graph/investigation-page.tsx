@@ -23,10 +23,17 @@ import { cn } from '@/lib/utils'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
 import { startAutosave, type Autosave } from '@/store/persistence'
+import { useI18n } from '@/i18n/locale'
 
 type LoadState = 'loading' | 'ready' | 'missing'
 
 export function InvestigationPage({ id }: { id: string }) {
+  const { t } = useI18n()
+  // The load effect must not rerun when the language changes: it would reload the investigation.
+  const autosaveErrorText = useRef(t.graph.autosaveError)
+  useEffect(() => {
+    autosaveErrorText.current = t.graph.autosaveError
+  }, [t])
   const [state, setState] = useState<LoadState>('loading')
   const autosave = useRef<Autosave | null>(null)
   const investigation = useGraphStore((s) => s.investigation)
@@ -39,7 +46,7 @@ export function InvestigationPage({ id }: { id: string }) {
     // The search and filters of a previous visit never carry over.
     useViewStore.getState().reset()
     const saver = startAutosave(undefined, undefined, () =>
-      toast.error('Impossible d’enregistrer les modifications', { id: 'autosave-error' }),
+      toast.error(autosaveErrorText.current, { id: 'autosave-error' }),
     )
     autosave.current = saver
 
@@ -88,9 +95,9 @@ export function InvestigationPage({ id }: { id: string }) {
   if (state === 'missing') {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
-        <p className="text-muted-foreground">Enquête introuvable dans ce navigateur.</p>
+        <p className="text-muted-foreground">{t.graph.notFound}</p>
         <Button variant="outline" asChild>
-          <a href={routeHref({ name: 'home' })}>Retour aux enquêtes</a>
+          <a href={routeHref({ name: 'home' })}>{t.graph.backHome}</a>
         </Button>
       </div>
     )
@@ -106,7 +113,7 @@ export function InvestigationPage({ id }: { id: string }) {
         ) : (
           <div className="flex h-11 shrink-0 items-center gap-2 border-b px-2">
             <Button variant="ghost" size="icon-sm" asChild>
-              <a href={routeHref({ name: 'home' })} aria-label="Retour aux enquêtes">
+              <a href={routeHref({ name: 'home' })} aria-label={t.graph.backHome}>
                 <ArrowLeft />
               </a>
             </Button>

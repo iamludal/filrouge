@@ -1,6 +1,6 @@
 import { relationLabelText, formatConfidence } from '@/domain/assessment'
 import { circleCenter, CIRCLE_RADIUS, edgeSegment, type Segment } from '@/domain/graph-geometry'
-import { ENTITY_TYPES } from '@/domain/entity-types'
+import type { EntityTypeId } from '@/domain/entity-types'
 import type { Entity, Position, Relation } from '@/domain/schemas'
 import { EXPORT_FONT_FAMILY, type MeasureText } from '@/features/graph-export/measure-text'
 import { truncate } from '@/lib/format'
@@ -55,12 +55,13 @@ export function layoutGraph(
   entities: Record<string, Entity>,
   relations: Record<string, Relation>,
   measureText: MeasureText,
+  unnamedLabel: (type: EntityTypeId) => string,
 ): GraphLayout {
   const boxes: Box[] = []
   const nodes: NodeLayout[] = Object.values(entities).map((entity) => {
     const center = circleCenter(entity.position)
     const unnamed = !entity.label
-    const label = truncate(entity.label || `${ENTITY_TYPES[entity.type].label} sans nom`, MAX_ENTITY_LABEL)
+    const label = truncate(entity.label || unnamedLabel(entity.type), MAX_ENTITY_LABEL)
     const labelWidth = measureText(label, ENTITY_LABEL_FONT)
     const top = entity.position.y
     boxes.push(

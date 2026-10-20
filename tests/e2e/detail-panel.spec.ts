@@ -20,7 +20,7 @@ const LONG_NOTES = `Voir ${'https://exemple.test/'.padEnd(150, 'a')}\n\n\`\`\`\n
 async function fillWithLongContent(page: Page, panel: Locator) {
   await panel.getByLabel('Fiabilité de la source').click()
   await page.getByRole('option', { name: 'F — Fiabilité indéterminée' }).click()
-  await panel.getByLabel('Crédibilité de l’information').click()
+  await panel.getByLabel(`Crédibilité de l'information`).click()
   await page.getByRole('option', { name: '6 — Véracité indéterminée' }).click()
 
   await panel.getByRole('button', { name: 'date de naissance' }).click()

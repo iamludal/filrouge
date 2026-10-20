@@ -1,6 +1,7 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ENTITY_TYPE_IDS, ENTITY_TYPES, type EntityTypeId } from '@/domain/entity-types'
+import { ENTITY_TYPE_IDS, type EntityTypeId } from '@/domain/entity-types'
 import { EntityIcon } from '@/features/entities/entity-icon'
+import { useI18n } from '@/i18n/locale'
 
 interface EntityTypeSelectProps {
   id?: string
@@ -9,6 +10,7 @@ interface EntityTypeSelectProps {
 }
 
 export function EntityTypeSelect({ id, value, onChange }: EntityTypeSelectProps) {
+  const { t } = useI18n()
   return (
     <Select value={value} onValueChange={(next) => onChange(next as EntityTypeId)}>
       <SelectTrigger id={id} className="w-full">
@@ -18,7 +20,7 @@ export function EntityTypeSelect({ id, value, onChange }: EntityTypeSelectProps)
         {ENTITY_TYPE_IDS.map((type) => (
           <SelectItem key={type} value={type}>
             <EntityIcon type={type} className="size-4" />
-            {ENTITY_TYPES[type].label}
+            {t.entityTypes[type].label}
           </SelectItem>
         ))}
       </SelectContent>

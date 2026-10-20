@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { useI18n } from '@/i18n/locale'
 import { DEFAULT_PNG_SCALE, PNG_SCALES, pngSize, type PngScale } from '@/features/graph-export/png'
 
 export interface PendingPng {
@@ -24,8 +25,6 @@ interface PngExportDialogProps {
   onCancel: () => void
   onConfirm: (scale: PngScale) => void
 }
-
-const number = (value: number) => value.toLocaleString('fr-FR')
 
 export function PngExportDialog({ pending, onCancel, onConfirm }: PngExportDialogProps) {
   return (
@@ -47,18 +46,20 @@ function PngForm({
   onCancel: () => void
   onConfirm: (scale: PngScale) => void
 }) {
+  const { t, format } = useI18n()
+  const { formatNumber } = format
   const [scale, setScale] = useState<PngScale>(DEFAULT_PNG_SCALE)
   const groupLabel = useId()
 
   return (
     <div className="grid gap-4">
       <DialogHeader>
-        <DialogTitle>Exporter « {pending.name} » en PNG</DialogTitle>
-        <DialogDescription>L’image est enregistrée sur cet appareil, rien n’est envoyé.</DialogDescription>
+        <DialogTitle>{t.graphExport.pngTitle(pending.name)}</DialogTitle>
+        <DialogDescription>{t.graphExport.pngDescription}</DialogDescription>
       </DialogHeader>
       <div className="grid gap-3">
         <p id={groupLabel} className="text-sm font-medium">
-          Échelle
+          {t.graphExport.scale}
         </p>
         <RadioGroup
           aria-labelledby={groupLabel}
@@ -73,10 +74,11 @@ function PngForm({
                 <RadioGroupItem id={id} value={String(option)} />
                 <label htmlFor={id} className="flex cursor-pointer gap-2">
                   <span className="font-medium">
-                    {option}×{option === DEFAULT_PNG_SCALE && ' (recommandé)'}
+                    {option}×{option === DEFAULT_PNG_SCALE && t.graphExport.recommended}
                   </span>
                   <span className="text-muted-foreground">
-                    {number(size.width)} × {number(size.height)} px{size.limited && ' (limitée)'}
+                    {formatNumber(size.width)} × {formatNumber(size.height)} px
+                    {size.limited && t.graphExport.limited}
                   </span>
                 </label>
               </div>
@@ -86,11 +88,11 @@ function PngForm({
       </div>
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
+          {t.common.cancel}
         </Button>
         {/* Focused on opening, so Enter exports at once at the recommended scale. */}
         <Button type="button" autoFocus onClick={() => onConfirm(scale)}>
-          Exporter
+          {t.graph.toolbar.export}
         </Button>
       </DialogFooter>
     </div>

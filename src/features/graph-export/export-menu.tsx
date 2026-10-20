@@ -7,9 +7,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useGraphExports } from '@/features/graph-export/use-graph-exports'
+import { useI18n } from '@/i18n/locale'
 
 /** Every export of the open investigation: JSON and images of the whole graph. */
 export function ExportMenu({ onExportJson }: { onExportJson: () => void }) {
+  const { t } = useI18n()
   const { empty, exportPng: openPngDialog, exportSvg: saveSvg, pngDialog } = useGraphExports()
 
   return (
@@ -17,7 +19,7 @@ export function ExportMenu({ onExportJson }: { onExportJson: () => void }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm">
-            <FileDown /> Exporter
+            <FileDown /> {t.graph.toolbar.export}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

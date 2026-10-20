@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createInvestigation } from '@/domain/factories'
-import { usageLabel } from '@/domain/sources'
+import { fr } from '@/i18n/messages/fr'
 import { SourcesLibrary } from '@/features/sources/sources-library-dialog'
 import { useGraphStore } from '@/store/graph-store'
 
@@ -16,11 +16,11 @@ function setupGraph() {
   return { a, b, relation }
 }
 
-describe('usageLabel', () => {
+describe('sources.usage', () => {
   it('handles none, one and many', () => {
-    expect(usageLabel(0)).toBe('Non utilisée')
-    expect(usageLabel(1)).toBe('1 utilisation')
-    expect(usageLabel(3)).toBe('3 utilisations')
+    expect(fr.sources.usage(0)).toBe('Non utilisée')
+    expect(fr.sources.usage(1)).toBe('1 utilisation')
+    expect(fr.sources.usage(3)).toBe('3 utilisations')
   })
 })
 
@@ -45,7 +45,7 @@ describe('SourcesLibrary', () => {
 
     render(<SourcesLibrary />)
     await userEvent.click(screen.getByRole('button', { name: 'Sources (2)' }))
-    const list = await screen.findByRole('list', { name: 'Sources de l’enquête' })
+    const list = await screen.findByRole('list', { name: `Sources de l'enquête` })
     const items = within(list).getAllByRole('listitem')
     expect(within(items[0]!).getByText('3 utilisations')).toBeInTheDocument()
     expect(within(items[1]!).getByText('Non utilisée')).toBeInTheDocument()

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import type { AttachmentStats } from '@/db/repositories/attachments'
 import { MAX_IMPORT_BYTES, estimateExportBytes } from '@/domain/export-format'
-import { formatBytes } from '@/lib/format'
+import { useI18n } from '@/i18n/locale'
 
 export interface PendingExport {
   id: string
@@ -46,6 +46,8 @@ function ExportForm({
   onCancel: () => void
   onConfirm: (includeAttachments: boolean) => void
 }) {
+  const { t, format } = useI18n()
+  const { formatBytes } = format
   const [include, setInclude] = useState(true)
   const { stats } = pending
   const estimate = include ? estimateExportBytes(pending.baseJson.length, stats) : pending.baseJson.length
@@ -54,8 +56,8 @@ function ExportForm({
   return (
     <div className="grid gap-4">
       <DialogHeader>
-        <DialogTitle>Exporter « {pending.name} »</DialogTitle>
-        <DialogDescription>Le fichier est enregistré sur cet appareil, rien n’est envoyé.</DialogDescription>
+        <DialogTitle>{t.importExport.dialog.title(pending.name)}</DialogTitle>
+        <DialogDescription>{t.importExport.dialog.description}</DialogDescription>
       </DialogHeader>
       <label className="flex items-center gap-2 text-sm">
         <input
@@ -64,21 +66,20 @@ function ExportForm({
           checked={include}
           onChange={(event) => setInclude(event.target.checked)}
         />
-        Inclure les captures ({stats.count}, {formatBytes(stats.totalSize)})
+        {t.importExport.dialog.include(stats.count, formatBytes(stats.totalSize))}
       </label>
-      <p className="text-sm text-muted-foreground">Taille estimée : environ {formatBytes(estimate)}</p>
+      <p className="text-sm text-muted-foreground">{t.importExport.dialog.estimate(formatBytes(estimate))}</p>
       {tooLarge && (
         <p role="alert" className="text-sm text-destructive">
-          Fichier estimé à plus de 200 Mo : il ne pourrait pas être réimporté. Excluez les captures ou
-          optimisez les plus lourdes.
+          {t.importExport.dialog.tooLarge(formatBytes(MAX_IMPORT_BYTES))}
         </p>
       )}
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Annuler
+          {t.common.cancel}
         </Button>
         <Button type="button" disabled={tooLarge} onClick={() => onConfirm(include)}>
-          Exporter
+          {t.graph.toolbar.export}
         </Button>
       </DialogFooter>
     </div>

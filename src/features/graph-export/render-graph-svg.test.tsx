@@ -1,4 +1,5 @@
 import { ENTITY_TYPES } from '@/domain/entity-types'
+import { fr } from '@/i18n/messages/fr'
 import { circleCenter, edgeSegment } from '@/domain/graph-geometry'
 import { createEntity, createRelation } from '@/domain/factories'
 import type { Confidence, Entity, Relation, Status } from '@/domain/schemas'
@@ -40,6 +41,7 @@ function draw(entities: Entity[], relations: Relation[] = []) {
     entities: byId(entities),
     relations: byId(relations),
     measureText: estimateTextWidth,
+    unnamedLabel: (type) => `${fr.entityTypes[type].label} sans nom`,
   })
   const doc = new DOMParser().parseFromString(out.svg, 'image/svg+xml')
   expect(doc.querySelector('parsererror')).toBeNull()

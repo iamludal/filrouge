@@ -32,7 +32,7 @@ async function buildGraph(page: Page) {
   await node(page, 'Alice').click()
   await panel.getByRole('combobox', { name: 'Fiabilité de la source' }).click()
   await page.getByRole('option', { name: 'B — Habituellement fiable' }).click()
-  await panel.getByRole('combobox', { name: 'Crédibilité de l’information' }).click()
+  await panel.getByRole('combobox', { name: `Crédibilité de l'information` }).click()
   await page.getByRole('option', { name: '2 — Probablement vraie' }).click()
   await expect(node(page, 'Alice').getByText('B2')).toBeVisible()
 }

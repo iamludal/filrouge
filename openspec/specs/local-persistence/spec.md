@@ -33,7 +33,7 @@ written atomically, a source and its screenshot together.
 
 ### Requirement: Save status
 The graph view SHALL show the save state: "Enregistrement…" while edits are pending or being
-written, "Enregistré" once everything is written, "Échec de l’enregistrement" after a failure.
+written, "Enregistré" once everything is written, "Échec de l'enregistrement" after a failure.
 
 #### Scenario: Save completes
 - **WHEN** the user edits an entity and the save succeeds

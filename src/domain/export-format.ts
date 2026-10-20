@@ -22,6 +22,40 @@ const MAX_ITEMS = 100_000
 const MAX_ATTACHMENTS = 10_000
 const MAX_BASE64_LENGTH = Math.ceil(LIMITS.attachmentBytes / 3) * 4
 
+/** Why an import is refused. The UI turns each code into a message in the active language. */
+export type ImportErrorCode =
+  | 'tooLarge'
+  | 'invalidJson'
+  | 'newerVersion'
+  | 'more'
+  | 'tooManyProperties'
+  | 'schema'
+  | 'duplicateId'
+  | 'inconsistentInvestigation'
+  | 'unknownEntity'
+  | 'unknownSource'
+  | 'unknownAttachment'
+  | 'invalidBase64'
+  | 'attachmentTooLarge'
+  | 'sizeMismatch'
+  | 'mimeMismatch'
+  | 'hashMismatch'
+  | 'sourceHashMismatch'
+
+export interface ImportError {
+  code: ImportErrorCode
+  /** Where the problem is in the file, e.g. `entities.3.id`. */
+  path?: string
+  /** `newerVersion`: the file's version; `more`: the number of errors left out; `tooManyProperties`: the limit; `schema`: the validator's message. */
+  value?: string | number
+}
+
+const IMPORT_CODE = 'importCode'
+
+function addImportIssue(ctx: z.RefinementCtx, path: (string | number)[], code: ImportErrorCode) {
+  ctx.addIssue({ code: 'custom', path, message: code, params: { [IMPORT_CODE]: code } })
+}
+
 const hex64 = z.string().regex(/^[a-f0-9]{64}$/)
 
 /** A screenshot as written in the export file: the Blob becomes base64 `data`. */
@@ -65,15 +99,10 @@ export const exportFileSchema = z
     ] as const
     for (const [key, items] of collections) {
       items.forEach((item, index) => {
-        if (ids.has(item.id))
-          ctx.addIssue({ code: 'custom', path: [key, index, 'id'], message: 'Identifiant dupliqué' })
+        if (ids.has(item.id)) addImportIssue(ctx, [key, index, 'id'], 'duplicateId')
         ids.add(item.id)
         if (item.investigationId !== investigationId) {
-          ctx.addIssue({
-            code: 'custom',
-            path: [key, index, 'investigationId'],
-            message: 'Enquête incohérente',
-          })
+          addImportIssue(ctx, [key, index, 'investigationId'], 'inconsistentInvestigation')
         }
       })
     }
@@ -81,7 +110,7 @@ export const exportFileSchema = z
     file.relations.forEach((relation, index) => {
       for (const end of ['from', 'to'] as const) {
         if (!entityIds.has(relation[end])) {
-          ctx.addIssue({ code: 'custom', path: ['relations', index, end], message: 'Entité inconnue' })
+          addImportIssue(ctx, ['relations', index, end], 'unknownEntity')
         }
       }
     })
@@ -92,18 +121,14 @@ export const exportFileSchema = z
     ] as const) {
       items.forEach((item, index) => {
         if (item.sourceIds.some((sourceId) => !sourceIds.has(sourceId))) {
-          ctx.addIssue({ code: 'custom', path: [key, index, 'sourceIds'], message: 'Source inconnue' })
+          addImportIssue(ctx, [key, index, 'sourceIds'], 'unknownSource')
         }
       })
     }
 
     file.sources.forEach((source, index) => {
       if (source.attachmentId && !attachmentIds.has(source.attachmentId)) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['sources', index, 'attachmentId'],
-          message: 'Capture inconnue',
-        })
+        addImportIssue(ctx, ['sources', index, 'attachmentId'], 'unknownAttachment')
       }
     })
   })
@@ -165,44 +190,45 @@ export async function serializeExport(
 }
 
 export type ParseResult =
-  { ok: true; snapshot: InvestigationSnapshot; attachments: Attachment[] } | { ok: false; errors: string[] }
+  | { ok: true; snapshot: InvestigationSnapshot; attachments: Attachment[] }
+  | { ok: false; errors: ImportError[] }
 
 /** Decodes and checks every embedded screenshot against its declaration and its source. */
 async function verifyAttachments(file: ExportFile): Promise<ParseResult> {
-  const errors: string[] = []
+  const errors: ImportError[] = []
   const attachments: Attachment[] = []
   const sourceByAttachment = new Map(
     file.sources.flatMap((source) => (source.attachmentId ? [[source.attachmentId, source] as const] : [])),
   )
 
   for (const [index, exported] of file.attachments.entries()) {
-    const fail = (message: string) => errors.push(`attachments.${index} : ${message}`)
+    const fail = (code: ImportErrorCode) => errors.push({ code, path: `attachments.${index}` })
     const bytes = base64ToBytes(exported.data)
     if (!bytes) {
-      fail('Contenu base64 invalide')
+      fail('invalidBase64')
       continue
     }
     if (bytes.length > LIMITS.attachmentBytes) {
-      fail('Capture trop volumineuse')
+      fail('attachmentTooLarge')
       continue
     }
     if (bytes.length !== exported.size) {
-      fail('Taille incohérente')
+      fail('sizeMismatch')
       continue
     }
     const mime = detectImageMime(bytes)
     if (mime !== exported.mime) {
-      fail('Format d’image incohérent')
+      fail('mimeMismatch')
       continue
     }
     const sha256 = await sha256Hex(bytes)
     if (sha256 !== exported.sha256) {
-      fail('Empreinte incohérente')
+      fail('hashMismatch')
       continue
     }
     const source = sourceByAttachment.get(exported.id)
     if (source?.sha256 && source.sha256 !== sha256) {
-      fail('Empreinte différente de celle de la source')
+      fail('sourceHashMismatch')
       continue
     }
     const { data: _data, ...fields } = exported
@@ -218,30 +244,33 @@ async function verifyAttachments(file: ExportFile): Promise<ParseResult> {
 
 /** Parses untrusted JSON text. Never throws; errors are short, display-safe strings. */
 export async function parseExport(text: string): Promise<ParseResult> {
-  if (text.length > MAX_IMPORT_BYTES) return { ok: false, errors: ['Fichier trop volumineux'] }
+  if (text.length > MAX_IMPORT_BYTES) return { ok: false, errors: [{ code: 'tooLarge' }] }
 
   let raw: unknown
   try {
     raw = JSON.parse(text)
   } catch {
-    return { ok: false, errors: ['Le fichier n’est pas un JSON valide'] }
+    return { ok: false, errors: [{ code: 'invalidJson' }] }
   }
 
   if (typeof raw === 'object' && raw !== null && 'schemaVersion' in raw) {
     const version = (raw as { schemaVersion: unknown }).schemaVersion
     if (typeof version === 'number' && version > SCHEMA_VERSION) {
-      return { ok: false, errors: [`Format v${version} produit par une version plus récente de filrouge`] }
+      return { ok: false, errors: [{ code: 'newerVersion', value: version }] }
     }
   }
 
   const result = exportFileSchema.safeParse(raw)
   if (!result.success) {
-    const errors = result.error.issues.slice(0, 5).map((issue) => {
-      const path = issue.path.map(String).join('.')
-      return path ? `${path} : ${issue.message}` : issue.message
+    const errors = result.error.issues.slice(0, 5).map((issue): ImportError => {
+      const path = issue.path.map(String).join('.') || undefined
+      const code =
+        issue.code === 'custom' ? (issue.params?.[IMPORT_CODE] as ImportErrorCode | undefined) : undefined
+      if (!code) return { code: 'schema', path, value: issue.message }
+      const value = issue.code === 'custom' ? (issue.params?.importValue as number | undefined) : undefined
+      return { code, path, value }
     })
-    if (result.error.issues.length > 5)
-      errors.push(`… et ${result.error.issues.length - 5} autre(s) erreur(s)`)
+    if (result.error.issues.length > 5) errors.push({ code: 'more', value: result.error.issues.length - 5 })
     return { ok: false, errors }
   }
 

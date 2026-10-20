@@ -32,6 +32,7 @@ import { useLongPress } from '@/features/graph/use-long-press'
 import { useGraphView } from '@/features/graph-search/use-graph-view'
 import { RelationDialog } from '@/features/relations/relation-dialog'
 import { useGraphStore, type Selection } from '@/store/graph-store'
+import { useI18n } from '@/i18n/locale'
 
 const nodeTypes = { entity: EntityNode }
 const edgeTypes = { relation: FloatingEdge }
@@ -122,6 +123,7 @@ function withEdgeViewFlags(edges: RelationEdge[], view: GraphView): RelationEdge
 }
 
 export function GraphCanvas() {
+  const { t } = useI18n()
   const entities = useGraphStore((state) => state.entities)
   const { addEntity, moveEntities, addRelation, removeElements, setSelection } = useGraphStore.getState()
   const view = useGraphView()
@@ -236,7 +238,7 @@ export function GraphCanvas() {
 
   const labelOf = (id: string | undefined) => {
     const entity = id ? entities[id] : undefined
-    return entity ? entity.label || ENTITY_TYPES[entity.type].label : ''
+    return entity ? entity.label || t.entityTypes[entity.type].label : ''
   }
 
   const minimapColor = useMemo(
@@ -274,24 +276,24 @@ export function GraphCanvas() {
         fitView={fitView}
         fitViewOptions={{ maxZoom: 1.2 }}
         attributionPosition="top-right"
-        aria-label="Graphe de l’enquête"
+        aria-label={t.graph.canvasLabel}
       >
         <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} />
         <Controls showInteractive={false} />
-        {!narrow && <MiniMap pannable zoomable nodeColor={minimapColor} ariaLabel="Mini-carte" />}
+        {!narrow && <MiniMap pannable zoomable nodeColor={minimapColor} ariaLabel={t.graph.minimap} />}
         <Panel position="top-left">
           <Button size="sm" onClick={addAtViewportCenter}>
-            <Plus /> Entité
+            <Plus /> {t.graph.addEntity}
           </Button>
         </Panel>
         {view.nothingMatchesFilters && (
           <Panel position="top-center" className="pointer-events-none mt-16 text-sm text-muted-foreground">
-            Aucun élément ne correspond aux filtres.
+            {t.graph.nothingMatches}
           </Panel>
         )}
         {nodes.length === 0 && (
           <Panel position="top-center" className="pointer-events-none mt-16 text-sm text-muted-foreground">
-            Double-cliquez (ou appuyez longuement) sur le canevas, ou utilisez « Entité », pour commencer.
+            {t.graph.emptyHint}
           </Panel>
         )}
       </ReactFlow>

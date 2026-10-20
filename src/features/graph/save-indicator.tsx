@@ -1,17 +1,12 @@
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 import { useGraphStore } from '@/store/graph-store'
-
-const TEXTS = {
-  saved: 'Enregistré',
-  pending: 'Enregistrement…',
-  saving: 'Enregistrement…',
-  error: 'Échec de l’enregistrement',
-} as const
+import { useI18n } from '@/i18n/locale'
 
 /** The save status. With `iconOnly` (narrow screens) the text is only the accessible name. */
 export function SaveIndicator({ iconOnly = false }: { iconOnly?: boolean }) {
   const status = useGraphStore((state) => state.saveStatus)
-  const text = TEXTS[status]
+  const { t } = useI18n()
+  const text = t.graph.save[status]
   const Icon = status === 'saved' ? Check : status === 'error' ? AlertCircle : Loader2
 
   return (

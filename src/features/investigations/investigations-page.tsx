@@ -25,8 +25,10 @@ import { ElementTimestamps } from '@/features/entities/element-timestamps'
 import { useExportInvestigation, useImportInvestigation } from '@/features/import-export/use-import-export'
 import { InvestigationFormDialog } from '@/features/investigations/investigation-form-dialog'
 import { useInvestigationsStore } from '@/store/investigations-store'
+import { useI18n } from '@/i18n/locale'
 
 export function InvestigationsPage() {
+  const { t } = useI18n()
   const { items, loaded, refresh, create, update, remove } = useInvestigationsStore()
   const [creating, setCreating] = useState(false)
   const [renaming, setRenaming] = useState<Investigation | null>(null)
@@ -42,27 +44,27 @@ export function InvestigationsPage() {
     <div className="mx-auto w-full max-w-4xl p-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Enquêtes</h1>
-          <p className="text-sm text-muted-foreground">Stockées uniquement dans ce navigateur.</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t.home.title}</h1>
+          <p className="text-sm text-muted-foreground">{t.home.storedLocally}</p>
         </div>
         <div className="flex gap-2">
           <input {...importer.inputProps} data-testid="import-input" />
           <Button variant="outline" onClick={importer.open}>
-            <FileUp /> Importer
+            <FileUp /> {t.home.import}
           </Button>
           <Button onClick={() => setCreating(true)}>
-            <Plus /> Nouvelle enquête
+            <Plus /> {t.home.new}
           </Button>
         </div>
       </div>
 
       {loaded && items.length === 0 && (
         <div className="rounded-xl border border-dashed p-10 text-center text-muted-foreground">
-          Aucune enquête pour le moment. Créez-en une ou importez un fichier JSON.
+          {t.home.empty}
         </div>
       )}
 
-      <ul className="grid grid-cols-1 gap-3" aria-label="Liste des enquêtes">
+      <ul className="grid grid-cols-1 gap-3" aria-label={t.home.listLabel}>
         {items.map((investigation) => (
           <li
             key={investigation.id}
@@ -86,20 +88,20 @@ export function InvestigationsPage() {
             </a>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label={`Actions pour ${investigation.name}`}>
+                <Button variant="ghost" size="icon" aria-label={t.home.actionsFor(investigation.name)}>
                   <MoreHorizontal />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onSelect={() => setRenaming(investigation)}>
-                  <Pencil /> Renommer
+                  <Pencil /> {t.home.rename}
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => void exportInvestigation(investigation.id)}>
-                  <FileDown /> Exporter en JSON
+                  <FileDown /> {t.home.exportJson}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive" onSelect={() => setDeleting(investigation)}>
-                  <Trash2 /> Supprimer
+                  <Trash2 /> {t.common.delete}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -110,8 +112,8 @@ export function InvestigationsPage() {
       <InvestigationFormDialog
         open={creating}
         onOpenChange={setCreating}
-        title="Nouvelle enquête"
-        submitLabel="Créer"
+        title={t.home.new}
+        submitLabel={t.home.create}
         onSubmit={async ({ name, description }) => {
           const investigation = await create(name, description || undefined)
           navigate({ name: 'investigation', id: investigation.id })
@@ -121,8 +123,8 @@ export function InvestigationsPage() {
       <InvestigationFormDialog
         open={renaming !== null}
         onOpenChange={(open) => !open && setRenaming(null)}
-        title="Renommer l’enquête"
-        submitLabel="Enregistrer"
+        title={t.home.renameTitle}
+        submitLabel={t.common.save}
         initial={renaming ?? undefined}
         onSubmit={async ({ name, description }) => {
           if (renaming) await update(renaming.id, { name, description: description || undefined })
@@ -133,23 +135,20 @@ export function InvestigationsPage() {
       <AlertDialog open={deleting !== null} onOpenChange={(open) => !open && setDeleting(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer « {deleting?.name} » ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Toutes les entités, relations et sources de cette enquête seront définitivement supprimées de ce
-              navigateur. Exportez-la d’abord si vous souhaitez la conserver.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t.home.deleteTitle(deleting?.name ?? '')}</AlertDialogTitle>
+            <AlertDialogDescription>{t.home.deleteDescription}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={async () => {
                 if (!deleting) return
                 await remove(deleting.id)
-                toast.success('Enquête supprimée')
+                toast.success(t.home.deleted)
               }}
             >
-              Supprimer
+              {t.common.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

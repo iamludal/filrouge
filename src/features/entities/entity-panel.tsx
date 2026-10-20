@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { ENTITY_TYPES } from '@/domain/entity-types'
 import { LIMITS, type Entity } from '@/domain/schemas'
 import { AssessmentFields } from '@/features/assessment/assessment-fields'
 import { ElementTimestamps } from '@/features/entities/element-timestamps'
@@ -14,6 +13,7 @@ import { PropertiesEditor } from '@/features/entities/properties-editor'
 import { SourcesSection } from '@/features/sources/sources-section'
 import { TagsEditor } from '@/features/entities/tags-editor'
 import { useGraphStore } from '@/store/graph-store'
+import { useI18n } from '@/i18n/locale'
 
 export function Field({
   label,
@@ -35,6 +35,7 @@ export function Field({
 }
 
 export function EntityPanel({ entity }: { entity: Entity }) {
+  const { t } = useI18n()
   const updateEntity = useGraphStore((state) => state.updateEntity)
   const removeElements = useGraphStore((state) => state.removeElements)
   const relationCount = useGraphStore(
@@ -45,19 +46,19 @@ export function EntityPanel({ entity }: { entity: Entity }) {
   return (
     <div className="grid grid-cols-1 gap-4">
       <ElementTimestamps createdAt={entity.createdAt} updatedAt={entity.updatedAt} />
-      <Field label="Type" htmlFor="panel-entity-type">
+      <Field label={t.entities.type} htmlFor="panel-entity-type">
         <EntityTypeSelect
           id="panel-entity-type"
           value={entity.type}
           onChange={(type) => updateEntity(entity.id, { type })}
         />
       </Field>
-      <Field label="Libellé" htmlFor="panel-entity-label">
+      <Field label={t.entities.label} htmlFor="panel-entity-label">
         <Input
           id="panel-entity-label"
           value={entity.label}
           maxLength={LIMITS.label}
-          placeholder={`${ENTITY_TYPES[entity.type].label} sans nom`}
+          placeholder={t.entities.unnamed(t.entityTypes[entity.type].label)}
           onChange={(event) => updateEntity(entity.id, { label: event.target.value })}
         />
       </Field>
@@ -68,24 +69,24 @@ export function EntityPanel({ entity }: { entity: Entity }) {
         onChange={(patch) => updateEntity(entity.id, patch)}
       />
       <Separator />
-      <Field label="Propriétés">
+      <Field label={t.entities.properties}>
         <PropertiesEditor
           properties={entity.properties}
-          suggestions={ENTITY_TYPES[entity.type].properties}
+          suggestions={t.entityTypes[entity.type].properties}
           onChange={(properties) => updateEntity(entity.id, { properties })}
         />
       </Field>
-      <Field label="Tags">
+      <Field label={t.entities.tags}>
         <TagsEditor tags={entity.tags} onChange={(tags) => updateEntity(entity.id, { tags })} />
       </Field>
-      <Field label="Notes">
+      <Field label={t.entities.notes}>
         <NotesEditor
           key={entity.id}
           value={entity.notes ?? ''}
           onChange={(notes) => updateEntity(entity.id, { notes: notes || undefined })}
         />
       </Field>
-      <Field label="Sources">
+      <Field label={t.entities.sources}>
         <SourcesSection element={{ type: 'entity', id: entity.id }} />
       </Field>
       <Separator />
@@ -94,8 +95,7 @@ export function EntityPanel({ entity }: { entity: Entity }) {
         className="h-auto min-h-8 py-1.5 whitespace-normal"
         onClick={() => removeElements([entity.id], [])}
       >
-        <Trash2 /> Supprimer l’entité
-        {relationCount > 0 && ` et ${relationCount} relation${relationCount > 1 ? 's' : ''}`}
+        <Trash2 /> {t.entities.delete(relationCount)}
       </Button>
     </div>
   )

@@ -8,21 +8,23 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useI18n } from '@/i18n/locale'
 
-const OPTIONS: { value: ThemePreference; label: string; icon: typeof Sun }[] = [
-  { value: 'light', label: 'Clair', icon: Sun },
-  { value: 'dark', label: 'Sombre', icon: Moon },
-  { value: 'system', label: 'Système', icon: Monitor },
+const OPTIONS: { value: ThemePreference; icon: typeof Sun }[] = [
+  { value: 'light', icon: Sun },
+  { value: 'dark', icon: Moon },
+  { value: 'system', icon: Monitor },
 ]
 
 export function ThemeToggle() {
+  const { t } = useI18n()
   const { preference, resolved, setPreference } = useTheme()
   const Icon = resolved === 'dark' ? Moon : Sun
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Changer de thème">
+        <Button variant="ghost" size="icon" aria-label={t.app.theme.change}>
           <Icon />
         </Button>
       </DropdownMenuTrigger>
@@ -31,10 +33,10 @@ export function ThemeToggle() {
           value={preference}
           onValueChange={(value) => setPreference(value as ThemePreference)}
         >
-          {OPTIONS.map(({ value, label, icon: OptionIcon }) => (
+          {OPTIONS.map(({ value, icon: OptionIcon }) => (
             <DropdownMenuRadioItem key={value} value={value}>
               <OptionIcon />
-              {label}
+              {t.app.theme[value]}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

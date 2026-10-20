@@ -83,7 +83,7 @@ test('sources: create with a screenshot, reuse, reload, detach and delete', asyn
   await editDialog.getByRole('button', { name: 'Annuler' }).click()
 
   await page.getByRole('button', { name: 'Sources (1)' }).click()
-  await expect(page.getByRole('list', { name: 'Sources de l’enquête' })).toContainText('2 utilisations')
+  await expect(page.getByRole('list', { name: `Sources de l'enquête` })).toContainText('2 utilisations')
   await page.keyboard.press('Escape')
   await expect(page.getByRole('dialog')).toBeHidden()
 

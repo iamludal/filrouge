@@ -21,7 +21,7 @@ describe('shortcutLabel', () => {
     expect(shortcutLabel('search', true)).toBe('⌘F')
   })
 
-  it('writes the other platforms’ shortcuts with Ctrl', () => {
+  it(`writes the other platforms' shortcuts with Ctrl`, () => {
     expect(shortcutLabel('undo', false)).toBe('Ctrl+Z')
     expect(shortcutLabel('redo', false)).toBe('Ctrl+Shift+Z')
     expect(shortcutLabel('search', false)).toBe('Ctrl+F')

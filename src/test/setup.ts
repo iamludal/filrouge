@@ -2,7 +2,7 @@
 import '@testing-library/jest-dom/vitest'
 import 'fake-indexeddb/auto'
 import { Blob as NodeBlob } from 'node:buffer'
-import { afterEach } from 'vitest'
+import { afterEach, beforeEach } from 'vitest'
 import { resetViewport } from './viewport'
 
 // fake-indexeddb clones values with Node's structuredClone, which turns jsdom's Blob into a plain
@@ -44,3 +44,13 @@ Element.prototype.scrollIntoView ??= () => {}
 
 // A test that mocked the viewport never leaks it into the next one.
 afterEach(resetViewport)
+
+// The suites assert on French texts: every test starts with French stored as the chosen language.
+// English is covered explicitly, with `renderWithLocale`.
+beforeEach(() => {
+  try {
+    localStorage.setItem('filrouge:locale', 'fr')
+  } catch {
+    // storage mocked to throw by the test itself
+  }
+})

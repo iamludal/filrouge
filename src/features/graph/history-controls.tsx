@@ -5,8 +5,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useHistoryShortcuts, type HistoryAction } from '@/features/graph/use-history-shortcuts'
 import { isApplePlatform, shortcutLabel } from '@/lib/platform'
 import { useGraphStore } from '@/store/graph-store'
+import { useI18n } from '@/i18n/locale'
 
-const LABELS: Record<HistoryAction, string> = { undo: 'Annuler', redo: 'Rétablir' }
 const ICONS: Record<HistoryAction, LucideIcon> = { undo: Undo2, redo: Redo2 }
 
 function HistoryButton({
@@ -19,7 +19,8 @@ function HistoryButton({
   className?: string
 }) {
   const Icon = ICONS[action]
-  const label = LABELS[action]
+  const { t } = useI18n()
+  const label = t.graph.history[action]
   return (
     <Tooltip>
       {/* A disabled button receives no pointer events: the tooltip hangs on a wrapper. */}

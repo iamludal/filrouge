@@ -107,10 +107,11 @@ export interface TagOption {
   count: number
 }
 
-/** The tags in use, case-insensitively merged and sorted, plus the checked ones no entity carries. */
+/** The tags in use, case-insensitively merged and sorted for `locale`, plus the checked ones no entity carries. */
 export function tagOptions(
   entities: Readonly<Record<string, Entity>>,
   checked: readonly string[],
+  locale: string,
 ): TagOption[] {
   const options = new Map<string, TagOption>()
   for (const entity of Object.values(entities)) {
@@ -122,7 +123,7 @@ export function tagOptions(
     }
   }
   for (const key of checked) if (!options.has(key)) options.set(key, { key, label: key, count: 0 })
-  return [...options.values()].sort((a, b) => a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }))
+  return [...options.values()].sort((a, b) => a.label.localeCompare(b.label, locale, { sensitivity: 'base' }))
 }
 
 /** What the canvas needs to know about each element while a search or a filter is active. */

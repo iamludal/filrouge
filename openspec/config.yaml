@@ -20,7 +20,7 @@ context: |
   - Data model change: bump SCHEMA_VERSION and add a tested migration.
 
   Conventions: Conventional Commits, one commit per task. Code, comments, commits and specs in
-  English; user-facing UI strings and ROADMAP/CLAUDE.md in French.
+  English; user-facing UI strings in French and English (src/i18n/), ROADMAP/CLAUDE.md in French.
 
 rules:
   specs:

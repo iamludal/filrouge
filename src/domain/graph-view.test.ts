@@ -182,12 +182,12 @@ describe('type and tag criteria', () => {
   it('merges tags ignoring case, keeps the first spelling, sorts in French, keeps unused checked ones', () => {
     const entities = [entity('A', { tags: ['Zèbre', 'cible'] }), entity('B', { tags: ['Cible', 'élan'] })]
     const byId = Object.fromEntries(entities.map((e) => [e.id, e]))
-    expect(tagOptions(byId, []).map(({ label, count }) => [label, count])).toEqual([
+    expect(tagOptions(byId, [], 'fr').map(({ label, count }) => [label, count])).toEqual([
       ['cible', 2],
       ['élan', 1],
       ['Zèbre', 1],
     ])
-    expect(tagOptions(byId, ['oublié'])).toContainEqual({ key: 'oublié', label: 'oublié', count: 0 })
+    expect(tagOptions(byId, ['oublié'], 'fr')).toContainEqual({ key: 'oublié', label: 'oublié', count: 0 })
   })
 })
 

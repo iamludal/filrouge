@@ -10,17 +10,20 @@ import { isApplePlatform, shortcutLabel } from '@/lib/platform'
 import { cn } from '@/lib/utils'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
+import { useI18n } from '@/i18n/locale'
+import type { Messages } from '@/i18n/types'
 
 const sameRef = (a: ElementRef | null, b: ElementRef) => a?.type === b.type && a.id === b.id
 
-function counterText(count: number, position: number): string {
-  if (count === 0) return 'Aucun résultat'
-  if (position > 0) return `${position} / ${count}`
-  return count === 1 ? '1 résultat' : `${count} résultats`
+function counterText(t: Messages, count: number, position: number): string {
+  if (count === 0) return t.search.none
+  if (position > 0) return t.search.position(position, count)
+  return t.search.count(count)
 }
 
 /** Search box of the graph toolbar: finds elements, shows how many, and walks through them. */
 export function SearchField({ fullWidth = false }: { fullWidth?: boolean }) {
+  const { t } = useI18n()
   const query = useViewStore((state) => state.query)
   const currentResult = useViewStore((state) => state.currentResult)
   const view = useGraphView()
@@ -58,7 +61,7 @@ export function SearchField({ fullWidth = false }: { fullWidth?: boolean }) {
   }
 
   const searching = view.searching
-  const label = 'Rechercher dans le graphe'
+  const label = t.graph.toolbar.search
 
   return (
     <div role="search" className={cn('flex items-center gap-1', fullWidth && 'min-w-0 flex-1')}>
@@ -74,7 +77,7 @@ export function SearchField({ fullWidth = false }: { fullWidth?: boolean }) {
           onKeyDown={onKeyDown}
           aria-label={label}
           title={`${label} (${shortcutLabel('search', isApplePlatform())})`}
-          placeholder="Rechercher…"
+          placeholder={t.search.placeholder}
           autoComplete="off"
           spellCheck={false}
           className={cn('pr-28 pl-7', fullWidth ? 'h-9 w-full' : 'h-7 w-64')}
@@ -84,13 +87,13 @@ export function SearchField({ fullWidth = false }: { fullWidth?: boolean }) {
           aria-live="polite"
           className="pointer-events-none absolute top-1/2 right-8 -translate-y-1/2 text-xs text-muted-foreground"
         >
-          {searching ? counterText(results.length, index + 1) : ''}
+          {searching ? counterText(t, results.length, index + 1) : ''}
         </span>
         {query && (
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label="Effacer la recherche"
+            aria-label={t.search.clear}
             className="absolute top-1/2 right-1 -translate-y-1/2"
             onClick={() => {
               useViewStore.getState().setQuery('')
@@ -106,7 +109,7 @@ export function SearchField({ fullWidth = false }: { fullWidth?: boolean }) {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Résultat précédent"
+            aria-label={t.search.previous}
             disabled={results.length === 0}
             onClick={previous}
           >
@@ -115,7 +118,7 @@ export function SearchField({ fullWidth = false }: { fullWidth?: boolean }) {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Résultat suivant"
+            aria-label={t.search.next}
             disabled={results.length === 0}
             onClick={next}
           >

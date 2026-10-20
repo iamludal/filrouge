@@ -62,9 +62,10 @@ elements as they were in the restored state, rather than setting them to the cur
 ### Requirement: Dates shown in the detail panel
 The detail panel of a single selected entity or relation SHALL start, above its other fields,
 with its creation date and, when it differs, its last-modified date. Each date SHALL be shown as
-a distinct icon (creation, modification) followed by the day in French medium format, in the
-browser's time zone (e.g. "20 oct. 2026"), with no visible text label. The two dates SHALL sit
-side by side on one row when they fit, and wrap onto a second row on a very narrow panel.
+a distinct icon (creation, modification) followed by the day in the active language's medium
+format, in the browser's time zone (e.g. "20 oct. 2026" in French, "Oct 20, 2026" in English),
+with no visible text label. The two dates SHALL sit side by side on one row when they fit, and
+wrap onto a second row on a very narrow panel.
 
 #### Scenario: Freshly created entity
 - **WHEN** the user adds an entity and looks at its panel
@@ -77,6 +78,10 @@ side by side on one row when they fit, and wrap onto a second row on a very narr
 #### Scenario: Live update
 - **WHEN** the user edits the selected entity's notes
 - **THEN** the modification date appears or updates without reselecting the entity
+
+#### Scenario: Dates follow the language
+- **WHEN** an entity created on 20 October 2026 is selected and the user switches from French to English
+- **THEN** its creation date changes from "20 oct. 2026" to "Oct 20, 2026" without reselecting the entity
 
 ### Requirement: Date labels on demand
 Each displayed date SHALL have the accessible name "Créée le <date>" or "Modifiée le <date>",
@@ -110,3 +115,12 @@ relation from the file, including when the import creates a copy with new ids.
 #### Scenario: Import as a copy
 - **WHEN** the user imports twice the same file
 - **THEN** the entities and relations of the copy have the same `createdAt` and `updatedAt` as in the file
+
+### Requirement: Date labels in English
+In English, each displayed date SHALL have the accessible name "Created on <date>" or "Modified
+on <date>", and its tooltip SHALL show that label followed by the full date and time, seconds
+included.
+
+#### Scenario: Hover a date in English
+- **WHEN** the interface is in English and the user hovers the creation date
+- **THEN** a tooltip shows "Created on" followed by the full date and time with seconds (e.g. "Created on October 20, 2026 at 2:32:05 PM")

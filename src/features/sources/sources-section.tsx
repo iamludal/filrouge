@@ -19,13 +19,16 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { sourceUsage } from '@/domain/graph'
 import type { Source } from '@/domain/schemas'
-import { sourceDisplayName } from '@/domain/sources'
 import { SourceFormDialog } from '@/features/sources/source-form-dialog'
 import { SourcePickerDialog } from '@/features/sources/source-picker-dialog'
 import { useGraphStore, type ElementRef } from '@/store/graph-store'
+import { useSourceName } from '@/features/sources/use-source-name'
+import { useI18n } from '@/i18n/locale'
 
 /** Sources attached to an entity or a relation, with the actions to add, open and detach them. */
 export function SourcesSection({ element }: { element: ElementRef }) {
+  const { t } = useI18n()
+  const sourceName = useSourceName()
   const sourceIds = useGraphStore((state) =>
     element.type === 'entity'
       ? state.entities[element.id]?.sourceIds
@@ -58,7 +61,7 @@ export function SourcesSection({ element }: { element: ElementRef }) {
   return (
     <div className="grid grid-cols-1 gap-2">
       {attached.length > 0 && (
-        <ul className="grid grid-cols-1 gap-1" aria-label="Sources attachées">
+        <ul className="grid grid-cols-1 gap-1" aria-label={t.sources.section.attachedLabel}>
           {attached.map((source) => (
             <li key={source.id} className="flex items-center gap-1">
               <button
@@ -66,17 +69,19 @@ export function SourcesSection({ element }: { element: ElementRef }) {
                 className="flex min-w-0 flex-1 items-center gap-1.5 rounded px-1 py-0.5 text-left text-sm hover:bg-accent"
                 onClick={() => setEditing(source)}
               >
-                <span className="min-w-0 wrap-anywhere">{sourceDisplayName(source)}</span>
-                {source.attachmentId && <Paperclip className="size-3.5 shrink-0" aria-label="Avec capture" />}
+                <span className="min-w-0 wrap-anywhere">{sourceName(source)}</span>
+                {source.attachmentId && (
+                  <Paperclip className="size-3.5 shrink-0" aria-label={t.sources.withScreenshot} />
+                )}
               </button>
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                aria-label={`Retirer ${sourceDisplayName(source)}`}
+                aria-label={t.sources.section.detachLabel(sourceName(source))}
                 onClick={() => requestDetach(source)}
               >
-                Retirer
+                {t.sources.section.detach}
               </Button>
             </li>
           ))}
@@ -85,12 +90,14 @@ export function SourcesSection({ element }: { element: ElementRef }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button type="button" variant="outline" size="sm">
-            <Plus /> Ajouter une source
+            <Plus /> {t.sources.section.add}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onSelect={() => setCreating(true)}>Nouvelle source</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setPicking(true)}>Source existante</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setCreating(true)}>
+            {t.sources.section.newSource}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setPicking(true)}>{t.sources.section.existing}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -107,11 +114,10 @@ export function SourcesSection({ element }: { element: ElementRef }) {
       <AlertDialog open={detaching !== null} onOpenChange={(open) => !open && setDetaching(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Retirer « {detaching ? sourceDisplayName(detaching) : ''} » ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Aucun autre élément n’utilise cette source. Elle peut rester dans l’enquête, sans être
-              rattachée.
-            </AlertDialogDescription>
+            <AlertDialogTitle>
+              {t.sources.section.detachTitle(detaching ? sourceName(detaching) : '')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{t.sources.section.detachDescription}</AlertDialogDescription>
           </AlertDialogHeader>
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -120,16 +126,16 @@ export function SourcesSection({ element }: { element: ElementRef }) {
               checked={deleteToo}
               onChange={(event) => setDeleteToo(event.target.checked)}
             />
-            Supprimer aussi la source et sa capture
+            {t.sources.section.alsoDelete}
           </label>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (detaching) detachSource(element, detaching.id, deleteToo)
               }}
             >
-              Retirer
+              {t.sources.section.detach}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

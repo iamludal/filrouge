@@ -8,7 +8,7 @@ const node = (page: Page, name: string) => page.locator('.react-flow__node', { h
 const drawer = (page: Page) => page.getByRole('region', { name: 'Panneau de détail' })
 const handle = (page: Page) =>
   drawer(page).getByRole('button', { name: /Déplier le panneau|Replier le panneau/ })
-const menuButton = (page: Page) => page.getByRole('button', { name: 'Plus d’actions' })
+const menuButton = (page: Page) => page.getByRole('button', { name: `Plus d'actions` })
 const saved = (page: Page) => expect(page.getByRole('status', { name: 'Enregistré' })).toBeVisible()
 
 async function openMenu(page: Page) {
@@ -79,7 +79,7 @@ test.describe('layout', () => {
 
   test('makes the toolbar buttons at least 44 px', async ({ page }) => {
     await createInvestigation(page, 'Cibles')
-    for (const name of ['Retour aux enquêtes', 'Rechercher dans le graphe', 'Annuler', 'Plus d’actions']) {
+    for (const name of ['Retour aux enquêtes', 'Rechercher dans le graphe', 'Annuler', `Plus d'actions`]) {
       const box = (await page
         .getByRole(name === 'Retour aux enquêtes' ? 'link' : 'button', { name })
         .boundingBox())!
@@ -352,5 +352,30 @@ test.describe('touch gestures', () => {
     await (await Finger.on(page)).drag(from, { x: bob.x + bob.width / 2, y: bob.y + 20 })
 
     await expect(page.getByRole('dialog', { name: 'Nouvelle relation' })).toBeVisible()
+  })
+})
+
+test.describe('language', () => {
+  test.use({ locale: 'fr-FR' })
+
+  test('the language menu is reachable at 360 px and English fits without horizontal scroll', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 640 })
+    await createInvestigation(page, 'Langue mobile')
+    await addEntityAt(page, 100, 100, 'Alice')
+    await noHorizontalScroll(page)
+
+    const menu = page.getByRole('button', { name: 'Changer de langue' })
+    await expect(menu).toBeVisible()
+    await menu.tap()
+    await page.getByRole('menuitemradio', { name: 'English' }).tap()
+
+    await expect(page.getByRole('button', { name: 'More actions' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Change language' })).toBeVisible()
+    await noHorizontalScroll(page)
+    await node(page, 'Alice').tap()
+    await expect(drawer(page).or(page.getByRole('region', { name: 'Detail panel' }))).toBeVisible()
+    await noHorizontalScroll(page)
   })
 })

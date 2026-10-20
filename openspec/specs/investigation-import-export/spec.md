@@ -78,7 +78,7 @@ rejected as a whole, with at most five short error messages shown to the user.
 
 #### Scenario: Not JSON
 - **WHEN** the user imports a file that is not valid JSON
-- **THEN** the import is rejected with "Le fichier n’est pas un JSON valide"
+- **THEN** the import is rejected with "Le fichier n'est pas un JSON valide"
 
 ### Requirement: Import integrity checks
 Import SHALL reject files containing duplicate ids, records belonging to another investigation,

@@ -46,7 +46,9 @@ export const propertyValueSchema = z.union([
 export const propertiesSchema = z
   .record(z.string().min(1).max(LIMITS.propertyKey), propertyValueSchema)
   .refine((record) => Object.keys(record).length <= LIMITS.properties, {
-    message: `Au plus ${LIMITS.properties} propriétés`,
+    message: 'tooManyProperties',
+    // Read back when an import fails, to word the error in the active language.
+    params: { importCode: 'tooManyProperties', importValue: LIMITS.properties },
   })
 
 export const positionSchema = z.object({ x: z.number().finite(), y: z.number().finite() })
