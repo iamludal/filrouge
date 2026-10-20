@@ -79,8 +79,8 @@ test('filtering by tag ignores case', async ({ page }) => {
   await saved(page)
 
   const filters = await openFilters(page)
-  await expect(filters.getByRole('checkbox', { name: /^(Cible|cible)$/ })).toHaveCount(1)
-  await filters.getByRole('checkbox', { name: /^(Cible|cible)$/ }).click()
+  await expect(filters.getByRole('button', { name: /^(Cible|cible) \(2\)$/ })).toHaveCount(1)
+  await filters.getByRole('button', { name: /^(Cible|cible) \(2\)$/ }).click()
 
   await shown(page, 'Alice')
   await shown(page, 'Bob')

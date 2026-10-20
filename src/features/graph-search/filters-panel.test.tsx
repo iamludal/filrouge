@@ -43,9 +43,11 @@ describe('FiltersButton', () => {
     load((id) => [at(id, 'person', ['Cible']), at(id, 'email', ['cible', 'suspect'])])
     const user = await openPanel()
 
-    expect(screen.getAllByRole('checkbox', { name: /^(Cible|suspect)$/ })).toHaveLength(2)
-    await user.click(screen.getByRole('checkbox', { name: 'suspect' }))
+    expect(screen.getByRole('button', { name: 'Cible (2)' })).toHaveAttribute('aria-pressed', 'false')
+    const suspect = screen.getByRole('button', { name: 'suspect (1)' })
+    await user.click(suspect)
     expect(useViewStore.getState().filters.tags).toEqual(['suspect'])
+    expect(suspect).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('reads "Aucun tag dans cette enquête" without tags', async () => {

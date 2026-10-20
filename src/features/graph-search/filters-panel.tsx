@@ -13,6 +13,7 @@ import { ENTITY_TYPES, type EntityTypeId } from '@/domain/entity-types'
 import { activeCriteriaCount, tagOptions, typeOptions, type GraphFilters } from '@/domain/graph-view'
 import type { Status } from '@/domain/schemas'
 import { EntityIcon } from '@/features/entities/entity-icon'
+import { cn } from '@/lib/utils'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
 
@@ -49,6 +50,45 @@ function CheckboxRow({
         {children}
       </Label>
     </div>
+  )
+}
+
+/** A tag the filter can be switched on for, with the number of entities carrying it. */
+function TagChip({
+  label,
+  count,
+  pressed,
+  onChange,
+}: {
+  label: string
+  count: number
+  pressed: boolean
+  onChange: (pressed: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={pressed}
+      aria-label={`${label} (${count})`}
+      onClick={() => onChange(!pressed)}
+      className={cn(
+        'inline-flex h-6 max-w-full min-w-0 items-center gap-1.5 rounded-full border pr-1 pl-2.5 text-xs font-medium transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+        pressed
+          ? 'border-primary bg-primary text-primary-foreground hover:bg-primary/90'
+          : 'border-border bg-background text-foreground hover:bg-muted',
+      )}
+    >
+      <span className="truncate">{label}</span>
+      <span
+        aria-hidden
+        className={cn(
+          'min-w-4 shrink-0 rounded-full px-1 text-center text-[0.625rem] leading-4 tabular-nums',
+          pressed ? 'bg-primary-foreground/20' : 'bg-muted text-muted-foreground',
+        )}
+      >
+        {count}
+      </span>
+    </button>
   )
 }
 
@@ -110,16 +150,15 @@ function FiltersForm({ filters }: { filters: GraphFilters }) {
         {tags.length === 0 ? (
           <p className="text-sm text-muted-foreground">Aucun tag dans cette enquête</p>
         ) : (
-          <div className="grid max-h-32 gap-1.5 overflow-y-auto">
-            {tags.map(({ key, label }) => (
-              <CheckboxRow
+          <div className="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto p-0.5">
+            {tags.map(({ key, label, count }) => (
+              <TagChip
                 key={key}
-                id={`filter-tag-${key}`}
-                checked={filters.tags.includes(key)}
-                onChange={(checked) => setFilters({ tags: toggled(filters.tags, key, checked) })}
-              >
-                <span className="truncate">{label}</span>
-              </CheckboxRow>
+                label={label}
+                count={count}
+                pressed={filters.tags.includes(key)}
+                onChange={(pressed) => setFilters({ tags: toggled(filters.tags, key, pressed) })}
+              />
             ))}
           </div>
         )}
