@@ -1,4 +1,4 @@
-import { ListFilter } from 'lucide-react'
+import { ListFilter, RotateCcw, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -121,7 +121,8 @@ function StatusToggle({
   )
 }
 
-function FiltersForm({ filters }: { filters: GraphFilters }) {
+/** `withReset` adds a reset button, for the dialog: the popover has its own next to the toolbar button. */
+function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; withReset?: boolean }) {
   const entities = useGraphStore((state) => state.entities)
   const { setFilters, resetFilters } = useViewStore.getState()
   const types = typeOptions(entities, filters.types)
@@ -130,6 +131,12 @@ function FiltersForm({ filters }: { filters: GraphFilters }) {
 
   return (
     <div className="grid max-h-[min(32rem,70vh)] gap-4 overflow-y-auto p-1">
+      {withReset && (
+        <Button variant="outline" size="sm" disabled={active === 0} onClick={resetFilters}>
+          <RotateCcw /> Réinitialiser
+        </Button>
+      )}
+
       <Criterion title="Type">
         {types.map(({ type, count }) => (
           <CheckboxRow
@@ -228,31 +235,44 @@ function FiltersForm({ filters }: { filters: GraphFilters }) {
           Inclure les éléments non cotés
         </CheckboxRow>
       </Criterion>
-
-      <Button variant="outline" size="sm" disabled={active === 0} onClick={resetFilters}>
-        Réinitialiser
-      </Button>
     </div>
   )
 }
 
-/** The "Filtres" button of the graph toolbar, with the number of criteria in force. */
+/**
+ * The "Filtres" button of the graph toolbar, with the number of criteria in force and, while any is,
+ * a cross to clear them all.
+ */
 export function FiltersButton() {
   const filters = useViewStore((state) => state.filters)
   const active = activeCriteriaCount(filters)
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm">
-          <ListFilter /> Filtres
-          {active > 0 && <Badge variant="secondary">{active}</Badge>}
+    <div className="flex">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm" className={cn(active > 0 && 'rounded-r-none')}>
+            <ListFilter /> Filtres
+            {active > 0 && <Badge variant="secondary">{active}</Badge>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="end" className="w-80">
+          <FiltersForm filters={filters} />
+        </PopoverContent>
+      </Popover>
+      {active > 0 && (
+        <Button
+          variant="outline"
+          size="icon-sm"
+          className="rounded-l-none border-l-0"
+          aria-label="Réinitialiser les filtres"
+          title="Réinitialiser les filtres"
+          onClick={useViewStore.getState().resetFilters}
+        >
+          <X />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent align="end" className="w-80">
-        <FiltersForm filters={filters} />
-      </PopoverContent>
-    </Popover>
+      )}
+    </div>
   )
 }
 
@@ -272,7 +292,7 @@ export function FiltersDialog({
           <DialogTitle>Filtres</DialogTitle>
           <DialogDescription>Les éléments qui ne correspondent pas sont estompés.</DialogDescription>
         </DialogHeader>
-        <FiltersForm filters={filters} />
+        <FiltersForm filters={filters} withReset />
       </DialogContent>
     </Dialog>
   )

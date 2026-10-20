@@ -168,7 +168,7 @@ test('a dimmed entity is still editable, and nothing matching is said', async ({
 test('the badge counts the criteria and the reset clears them', async ({ page }) => {
   await buildGraph(page)
   const filters = await openFilters(page)
-  await expect(filters.getByRole('button', { name: 'Réinitialiser' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Réinitialiser les filtres' })).toBeHidden()
 
   await filters.getByRole('checkbox', { name: 'Email (1)' }).click()
   await filters.getByRole('checkbox', { name: 'Personne (2)' }).click()
@@ -178,9 +178,10 @@ test('the badge counts the criteria and the reset clears them', async ({ page })
     .click()
   await expect(filtersButton(page)).toContainText('2')
 
-  await filters.getByRole('button', { name: 'Réinitialiser' }).click()
-  await expect(filtersButton(page)).not.toContainText(/\d/)
   await closeFilters(page)
+  await page.getByRole('button', { name: 'Réinitialiser les filtres' }).click()
+  await expect(filtersButton(page)).not.toContainText(/\d/)
+  await expect(page.getByRole('button', { name: 'Réinitialiser les filtres' })).toBeHidden()
   for (const name of ['Alice', 'Bob', 'Courriel']) await shown(page, name)
 })
 

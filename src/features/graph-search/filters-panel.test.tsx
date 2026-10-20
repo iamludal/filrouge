@@ -59,7 +59,7 @@ describe('FiltersButton', () => {
   it('counts the active criteria on the button and resets them', async () => {
     load((id) => [at(id, 'person'), at(id, 'email'), at(id, 'domain')])
     const user = await openPanel()
-    expect(screen.getByRole('button', { name: 'Réinitialiser' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Réinitialiser les filtres' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('checkbox', { name: 'Email (1)' }))
     await user.click(screen.getByRole('checkbox', { name: 'Domaine (1)' }))
@@ -74,9 +74,11 @@ describe('FiltersButton', () => {
       entityStatus: null,
     })
 
-    await user.click(screen.getByRole('button', { name: 'Réinitialiser' }))
+    await user.click(screen.getByRole('button', { name: 'Réinitialiser les filtres' }))
     expect(useViewStore.getState().filters).toBe(EMPTY_FILTERS)
     expect(screen.getByRole('button', { name: /Filtres/ })).not.toHaveTextContent(/\d/)
+    expect(screen.queryByRole('button', { name: 'Réinitialiser les filtres' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Filtres/ }))
     expect(screen.getByRole('checkbox', { name: 'Email (1)' })).not.toBeChecked()
   })
 
