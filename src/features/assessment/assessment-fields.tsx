@@ -52,7 +52,7 @@ export function AssessmentFields({ idPrefix, status, confidence, onChange }: Ass
           <SelectContent>
             {RELIABILITY_VALUES.map((value) => (
               <SelectItem key={value} value={value}>
-                {value} — {t.assessment.reliability[value].label}
+                {value} – {t.assessment.reliability[value].label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -71,7 +71,7 @@ export function AssessmentFields({ idPrefix, status, confidence, onChange }: Ass
           <SelectContent>
             {CREDIBILITY_VALUES.map((value) => (
               <SelectItem key={value} value={String(value)}>
-                {value} — {t.assessment.credibility[value].label}
+                {value} – {t.assessment.credibility[value].label}
               </SelectItem>
             ))}
           </SelectContent>

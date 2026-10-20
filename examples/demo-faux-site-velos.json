@@ -4,7 +4,7 @@
   "exportedAt": "2026-09-15T10:00:00.000Z",
   "investigation": {
     "id": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-    "name": "Démo — Faux site de vente de vélos (escroquerie en ligne)",
+    "name": "Démo – Faux site de vente de vélos (escroquerie en ligne)",
     "description": "Scénario fictif et volontairement court (10 entités) destiné à la démonstration. Personnes, organisation, domaines (`.example`), IP (plage de documentation), téléphone (plage ARCEP réservée à la fiction) et portefeuille sont inventés.\n\nUne victime a payé un vélo jamais livré sur une boutique en ligne éphémère. Deux chaînes de pivots convergent vers un suspect :\n\n1. domaine, puis WHOIS historique, puis email, puis profil de forum ;\n2. raison sociale du site, puis registre des entreprises, puis dirigeant.\n\nLe lien entre le portefeuille et le suspect reste à établir.",
     "createdAt": "2026-09-14T09:00:00.000Z",
     "updatedAt": "2026-09-15T10:00:00.000Z",
@@ -16,7 +16,7 @@
       "id": "69e5195b-5e5d-5361-b669-afcffa6001a6",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "type": "document",
-      "label": "Plainte — vélo jamais livré",
+      "label": "Plainte – vélo jamais livré",
       "properties": {
         "auteur": "Mme L. Garnier (victime fictive)"
       },
@@ -453,7 +453,7 @@
     {
       "id": "5f82ea77-e6fc-5b20-85e8-9b6470b27ce7",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "WHOIS historique — veloccasion-direct.example",
+      "title": "WHOIS historique – veloccasion-direct.example",
       "url": "https://whois-history.example/veloccasion-direct.example",
       "capturedAt": "2026-09-14T10:15:00.000Z",
       "note": "Enregistrement d'août 2026, avant activation de la protection de la vie privée : l'email du titulaire est visible."
@@ -461,7 +461,7 @@
     {
       "id": "d55857e4-2a27-5ada-b85e-9bbd183c6bf3",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "Registre des entreprises (fictif) — KM Négoce",
+      "title": "Registre des entreprises (fictif) – KM Négoce",
       "url": "https://registre-entreprises.example/km-negoce",
       "capturedAt": "2026-09-14T11:10:00.000Z",
       "note": "SASU immatriculée en juin 2026, dirigeant : Kévin Morand. Siège dans une société de domiciliation."
@@ -469,7 +469,7 @@
     {
       "id": "ac3f6eda-38d7-5301-b670-b8140f4a3dab",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "Forum Cycl’Annonces — profil « kmorand33 »",
+      "title": "Forum Cycl’Annonces – profil « kmorand33 »",
       "url": "https://cyclannonces.example/membres/kmorand33",
       "archiveUrl": "https://archive.example/2026.09.15/cyclannonces-kmorand33",
       "capturedAt": "2026-09-15T09:20:00.000Z",

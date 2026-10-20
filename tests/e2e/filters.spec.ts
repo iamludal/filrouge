@@ -129,12 +129,12 @@ test('only hypothetical entities', async ({ page }) => {
 
 test('minimum confidence, and excluding ungraded elements', async ({ page }) => {
   await buildGraph(page)
-  await grade(page, 'Alice', 'B — Habituellement fiable', '2 — Probablement vraie')
-  await grade(page, 'Bob', 'C — Assez fiable', '1 — Confirmée')
+  await grade(page, 'Alice', 'B – Habituellement fiable', '2 – Probablement vraie')
+  await grade(page, 'Bob', 'C – Assez fiable', '1 – Confirmée')
 
   const filters = await openFilters(page)
   await filters.getByRole('combobox', { name: 'Fiabilité au moins' }).click()
-  await page.getByRole('option', { name: 'B — Habituellement fiable' }).click()
+  await page.getByRole('option', { name: 'B – Habituellement fiable' }).click()
   await shown(page, 'Alice')
   await dimmed(page, 'Bob')
   await shown(page, 'Courriel') // ungraded, still included
@@ -144,7 +144,7 @@ test('minimum confidence, and excluding ungraded elements', async ({ page }) => 
   await shown(page, 'Alice')
 
   await filters.getByRole('combobox', { name: 'Crédibilité au moins' }).click()
-  await page.getByRole('option', { name: '1 — Confirmée' }).click()
+  await page.getByRole('option', { name: '1 – Confirmée' }).click()
   await dimmed(page, 'Alice') // B2 is not credible enough
   await expect(filtersButton(page)).toContainText('1') // thresholds and ungraded are one criterion
 })

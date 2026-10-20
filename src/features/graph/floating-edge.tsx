@@ -57,7 +57,7 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
               selected && 'border-primary text-foreground',
             )}
             style={{ transform: `translate(-50%, -50%) translate(${middle.x}px, ${middle.y}px)` }}
-            title={description ? `${label} — ${description}` : label}
+            title={description ? `${label} – ${description}` : label}
           >
             {label}
           </div>

@@ -37,8 +37,8 @@ bun run dev       # http://localhost:5173
 Le workflow `.github/workflows/deploy.yml` publie `dist/` sur GitHub Pages à chaque push sur `main`.
 
 **Utilisez un domaine (ou sous-domaine) dédié** (Settings › Pages › Custom domain). IndexedDB est isolé
-par origine : servie depuis `<user>.github.io/filrouge`, l'application partagerait son origine — donc ses
-données — avec tous les autres sites Pages du même compte. Pour un sous-chemin malgré tout, construire avec
+par origine : servie depuis `<user>.github.io/filrouge`, l'application partagerait son origine – donc ses
+données – avec tous les autres sites Pages du même compte. Pour un sous-chemin malgré tout, construire avec
 `FILROUGE_BASE=/filrouge/ bun run build`.
 
 ## Sécurité

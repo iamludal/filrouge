@@ -68,8 +68,8 @@ The module exports, as plain data and pure functions:
 | 5     | Improbable                  | information improbable                    |
 | 6     | Véracité indéterminée       | véracité de l’information indéterminée    |
 
-Labels and phrases are separate because "F — Fiabilité indéterminée" does not read as "source
-fiabilité indéterminée". Selector items render as `"<value> — <label>"`.
+Labels and phrases are separate because "F – Fiabilité indéterminée" does not read as "source
+fiabilité indéterminée". Selector items render as `"<value> – <label>"`.
 
 *Alternative:* derive phrases by lower-casing labels. Rejected for the reason above.
 

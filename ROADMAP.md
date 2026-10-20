@@ -1,4 +1,4 @@
-# ROADMAP — filrouge
+# ROADMAP – filrouge
 
 > **filrouge** est une application web **100 % statique**, **local-first** et open source pour relier visuellement
 > les trouvailles d'une enquête OSINT : entités, liens, sources et niveaux de confiance.
@@ -82,7 +82,7 @@ tests/
 ## 4. Modèle de données (v1)
 
 ```ts
-// src/domain/schemas.ts — à implémenter avec Zod, types inférés via z.infer
+// src/domain/schemas.ts – à implémenter avec Zod, types inférés via z.infer
 Investigation { id: string; name: string; description?: string;
                 createdAt: string; updatedAt: string;
                 schemaVersion: number; encrypted: boolean }
@@ -136,7 +136,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 
 ## 6. Jalons
 
-### v0.0 — Fondations
+### v0.0 – Fondations
 
 - [x] Initialiser le projet Vite + React + TS (strict) avec Bun
 - [x] Configurer Tailwind v4, shadcn/ui, thème clair/sombre (suivi du système + bascule manuelle)
@@ -148,7 +148,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 
 **Critère d'acceptation** : `bun run dev` affiche une coquille d'app vide et la CI est verte.
 
-### v0.1 — MVP : graphe éditable et persistant
+### v0.1 – MVP : graphe éditable et persistant
 
 - [x] Schémas Zod du modèle (§4) + tests de validation
 - [x] Base Dexie (tables `investigations`, `entities`, `relations`, `sources`, `attachments`, index par `investigationId`)
@@ -166,7 +166,7 @@ IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
 **Critère d'acceptation** : je crée une enquête, ajoute 10 entités reliées, recharge la page,
 tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'identique.
 
-### v0.2 — Sources, confiance, navigation
+### v0.2 – Sources, confiance, navigation
 
 - [x] CRUD des sources, rattachement à une entité ou une relation
 - [x] Pièces jointes (captures d'écran) stockées en Blob + calcul SHA-256
@@ -178,7 +178,7 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [x] Undo/redo (Cmd/Ctrl+Z, Cmd/Ctrl+Shift+Z) via zundo
 - [x] Export PNG et SVG du graphe
 
-### v0.3 — Analyse et productivité
+### v0.3 – Analyse et productivité
 
 - [x] Mise en page responsive mobile et tablette (dès 360 px de large, mise en page étroite sous le breakpoint `md`) : barre d'outils du graphe compactée (recherche dépliable, Annuler, menu « Plus d'actions » avec Rétablir, Filtres, Sources et exports), panneau de détail en tiroir ancré en bas, non modal, masqué sans sélection, réduit (résumé de la sélection) ou déplié (éditeur complet) au toucher ou au glisser de sa poignée, minimap masquée, bouton « Supprimer la sélection » pour la sélection multiple, cibles tactiles ≥ 44 px, dialogues contenus dans l'écran, aucun défilement horizontal. Tests E2E Playwright sur un viewport mobile (`devices['Pixel 7']`)
 - [x] Gestes tactiles sur le canvas : pan à un doigt et zoom au pincement, appui long sur le canvas pour ajouter une entité (équivalent du double-clic), création de relation au doigt depuis la poignée d'une entité sélectionnée (zone tactile de 44 px)
@@ -192,16 +192,18 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [ ] Pivots : templates d'URL par type d'entité (ex. `https://crt.sh/?q={value}`), ouverts dans un nouvel onglet avec `rel="noopener noreferrer"`, éditables dans les paramètres
 - [ ] Palette de commandes (Cmd/Ctrl+K)
 - [ ] Captures similaires : hash perceptuel (dHash 64 bits, calculé localement) de chaque capture, signalement « Capture très proche de celle de la source X » sous un seuil de distance de Hamming, et comparaison côte à côte de deux captures (ex. un post capturé à deux dates)
+- [ ] Mise en forme des entités : couleur et icône personnalisées par entité (remplacent celles du type ; icône choisie dans le jeu lucide déjà livré, sans import d'image) et marqueur « important » (mise en évidence visuelle sur le graphe, filtrable) – périmètre à préciser (OpenSpec)
 - [ ] Groupes / clusters visuels de nœuds
 
-### v0.4 — Vues complémentaires
+### v0.4 – Vues complémentaires
 
 - [ ] Vue tableau de toutes les entités (tri, filtres, édition rapide)
 - [ ] Timeline des entités et relations datées (type `event` et propriétés date)
 - [ ] Carte Leaflet des entités géolocalisées. **Désactivée par défaut**, avec un avertissement expliquant que les tuiles sont chargées depuis un serveur tiers
 - [ ] Dossiers d'enquêtes sur l'écran d'accueil (un seul niveau, sans imbrication) : créer, renommer, supprimer un dossier (ses enquêtes reviennent à la racine, jamais supprimées), déplacer une enquête, filtrer la liste par dossier. Le dossier est une organisation locale : non inclus dans l'export
+- [ ] Archivage d'enquêtes (alternative réversible à la suppression, les données étant uniquement locales) : archiver / désarchiver depuis la liste, enquêtes archivées masquées par défaut (section repliée ou filtre « Archivées »), lecture seule ou ouverture possible sans édition accidentelle, suppression définitive toujours disponible depuis les archives. Champ `archivedAt` : migration de schéma testée (`SCHEMA_VERSION`). À préciser : inclusion ou non dans l'export
 
-### v1.0 — Sécurité, interopérabilité, distribution
+### v1.0 – Sécurité, interopérabilité, distribution
 
 - [ ] Chiffrement optionnel par enquête : AES-GCM, clé dérivée par PBKDF2 (≥ 600 000 itérations, sel aléatoire), déverrouillage par passphrase, clé gardée uniquement en mémoire
 - [ ] Verrouillage automatique après inactivité

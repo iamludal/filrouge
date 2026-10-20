@@ -5,7 +5,7 @@ Each numbered group is one Conventional Commit and one ROADMAP v0.3 box. Every g
 (both groups change the UI; `test:e2e` now runs the `chromium` and `mobile` projects). Agents do
 not commit: they leave the group in the working tree and propose its commit message.
 
-## 1. Narrow-screen layout — `feat(responsive): adapt the graph view to narrow screens with a bottom detail drawer`
+## 1. Narrow-screen layout – `feat(responsive): adapt the graph view to narrow screens with a bottom detail drawer`
 
 - [x] 1.1 Add `useIsNarrow()` in `src/app/use-media-query.ts` (`useSyncExternalStore` over `matchMedia('(max-width: 47.99rem)')`) and a `mockViewport('narrow' | 'wide')` helper in `src/test/` that swaps the `matchMedia` stub and dispatches `change`; verify `use-media-query.test.ts`: wide by default, narrow after the helper, re-render on change
 - [x] 1.2 Add `interactive-widget=resizes-content` to the viewport meta in `index.html`; give `DialogContent` (`src/components/ui/dialog.tsx`) `max-h-[calc(100dvh-2rem)] overflow-y-auto`; verify `bun run build` succeeds and `smoke.spec.ts` (CSP) still passes
@@ -17,7 +17,7 @@ not commit: they leave the group in the working tree and propose its commit mess
 - [x] 1.8 Add the `mobile` Playwright project (`devices['Pixel 7']`, `testMatch: /mobile\.spec\.ts/`, ignored by `chromium`) and `tests/e2e/mobile.spec.ts` covering the responsive-layout scenarios (phone vs 768 px tablet, rotate 412 → 915 px keeping the selection, scroll width = viewport width at 360 px on the home screen and on a long-named investigation, compact toolbar and menu entries, SVG export from the menu, save status icon, filters dot and badge, drawer hidden / collapsed summary / tap on canvas above it / deselect, expand by tap, expand and collapse by dragging the handle, short drag, 85 % height, "Fermer", swipe down from collapsed, next selection collapsed, switch element while expanded, rename in the drawer persisted after reload, 44 px toolbar buttons, "Nouvelle source" at 360 × 640 with "Enregistrer" reachable), the graph-search narrow scenarios, the graph-filters narrow scenario and the mini-map scenario; add the "Supprimer la sélection" scenario to `tests/e2e/selection.spec.ts`; verify `bun run test:e2e` is green on both projects
 - [x] 1.9 Check the "Mise en page responsive" box in `ROADMAP.md` (v0.3) and verify the full check suite, `bun run test:e2e` included, is green
 
-## 2. Touch gestures — `feat(graph): add entities by long press and create relations with a finger`
+## 2. Touch gestures – `feat(graph): add entities by long press and create relations with a finger`
 
 - [x] 2.1 Add long press to `GraphCanvas`: touch pointers on `.react-flow__pane` only, 500 ms timer cancelled by a move beyond 10 px, `pointerup`, `pointercancel` or a second pointer, then `openAddEntityAt`; prevent the pane's `contextmenu` on touch and disable callout / text selection on the pane; update the empty-graph hint to mention the long press on touch screens; verify a component test with fake timers: dialog opens after 500 ms, not after a 30 px move, not after `pointerup` at 300 ms, not with a second pointer, not for `pointerType: 'mouse'`, not on a node
 - [x] 2.2 Give the entity node's source handle a 44 × 44 px invisible hit area under `(pointer: coarse)`; keep React Flow's `panOnDrag` / `zoomOnPinch` defaults explicit on `<ReactFlow>`; verify `entity-node.test.tsx` asserts the hit-area class on the source handle

@@ -108,9 +108,9 @@ describe('FiltersButton', () => {
     expect(screen.getByRole('checkbox', { name: 'Inclure les éléments non cotés' })).toBeChecked()
 
     await user.click(screen.getByRole('combobox', { name: 'Fiabilité au moins' }))
-    await user.click(await screen.findByRole('option', { name: 'B — Habituellement fiable' }))
+    await user.click(await screen.findByRole('option', { name: 'B – Habituellement fiable' }))
     await user.click(screen.getByRole('combobox', { name: 'Crédibilité au moins' }))
-    await user.click(await screen.findByRole('option', { name: '2 — Probablement vraie' }))
+    await user.click(await screen.findByRole('option', { name: '2 – Probablement vraie' }))
     await user.click(screen.getByRole('checkbox', { name: 'Inclure les éléments non cotés' }))
 
     expect(useViewStore.getState().filters).toMatchObject({

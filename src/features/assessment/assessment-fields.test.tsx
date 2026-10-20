@@ -40,22 +40,22 @@ describe('AssessmentFields', () => {
   it('grades in two steps and shows the notation', async () => {
     render(<Harness />)
     expect(screen.queryByRole('button', { name: 'Effacer la cotation' })).not.toBeInTheDocument()
-    await pick('Fiabilité de la source', 'B — Habituellement fiable')
+    await pick('Fiabilité de la source', 'B – Habituellement fiable')
     expect(state().confidence).toEqual({ reliability: 'B', credibility: 6 })
-    await pick(`Crédibilité de l'information`, '2 — Probablement vraie')
+    await pick(`Crédibilité de l'information`, '2 – Probablement vraie')
     expect(state().confidence).toEqual({ reliability: 'B', credibility: 2 })
     expect(screen.getByText('Cotation : B2')).toBeInTheDocument()
   })
 
   it('completes a grade of which only the credibility is picked', async () => {
     render(<Harness />)
-    await pick(`Crédibilité de l'information`, '1 — Confirmée')
+    await pick(`Crédibilité de l'information`, '1 – Confirmée')
     expect(state().confidence).toEqual({ reliability: 'F', credibility: 1 })
   })
 
   it('changes one half and keeps the other', async () => {
     render(<Harness confidence={{ reliability: 'B', credibility: 2 }} />)
-    await pick(`Crédibilité de l'information`, '4 — Douteuse')
+    await pick(`Crédibilité de l'information`, '4 – Douteuse')
     expect(state().confidence).toEqual({ reliability: 'B', credibility: 4 })
   })
 

@@ -27,11 +27,11 @@ French meaning listed in the scenarios below.
 
 #### Scenario: Reliability labels
 - **WHEN** the user opens the reliability selector
-- **THEN** it offers "A — Totalement fiable", "B — Habituellement fiable", "C — Assez fiable", "D — Pas toujours fiable", "E — Peu fiable" and "F — Fiabilité indéterminée", in that order
+- **THEN** it offers "A – Totalement fiable", "B – Habituellement fiable", "C – Assez fiable", "D – Pas toujours fiable", "E – Peu fiable" and "F – Fiabilité indéterminée", in that order
 
 #### Scenario: Credibility labels
 - **WHEN** the user opens the credibility selector
-- **THEN** it offers "1 — Confirmée", "2 — Probablement vraie", "3 — Possiblement vraie", "4 — Douteuse", "5 — Improbable" and "6 — Véracité indéterminée", in that order
+- **THEN** it offers "1 – Confirmée", "2 – Probablement vraie", "3 – Possiblement vraie", "4 – Douteuse", "5 – Improbable" and "6 – Véracité indéterminée", in that order
 
 #### Scenario: Out-of-scale grade rejected
 - **WHEN** an imported file contains an entity whose confidence reliability is "G" or credibility is 7
@@ -43,11 +43,11 @@ l’information" selector. An ungraded element SHALL show both as "Non évaluée
 SHALL grade the element immediately.
 
 #### Scenario: Grade an entity
-- **WHEN** an ungraded entity is selected and the user picks "B — Habituellement fiable" then "2 — Probablement vraie"
+- **WHEN** an ungraded entity is selected and the user picks "B – Habituellement fiable" then "2 – Probablement vraie"
 - **THEN** the entity's confidence is reliability "B", credibility 2, and the panel shows "Cotation : B2"
 
 #### Scenario: Change one half of a grade
-- **WHEN** a relation graded "B2" is selected and the user picks "4 — Douteuse"
+- **WHEN** a relation graded "B2" is selected and the user picks "4 – Douteuse"
 - **THEN** the relation's grade becomes "B4"
 
 ### Requirement: Grade is always complete
@@ -55,11 +55,11 @@ A grade SHALL never be half set. Picking a reliability on an ungraded element SH
 credibility to 6, and picking a credibility on an ungraded element SHALL set its reliability to F.
 
 #### Scenario: Only the reliability is known
-- **WHEN** an ungraded entity is selected and the user picks only "A — Totalement fiable"
-- **THEN** the entity's grade is "A6" and the credibility selector shows "6 — Véracité indéterminée"
+- **WHEN** an ungraded entity is selected and the user picks only "A – Totalement fiable"
+- **THEN** the entity's grade is "A6" and the credibility selector shows "6 – Véracité indéterminée"
 
 #### Scenario: Only the credibility is known
-- **WHEN** an ungraded relation is selected and the user picks only "1 — Confirmée"
+- **WHEN** an ungraded relation is selected and the user picks only "1 – Confirmée"
 - **THEN** the relation's grade is "F1"
 
 ### Requirement: Clear the confidence grade

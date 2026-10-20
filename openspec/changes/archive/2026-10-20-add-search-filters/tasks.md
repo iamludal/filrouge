@@ -8,7 +8,7 @@ propose its commit message.
 Prerequisite: `add-graph-export` is committed (this change builds on `src/domain/graph-geometry.ts`
 and touches the files it modifies).
 
-## 1. Full-text search — `feat(graph): add full-text search with highlighting and result navigation`
+## 1. Full-text search – `feat(graph): add full-text search with highlighting and result navigation`
 
 - [x] 1.1 Add `src/domain/graph-view.ts` with `normalizeText`, `searchTerms`, cached `entityHaystack` / `relationHaystack` (WeakMap), result ordering by anchor (`circleCenter`, relation midpoint) and `computeGraphView` for the search part (filters argument accepted, not applied yet); move `ElementRef` to the domain and re-export it from the store; verify `src/domain/graph-view.test.ts` covers every graph-search scenario of "Searched fields" and "Matching rules" (property key/value incl. number and boolean, notes, tags, relation label, type name not searched, case and accents, words across fields, one word missing, blank query), ordering top-to-bottom then left-to-right, and cache invalidation after an edit (new object)
 - [x] 1.2 Add `src/store/view-store.ts` (`query`, `currentResult`, `setQuery`, `setCurrentResult`, `reset`; plain Zustand, no `temporal`); verify `src/store/view-store.test.ts`: `setQuery` clears the current result, `reset` empties everything, and changing the query leaves `useGraphStore.temporal` history and `dirty` untouched
@@ -17,7 +17,7 @@ and touches the files it modifies).
 - [x] 1.5 Reset the view store when `InvestigationPage` opens an investigation and when it leaves; verify `bun run test` and the e2e of task 1.6 (search empty after going home and back)
 - [x] 1.6 Add `tests/e2e/search.spec.ts` covering the graph-search scenarios: highlight and dim, dimmed node still editable, rename making a node match, match in a property / notes / tag / relation label, counter texts, Enter / Shift+Enter navigation selecting the result and showing its editor, navigation to a relation, Ctrl+F focus, Escape and clear button, search empty after reopening; check the "Recherche plein texte" box in `ROADMAP.md` (v0.2) and verify the full check suite, `bun run test:e2e` included, is green
 
-## 2. Filters — `feat(graph): filter the graph by type, tag, status and confidence`
+## 2. Filters – `feat(graph): filter the graph by type, tag, status and confidence`
 
 - [x] 2.1 Add `GraphFilters`, `EMPTY_FILTERS`, `passesFilters`, `relationPassesFilters`, `activeCriteriaCount`, `typeOptions`, `tagOptions` to `src/domain/graph-view.ts` and apply filters in `computeGraphView` (relation dimmed when it fails status/confidence or an end is filtered out; search results taken among filtered-in elements); verify `graph-view.test.ts` covers every graph-filters scenario of "Type criterion", "Tag criterion", "Status criteria" (only verified relations with no entity dimmed, only hypothetical entities with their relations dimmed, back to all), "Confidence criterion" (A1 / B3 / C1 with "au moins B", B2 / B3 with B and 2, ungraded excluded), "Combining criteria", "Filters on relations" and "Filters and search combined", plus tags merged ignoring case with first-seen spelling and French sort, and a checked type no longer used still listed with count 0
 - [x] 2.2 Add `filters`, `setFilters`, `resetFilters` to the view store (included in `reset`); verify `view-store.test.ts`: changing filters records no undo step and no `dirty` change, `reset` restores `EMPTY_FILTERS`

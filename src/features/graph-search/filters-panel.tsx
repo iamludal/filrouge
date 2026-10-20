@@ -202,7 +202,7 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
             <SelectItem value={ANY}>{t.filters.any}</SelectItem>
             {RELIABILITY_VALUES.filter((value) => value !== 'F').map((value) => (
               <SelectItem key={value} value={value}>
-                {value} — {t.assessment.reliability[value].label}
+                {value} – {t.assessment.reliability[value].label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -225,7 +225,7 @@ function FiltersForm({ filters, withReset = false }: { filters: GraphFilters; wi
             <SelectItem value={ANY}>{t.filters.any}</SelectItem>
             {CREDIBILITY_VALUES.filter((value) => value !== 6).map((value) => (
               <SelectItem key={value} value={String(value)}>
-                {value} — {t.assessment.credibility[value].label}
+                {value} – {t.assessment.credibility[value].label}
               </SelectItem>
             ))}
           </SelectContent>

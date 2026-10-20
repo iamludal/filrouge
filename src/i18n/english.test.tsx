@@ -91,31 +91,31 @@ describe('assessment in English', () => {
 
     await userEvent.click(screen.getByRole('combobox', { name: 'Source reliability' }))
     expect((await screen.findAllByRole('option')).map((o) => o.textContent)).toEqual([
-      'A — Completely reliable',
-      'B — Usually reliable',
-      'C — Fairly reliable',
-      'D — Not usually reliable',
-      'E — Unreliable',
-      'F — Reliability cannot be judged',
+      'A – Completely reliable',
+      'B – Usually reliable',
+      'C – Fairly reliable',
+      'D – Not usually reliable',
+      'E – Unreliable',
+      'F – Reliability cannot be judged',
     ])
-    await userEvent.click(screen.getByRole('option', { name: 'B — Usually reliable' }))
+    await userEvent.click(screen.getByRole('option', { name: 'B – Usually reliable' }))
 
     await userEvent.click(screen.getByRole('combobox', { name: 'Information credibility' }))
     expect((await screen.findAllByRole('option')).map((o) => o.textContent)).toEqual([
-      '1 — Confirmed by other sources',
-      '2 — Probably true',
-      '3 — Possibly true',
-      '4 — Doubtful',
-      '5 — Improbable',
-      '6 — Truth cannot be judged',
+      '1 – Confirmed by other sources',
+      '2 – Probably true',
+      '3 – Possibly true',
+      '4 – Doubtful',
+      '5 – Improbable',
+      '6 – Truth cannot be judged',
     ])
-    await userEvent.click(screen.getByRole('option', { name: '2 — Probably true' }))
+    await userEvent.click(screen.getByRole('option', { name: '2 – Probably true' }))
     expect(screen.getByText('Rating: B2')).toBeInTheDocument()
   })
 
   it('picks a half grade without error', async () => {
     inEnglish(<Harness />)
-    await pick('Source reliability', 'A — Completely reliable')
+    await pick('Source reliability', 'A – Completely reliable')
     expect(screen.getByText('Rating: A6')).toBeInTheDocument()
   })
 })

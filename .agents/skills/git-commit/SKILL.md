@@ -13,7 +13,7 @@ request to commit in this turn, so commit straight away, without asking for conf
 ## Why the index is off-limits
 
 The user stages files as they review them: staged means "I have read this". The commit must contain
-exactly that set — nothing they have not reviewed, and nothing they had reviewed dropped. So this
+exactly that set – nothing they have not reviewed, and nothing they had reviewed dropped. So this
 skill only ever reads the index, and the commit command is chosen so it cannot write to it either:
 
 - No `git add`, `git reset`, `git restore --staged`, `git stash`, `git rm`, `git mv`.

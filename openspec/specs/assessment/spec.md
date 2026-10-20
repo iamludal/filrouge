@@ -26,19 +26,19 @@ meaning listed in the scenarios below, in the active language.
 
 #### Scenario: Reliability labels
 - **WHEN** the user opens the reliability selector
-- **THEN** it offers "A — Totalement fiable", "B — Habituellement fiable", "C — Assez fiable", "D — Pas toujours fiable", "E — Peu fiable" and "F — Fiabilité indéterminée", in that order
+- **THEN** it offers "A – Totalement fiable", "B – Habituellement fiable", "C – Assez fiable", "D – Pas toujours fiable", "E – Peu fiable" and "F – Fiabilité indéterminée", in that order
 
 #### Scenario: Credibility labels
 - **WHEN** the user opens the credibility selector
-- **THEN** it offers "1 — Confirmée", "2 — Probablement vraie", "3 — Possiblement vraie", "4 — Douteuse", "5 — Improbable" and "6 — Véracité indéterminée", in that order
+- **THEN** it offers "1 – Confirmée", "2 – Probablement vraie", "3 – Possiblement vraie", "4 – Douteuse", "5 – Improbable" and "6 – Véracité indéterminée", in that order
 
 #### Scenario: Reliability labels in English
 - **WHEN** the interface is in English and the user opens the reliability selector
-- **THEN** it offers "A — Completely reliable", "B — Usually reliable", "C — Fairly reliable", "D — Not usually reliable", "E — Unreliable" and "F — Reliability cannot be judged", in that order
+- **THEN** it offers "A – Completely reliable", "B – Usually reliable", "C – Fairly reliable", "D – Not usually reliable", "E – Unreliable" and "F – Reliability cannot be judged", in that order
 
 #### Scenario: Credibility labels in English
 - **WHEN** the interface is in English and the user opens the credibility selector
-- **THEN** it offers "1 — Confirmed by other sources", "2 — Probably true", "3 — Possibly true", "4 — Doubtful", "5 — Improbable" and "6 — Truth cannot be judged", in that order
+- **THEN** it offers "1 – Confirmed by other sources", "2 – Probably true", "3 – Possibly true", "4 – Doubtful", "5 – Improbable" and "6 – Truth cannot be judged", in that order
 
 #### Scenario: Out-of-scale grade rejected
 - **WHEN** an imported file contains an entity whose confidence reliability is "G" or credibility is 7
@@ -50,11 +50,11 @@ l'information" selector. An ungraded element SHALL show both as "Non évaluée".
 SHALL grade the element immediately.
 
 #### Scenario: Grade an entity
-- **WHEN** an ungraded entity is selected and the user picks "B — Habituellement fiable" then "2 — Probablement vraie"
+- **WHEN** an ungraded entity is selected and the user picks "B – Habituellement fiable" then "2 – Probablement vraie"
 - **THEN** the entity's confidence is reliability "B", credibility 2, and the panel shows "Cotation : B2"
 
 #### Scenario: Change one half of a grade
-- **WHEN** a relation graded "B2" is selected and the user picks "4 — Douteuse"
+- **WHEN** a relation graded "B2" is selected and the user picks "4 – Douteuse"
 - **THEN** the relation's grade becomes "B4"
 
 ### Requirement: Grade is always complete
@@ -62,11 +62,11 @@ A grade SHALL never be half set. Picking a reliability on an ungraded element SH
 credibility to 6, and picking a credibility on an ungraded element SHALL set its reliability to F.
 
 #### Scenario: Only the reliability is known
-- **WHEN** an ungraded entity is selected and the user picks only "A — Totalement fiable"
-- **THEN** the entity's grade is "A6" and the credibility selector shows "6 — Véracité indéterminée"
+- **WHEN** an ungraded entity is selected and the user picks only "A – Totalement fiable"
+- **THEN** the entity's grade is "A6" and the credibility selector shows "6 – Véracité indéterminée"
 
 #### Scenario: Only the credibility is known
-- **WHEN** an ungraded relation is selected and the user picks only "1 — Confirmée"
+- **WHEN** an ungraded relation is selected and the user picks only "1 – Confirmée"
 - **THEN** the relation's grade is "F1"
 
 ### Requirement: Clear the confidence grade
@@ -115,7 +115,7 @@ In English, the assessment texts SHALL use the NATO (AJP-2.1) Admiralty terminol
 credibility", an ungraded element shows "Not rated", and the grade summary reads "Rating: <grade>".
 
 #### Scenario: Grade an entity in English
-- **WHEN** the interface is in English, an ungraded entity is selected and the user picks "B — Usually reliable" then "2 — Probably true"
+- **WHEN** the interface is in English, an ungraded entity is selected and the user picks "B – Usually reliable" then "2 – Probably true"
 - **THEN** the panel shows "Rating: B2"
 
 #### Scenario: Ungraded element in English

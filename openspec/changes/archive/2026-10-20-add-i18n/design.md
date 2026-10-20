@@ -37,7 +37,7 @@ See proposal.md for motivation. Current state:
 
 ## Decisions
 
-### D1 — In-house typed dictionaries instead of i18next / FormatJS
+### D1 – In-house typed dictionaries instead of i18next / FormatJS
 
 `src/i18n/messages/fr.ts` is the source of truth (`as const` object, nested by feature:
 `common`, `home`, `graph`, `detail`, `sources`, `assessment`, `entityTypes`, `importExport`…).
@@ -52,15 +52,15 @@ any missing or extra key. Values are plain strings or functions for interpolatio
 - Both dictionaries are bundled statically (a few KB gzipped each). Lazy-loading the inactive one
   would add an async gap on switch for a negligible gain.
 
-### D2 — `LocaleProvider` + `useI18n()` mirroring the theme
+### D2 – `LocaleProvider` + `useI18n()` mirroring the theme
 
 `src/i18n/locale.tsx` exposes `LocaleProvider`, `useI18n(): { locale, t, setLocale }`, where `t`
 is the active dictionary object (`t.home.newInvestigation`, `t.graph.deleteCount(3)`).
 `LocaleProvider` wraps the app in `src/app/providers.tsx`; context change re-renders consumers
-only — Zustand stores, React Flow state, undo history and form state are untouched.
+only – Zustand stores, React Flow state, undo history and form state are untouched.
 
 - Pure helpers in `src/i18n/detect.ts` (unit-tested without React):
-  `resolveLocale(stored: unknown, languages: readonly string[]): Locale` — stored `fr`/`en` wins,
+  `resolveLocale(stored: unknown, languages: readonly string[]): Locale` – stored `fr`/`en` wins,
   else first `languages` entry whose lowercased primary subtag is `fr` or `en`, else `en`.
 - The context defaults to French, so a component rendered without provider (existing tests) works
   and needs no wrapper; the real app always mounts `LocaleProvider`.
@@ -70,7 +70,7 @@ only — Zustand stores, React Flow state, undo history and form state are untou
   as a static default; no pre-paint script is needed since all texts are rendered by React.
 - The `languagechange` event is not listened to: the browser preference is read at load only.
 
-### D3 — Domain returns identifiers, the UI translates
+### D3 – Domain returns identifiers, the UI translates
 
 The domain keeps its ids and data, and loses its display texts:
 
@@ -89,7 +89,7 @@ The domain keeps its ids and data, and loses its display texts:
 *Alternative*: pass `t` into domain functions everywhere. Rejected: couples the domain to UI
 wording and makes domain tests depend on dictionaries.
 
-### D4 — Zod messages follow the locale via `z.config(z.locales.xx())`
+### D4 – Zod messages follow the locale via `z.config(z.locales.xx())`
 
 `schemas.ts` already calls `z.config({ jitless: true })`. On locale change the provider calls
 `z.config(locale === 'fr' ? z.locales.fr() : z.locales.en())` (the locale bundles ship inside
@@ -97,7 +97,7 @@ wording and makes domain tests depend on dictionaries.
 they are translated by the UI rather than by Zod. `z.config` merges, so `jitless` is preserved;
 a unit test asserts it.
 
-### D5 — Formatting with a locale-aware formatter set
+### D5 – Formatting with a locale-aware formatter set
 
 `src/lib/format.ts` exports `createFormatters(locale)` returning `formatDate`,
 `formatDateTime`, `formatDateTimeFull`, `formatBytes`, `formatNumber`, with `Intl.DateTimeFormat`
@@ -106,7 +106,7 @@ a unit test asserts it.
 dictionary (`o/Ko/Mo`, `B/KB/MB`), still on binary (1024) steps as today. Tag sorting
 (`graph-view.ts`) takes the collation locale as an argument.
 
-### D6 — Tests default to French; English covered explicitly
+### D6 – Tests default to French; English covered explicitly
 
 - Vitest: `src/test/setup.ts` stores `filrouge:locale = fr` before each test (and after
   `localStorage.clear()` if any test clears it), so existing assertions stay valid. A
@@ -117,7 +117,7 @@ dictionary (`o/Ko/Mo`, `B/KB/MB`), still on binary (1024) steps as today. Tag so
 - A unit test walks `fr` and `en` and asserts the same key set and no empty string (TypeScript
   already enforces shape; this catches `''` placeholders).
 
-### D7 — Migration of strings, feature by feature
+### D7 – Migration of strings, feature by feature
 
 Two commits. First, a behavior-neutral refactor: the dictionary shape, `useI18n()` pinned to
 French, and every literal extracted one feature folder at a time, each step leaving the app fully
@@ -127,7 +127,7 @@ second commit's dictionary complete by construction. ESLint cannot easily forbid
 false positives (icons, symbols, `·`), so no lint rule is added; the e2e English walk-through and
 a grep for accented characters in `src/` (outside `src/i18n/` and tests) serve as the final check.
 
-### D8 — English OSINT vocabulary
+### D8 – English OSINT vocabulary
 
 English texts use the terms practitioners and tools already use, not literal translations.
 Reference glossary for `en.ts`:
@@ -136,14 +136,14 @@ Reference glossary for `en.ts`:
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | Enquête                                               | Investigation                                                                                                          | Maltego, Flowsint                    |
 | Entité / Relation                                     | Entity / Relation (link on the graph)                                                                                  | Maltego "entity", link analysis      |
-| Capture                                               | Screenshot                                                                                                             | —                                    |
+| Capture                                               | Screenshot                                                                                                             | –                                    |
 | Empreinte (SHA-256)                                   | Hash (SHA-256)                                                                                                         | forensics usage                      |
 | Cotation                                              | Rating ("Rating: B2", "rated B2")                                                                                      | Admiralty code literature            |
 | Fiabilité de la source / Crédibilité de l'information | Source reliability / Information credibility                                                                           | NATO AJP-2.1                         |
 | A … F                                                 | Completely reliable, Usually reliable, Fairly reliable, Not usually reliable, Unreliable, Reliability cannot be judged | NATO AJP-2.1, MISP `admiralty-scale` |
 | 1 … 6                                                 | Confirmed by other sources, Probably true, Possibly true, Doubtful, Improbable, Truth cannot be judged                 | NATO AJP-2.1, MISP `admiralty-scale` |
-| Non évaluée                                           | Not rated                                                                                                              | —                                    |
-| Hypothèse / vérifiée                                  | Hypothesis / verified                                                                                                  | —                                    |
+| Non évaluée                                           | Not rated                                                                                                              | –                                    |
+| Hypothèse / vérifiée                                  | Hypothesis / verified                                                                                                  | –                                    |
 | Alias / compte                                        | Alias / account                                                                                                        | Maltego "Alias"                      |
 | Adresse IP                                            | IP address                                                                                                             | Maltego "IPv4 Address"               |
 | Portefeuille crypto                                   | Crypto wallet                                                                                                          | Flowsint                             |
@@ -155,7 +155,7 @@ admiralty-scale taxonomy](https://github.com/MISP/misp-taxonomies/tree/main/admi
 [Maltego standard entities](https://docs.maltego.com/support/solutions/articles/15000034102-standard-entities),
 [Flowsint](https://github.com/SocialMDev/flowsint).
 
-### D9 — Language menu
+### D9 – Language menu
 
 `src/components/language-menu.tsx`, a `DropdownMenu` with `DropdownMenuRadioGroup` like
 `ThemeToggle`, trigger icon `Languages` (lucide), placed before `ThemeToggle` in the header.

@@ -31,4 +31,5 @@ Guide pour les agents de développement travaillant sur filrouge.
 - Ne jamais logguer le contenu d'une enquête (`no-console` actif, sauf warn/error).
 - Toute donnée importée passe par un schéma Zod avant d'atteindre le store.
 - Toute nouvelle action de la barre d'outils du graphe doit aussi figurer dans le menu « Plus d'actions » de la barre compacte (`compact-graph-toolbar.tsx`, écrans étroits).
+- Ne jamais utiliser le tiret cadratin « — » (trop long) : utiliser le tiret demi-cadratin « – » à la place (code, docs, textes, messages de commit).
 - Changement du modèle : incrémenter `SCHEMA_VERSION` et ajouter une migration testée.

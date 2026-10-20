@@ -100,9 +100,9 @@ sans fin. Ensuite, rends le verdict avec cette structure :
 <1-2 phrases : la raison principale>
 
 ## 🚧 Conflits et frictions
-- **Bloquant** — <constat> (<source>)
-- **À arbitrer** — <constat> (<source>)
-- **À prévoir** — <constat> (<source>)
+- **Bloquant** – <constat> (<source>)
+- **À arbitrer** – <constat> (<source>)
+- **À prévoir** – <constat> (<source>)
 
 ## 👍👎 Pour / contre
 <quelques puces courtes>
@@ -111,7 +111,7 @@ sans fin. Ensuite, rends le verdict avec cette structure :
 Dedans : … / Dehors (plus tard ou jamais) : …
 
 ## 📍 Placement
-<jalon> — <pourquoi ici : dépendances, ordre de la roadmap>
+<jalon> – <pourquoi ici : dépendances, ordre de la roadmap>
 
 ## 📝 Ligne ROADMAP proposée
 - [ ] …

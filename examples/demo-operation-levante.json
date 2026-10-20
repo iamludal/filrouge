@@ -4,7 +4,7 @@
   "exportedAt": "2026-06-10T17:00:00.000Z",
   "investigation": {
     "id": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-    "name": "Démo — Opération Levante (traque d'un fugitif)",
+    "name": "Démo – Opération Levante (traque d'un fugitif)",
     "description": "Scénario fictif destiné à la démonstration. Personnes, comptes, organisations, domaines (`.example`), IP (plage de documentation), téléphone (plage ARCEP réservée à la fiction) et portefeuille sont inventés.\n\nDamien Verlac s'est soustrait à son contrôle judiciaire le 12 mars 2026. À partir du seul avis de recherche, la chaîne de pivots mène de la France à Tarifa (Espagne) :\n\n1. avis de recherche, puis forum moto (email, pseudo) ;\n2. annonce de vente, puis adresse BTC réutilisée sur un canal Telegram ;\n3. compte Instagram, puis photo géolocalisée (plage, van, école) ;\n4. site de l'école, puis moniteur « Dani V. » ;\n5. entourage (compagne), puis logement présumé ;\n6. transmission aux autorités.",
     "createdAt": "2026-06-02T08:00:00.000Z",
     "updatedAt": "2026-06-10T17:00:00.000Z",
@@ -1168,7 +1168,7 @@
     {
       "id": "7bb32152-c40c-4f58-b39f-6d766df28e59",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Forum Bécanes & Co — profil « dverlac_moto »",
+      "title": "Forum Bécanes & Co – profil « dverlac_moto »",
       "url": "https://forum-becanes.example/membres/dverlac_moto",
       "archiveUrl": "https://archive.example/2026.06.02/forum-becanes-dverlac_moto",
       "capturedAt": "2026-06-02T09:40:00.000Z",
@@ -1177,7 +1177,7 @@
     {
       "id": "d6dbc6d2-b590-4290-8978-e2512cb653b7",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Forum Bécanes & Co — annonce « Vends MT-07, paiement BTC accepté »",
+      "title": "Forum Bécanes & Co – annonce « Vends MT-07, paiement BTC accepté »",
       "url": "https://forum-becanes.example/annonces/48213",
       "archiveUrl": "https://archive.example/2026.06.02/forum-becanes-48213",
       "capturedAt": "2026-06-02T10:05:00.000Z",
@@ -1186,7 +1186,7 @@
     {
       "id": "46cb6afc-7ae8-40ce-9745-a0645c066cb2",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Explorateur blockchain — historique du portefeuille bc1q…7ksd",
+      "title": "Explorateur blockchain – historique du portefeuille bc1q…7ksd",
       "url": "https://blockchain-explorer.example/address/bc1qz7m4h2xk9w0r3tlv8yqfp5n6e2cj0a4gdu7ksd",
       "capturedAt": "2026-06-03T14:20:00.000Z",
       "note": "Premières entrées en mars 2026, activité régulière depuis avril 2026 (petits montants, profil de vente de matériel)."
@@ -1194,7 +1194,7 @@
     {
       "id": "08c8ced1-55f1-417f-bbd1-82c396f9768a",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Telegram — canal « Levante Rider Shop »",
+      "title": "Telegram – canal « Levante Rider Shop »",
       "url": "https://telegram.example/levanteridershop",
       "archiveUrl": "https://archive.example/2026.06.03/levanteridershop",
       "capturedAt": "2026-06-03T15:00:00.000Z",
@@ -1203,7 +1203,7 @@
     {
       "id": "48a5de16-7944-4d4d-bd57-7361253885aa",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Instagram — compte @kite_dv et publication du 2026-05-18",
+      "title": "Instagram – compte @kite_dv et publication du 2026-05-18",
       "url": "https://instagram.example/kite_dv",
       "archiveUrl": "https://archive.example/2026.06.04/instagram-kite_dv",
       "capturedAt": "2026-06-04T11:30:00.000Z",
@@ -1212,7 +1212,7 @@
     {
       "id": "5a6a5066-0010-4bbb-a029-66145d02d3ae",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Instagram — compte @sophie.rnc",
+      "title": "Instagram – compte @sophie.rnc",
       "url": "https://instagram.example/sophie.rnc",
       "archiveUrl": "https://archive.example/2026.06.04/instagram-sophie.rnc",
       "capturedAt": "2026-06-04T13:10:00.000Z",
@@ -1228,7 +1228,7 @@
     {
       "id": "2d07bd6e-5725-46ed-bf65-ccf02ab4a802",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Escuela Kite Levante — page « Equipo »",
+      "title": "Escuela Kite Levante – page « Equipo »",
       "url": "https://kitelevante.example/equipo",
       "archiveUrl": "https://archive.example/2026.06.05/kitelevante-equipo",
       "capturedAt": "2026-06-05T10:30:00.000Z",
@@ -1251,7 +1251,7 @@
     {
       "id": "90cfc038-d505-4e9f-a186-17bff4770328",
       "investigationId": "6faadc3e-6d82-447b-8f38-5391e9090b3e",
-      "title": "Instagram — story de @sophie.rnc (capture du 2026-06-07)",
+      "title": "Instagram – story de @sophie.rnc (capture du 2026-06-07)",
       "capturedAt": "2026-06-07T19:45:00.000Z",
       "note": "Story éphémère capturée avant expiration. Vue depuis une terrasse : enseigne et clocher identifiables, ce qui situe le logement dans une rue du centre de Tarifa."
     }

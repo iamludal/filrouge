@@ -33,8 +33,8 @@ test('status and Admiralty grades: edit, render, persist and round-trip', async 
   const knowsPath = page.locator(`[id="${await edgePath(page, 0).getAttribute('id')}"]`)
 
   // The new relation is selected: its link label carries the grade.
-  await pick(panel, 'Fiabilité de la source', 'C — Assez fiable')
-  await pick(panel, `Crédibilité de l'information`, '3 — Possiblement vraie')
+  await pick(panel, 'Fiabilité de la source', 'C – Assez fiable')
+  await pick(panel, `Crédibilité de l'information`, '3 – Possiblement vraie')
   await expect(page.getByText('connaît · C3')).toBeVisible()
 
   // A relation can be created verified from the dialog.
@@ -50,9 +50,9 @@ test('status and Admiralty grades: edit, render, persist and round-trip', async 
 
   // Grading in two steps completes the missing half first.
   await expect(node(page, 'Alice').getByRole('img')).toHaveCount(0)
-  await pick(panel, 'Fiabilité de la source', 'B — Habituellement fiable')
+  await pick(panel, 'Fiabilité de la source', 'B – Habituellement fiable')
   await expect(node(page, 'Alice').getByText('B6')).toBeVisible()
-  await pick(panel, `Crédibilité de l'information`, '2 — Probablement vraie')
+  await pick(panel, `Crédibilité de l'information`, '2 – Probablement vraie')
   await expect(node(page, 'Alice').getByText('B2')).toBeVisible()
   await expect(panel.getByText('Cotation : B2')).toBeVisible()
 
@@ -69,8 +69,8 @@ test('status and Admiralty grades: edit, render, persist and round-trip', async 
   await node(page, 'Alice').click()
   await panel.getByRole('button', { name: 'Effacer la cotation' }).click()
   await expect(node(page, 'Alice').getByRole('img')).toHaveCount(0)
-  await pick(panel, 'Fiabilité de la source', 'A — Totalement fiable')
-  await pick(panel, `Crédibilité de l'information`, '1 — Confirmée')
+  await pick(panel, 'Fiabilité de la source', 'A – Totalement fiable')
+  await pick(panel, `Crédibilité de l'information`, '1 – Confirmée')
 
   // Export, delete, re-import: statuses and grades are unchanged.
   await expect(page.getByRole('status')).toHaveText('Enregistré')
