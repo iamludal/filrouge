@@ -33,8 +33,10 @@ Each node SHALL show the entity's icon and colour (its custom ones, otherwise it
 entity-appearance) and the entity label. An entity without a label SHALL be shown as "<type label>
 sans nom". A hypothetical entity SHALL have a dashed circle and a verified entity a solid one. A
 graded entity SHALL show its grade (e.g. "B2") in a badge on its node; an ungraded entity SHALL
-show no badge. An important entity SHALL show a flag badge, named "Important", at the top left of
-its circle; an unmarked entity SHALL show none.
+show no badge. An important entity SHALL show a 24 px flag badge, named "Important", at the top
+left of its circle, and its circle's border SHALL grow outwards from 2 to 4 px, so the circle
+looks larger without moving its relations, and get a translucent background of the entity's
+colour; an unmarked entity SHALL show none of them.
 
 #### Scenario: Unlabelled entity
 - **WHEN** an entity of type "Personne" has an empty label
@@ -63,6 +65,14 @@ its circle; an unmarked entity SHALL show none.
 #### Scenario: Unmarked entity
 - **WHEN** an entity is not marked important
 - **THEN** its node shows no flag badge
+
+#### Scenario: Important entity stands out
+- **WHEN** an entity is marked important
+- **THEN** its circle border grows outwards to 4 px with the circle's centre unchanged, its background is tinted with the entity's colour and its flag badge is 24 px wide
+
+#### Scenario: Tint follows the mark
+- **WHEN** an important entity's mark is removed
+- **THEN** its circle has a 2 px border and the plain card background again
 
 ### Requirement: Add an entity
 The user SHALL be able to add an entity by double-clicking the empty canvas, by a long press (at

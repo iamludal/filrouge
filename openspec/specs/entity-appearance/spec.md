@@ -45,14 +45,14 @@ colour.
 - **THEN** the "Vert" swatch is shown as selected, and when it has no custom colour "Couleur du type" is
 
 ### Requirement: Icon set
-The application SHALL offer a fixed set of 44 icons, each with a stable id and a name in the
-active language: the 14 entity type icons plus 30 others (e.g. a group of people, a mask, a skull,
-a bot, a lock, a smartphone, a database, a bank, a plane, a gavel). Every icon SHALL be shipped
+The application SHALL offer a fixed set of 95 icons, each with a stable id and a name in the
+active language: the 14 entity type icons plus 81 others (e.g. a group of people, a mask, a skull,
+an identity card, a factory, a truck, a drone, a satellite, a bitcoin, a lock, a bank, a gavel). Every icon SHALL be shipped
 with the application. No other icon, and no user image, SHALL be selectable.
 
 #### Scenario: Icon set offered
 - **WHEN** the user opens the icon picker of the selected entity
-- **THEN** 44 icons are offered, each with an accessible name (e.g. "Crâne"), plus an "Icône du type" choice
+- **THEN** 95 icons are offered, each with an accessible name (e.g. "Crâne"), plus an "Icône du type" choice
 
 #### Scenario: No network request
 - **WHEN** the user opens the icon picker and picks an icon

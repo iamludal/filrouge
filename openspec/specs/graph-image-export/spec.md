@@ -54,7 +54,8 @@ background whatever the active theme.
 Each entity SHALL be drawn as on the canvas: a circle bordered with the entity's colour holding the
 entity's icon (its custom ones, otherwise its type's, see entity-appearance), its label below (or
 "<type label> sans nom" when empty), a dashed border when it is a hypothesis and a solid one when
-verified, its grade (e.g. "B2") in a badge when graded, and a flag badge when it is important. A
+verified, its grade (e.g. "B2") in a badge when graded, and, when it is important, a
+flag badge and a circle whose border grows outwards to 4 px, filled with a light shade of the entity's colour. A
 label longer than 24 characters SHALL be cut to its first 23 characters followed by "…".
 
 #### Scenario: Unlabelled entity
@@ -80,6 +81,10 @@ label longer than 24 characters SHALL be cut to its first 23 characters followed
 #### Scenario: Important entity
 - **WHEN** entity A is important, entity B is not, and the user exports the SVG
 - **THEN** a flag badge is drawn at the top left of A's circle and none next to B's, and the badge lies inside the image bounds
+
+#### Scenario: Important entity tinted
+- **WHEN** entity A is important, entity B is not, and the user exports the SVG
+- **THEN** A's circle has a 4 px stroke reaching 2 px beyond its edge and a light fill of A's colour, and B's circle a 2 px stroke and a white fill
 
 ### Requirement: Relation drawing
 Each relation SHALL be drawn as a straight line between the circles of its two entities, with an
