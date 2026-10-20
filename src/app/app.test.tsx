@@ -15,6 +15,18 @@ describe('App shell', () => {
     expect(screen.getByRole('button', { name: 'Changer de thème' })).toBeInTheDocument()
   })
 
+  it('links to the source repository in a new tab', () => {
+    render(
+      <Providers>
+        <App />
+      </Providers>,
+    )
+    const link = screen.getByRole('link', { name: 'Code source sur GitHub' })
+    expect(link).toHaveAttribute('href', 'https://github.com/iamludal/filrouge')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
   it('shows only the brand in the document title on the home screen', () => {
     window.location.hash = '#/'
     render(

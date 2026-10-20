@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useRoute, routeHref } from '@/app/router'
+import { GithubLink } from '@/components/github-link'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { InvestigationsPage } from '@/features/investigations/investigations-page'
 import { useGraphStore } from '@/store/graph-store'
@@ -33,7 +34,10 @@ export function App() {
           <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="size-6" />
           Filrouge
         </a>
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <GithubLink />
+          <ThemeToggle />
+        </div>
       </header>
       <main className="flex min-h-0 flex-1 flex-col overflow-auto">
         <Suspense fallback={null}>

@@ -2,7 +2,7 @@
 
 ## Purpose
 Provides the application frame shared by every screen: navigation between the home screen and an
-investigation through the URL, and the user's colour theme.
+investigation through the URL, the user's colour theme, and a link to the source repository.
 
 ## Requirements
 
@@ -47,6 +47,15 @@ is blank, the title SHALL fall back to "Filrouge".
 #### Scenario: Investigation renamed
 - **WHEN** the user renames the open investigation to "Renommée"
 - **THEN** the document title becomes "Renommée – Filrouge" without reloading
+
+### Requirement: Source repository link
+The header SHALL show a GitHub icon link, next to the theme menu, to the source repository
+`https://github.com/iamludal/filrouge`. The link SHALL open in a new tab without giving the opened
+page access to the application window.
+
+#### Scenario: Open the repository
+- **WHEN** the user activates the "Code source sur GitHub" link in the header
+- **THEN** `https://github.com/iamludal/filrouge` opens in a new tab
 
 ### Requirement: Theme preference
 The user SHALL be able to choose a light, dark or system theme. The choice SHALL persist in this
