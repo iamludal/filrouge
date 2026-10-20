@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { ENTITY_TYPES } from '@/domain/entity-types'
 import { LIMITS, type Entity } from '@/domain/schemas'
 import { AssessmentFields } from '@/features/assessment/assessment-fields'
+import { ElementTimestamps } from '@/features/entities/element-timestamps'
 import { EntityTypeSelect } from '@/features/entities/entity-type-select'
 import { NotesEditor } from '@/features/entities/notes-editor'
 import { PropertiesEditor } from '@/features/entities/properties-editor'
@@ -43,6 +44,7 @@ export function EntityPanel({ entity }: { entity: Entity }) {
 
   return (
     <div className="grid gap-4">
+      <ElementTimestamps createdAt={entity.createdAt} updatedAt={entity.updatedAt} />
       <Field label="Type" htmlFor="panel-entity-type">
         <EntityTypeSelect
           id="panel-entity-type"

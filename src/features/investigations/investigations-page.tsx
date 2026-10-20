@@ -23,9 +23,8 @@ import {
 import type { Investigation } from '@/domain/schemas'
 import { useExportInvestigation, useImportInvestigation } from '@/features/import-export/use-import-export'
 import { InvestigationFormDialog } from '@/features/investigations/investigation-form-dialog'
+import { formatDateTime } from '@/lib/format'
 import { useInvestigationsStore } from '@/store/investigations-store'
-
-const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' })
 
 export function InvestigationsPage() {
   const { items, loaded, refresh, create, update, remove } = useInvestigationsStore()
@@ -78,7 +77,7 @@ export function InvestigationsPage() {
                 <p className="line-clamp-2 text-sm text-muted-foreground">{investigation.description}</p>
               )}
               <div className="mt-1 text-xs text-muted-foreground">
-                Modifiée le {dateFormat.format(new Date(investigation.updatedAt))}
+                Modifiée le {formatDateTime(investigation.updatedAt)}
               </div>
             </a>
             <DropdownMenu>

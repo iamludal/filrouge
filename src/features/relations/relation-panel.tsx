@@ -7,6 +7,7 @@ import { ENTITY_TYPES } from '@/domain/entity-types'
 import { RELATION_SUGGESTIONS } from '@/domain/relations'
 import { LIMITS, type Relation } from '@/domain/schemas'
 import { AssessmentFields } from '@/features/assessment/assessment-fields'
+import { ElementTimestamps } from '@/features/entities/element-timestamps'
 import { Field } from '@/features/entities/entity-panel'
 import { SourcesSection } from '@/features/sources/sources-section'
 import { useGraphStore } from '@/store/graph-store'
@@ -21,6 +22,7 @@ export function RelationPanel({ relation }: { relation: Relation }) {
 
   return (
     <div className="grid gap-4">
+      <ElementTimestamps createdAt={relation.createdAt} updatedAt={relation.updatedAt} />
       <div className="flex items-center gap-2 text-sm">
         <button
           type="button"

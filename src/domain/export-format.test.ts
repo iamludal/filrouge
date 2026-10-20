@@ -141,6 +141,15 @@ describe('export format', () => {
     expect(copy.entities.every((entity) => entity.investigationId === copy.investigation.id)).toBe(true)
     expect((await parseExport(await serializeExport(copy))).ok).toBe(true)
   })
+
+  it('keeps entity and relation dates when remapping ids', () => {
+    const snapshot = sampleSnapshot()
+    const { snapshot: copy } = remapIds({ snapshot, attachments: [] })
+    const dates = (items: { createdAt: string; updatedAt: string }[]) =>
+      items.map(({ createdAt, updatedAt }) => ({ createdAt, updatedAt }))
+    expect(dates(copy.entities)).toEqual(dates(snapshot.entities))
+    expect(dates(copy.relations)).toEqual(dates(snapshot.relations))
+  })
 })
 
 describe('export with attachments', () => {

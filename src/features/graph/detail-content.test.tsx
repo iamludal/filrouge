@@ -51,4 +51,25 @@ describe('DetailPanel selection states', () => {
     expect(Object.keys(restored.entities)).toHaveLength(3)
     expect(Object.keys(restored.relations)).toHaveLength(1)
   })
+
+  it('shows the dates of the selected entity and updates them after an edit', () => {
+    const { a } = setup()
+    act(() => useGraphStore.getState().setSelection({ entityIds: [a.id], relationIds: [] }))
+    expect(screen.getByLabelText(/^Créée le /)).toBeInTheDocument()
+    expect(screen.queryByLabelText(/^Modifiée le /)).not.toBeInTheDocument()
+
+    act(() => {
+      vi.useFakeTimers({ toFake: ['Date'] })
+      vi.setSystemTime(new Date(Date.parse(a.createdAt) + 60_000))
+      useGraphStore.getState().updateEntity(a.id, { notes: 'x' })
+      vi.useRealTimers()
+    })
+    expect(screen.getByLabelText(/^Modifiée le /)).toBeInTheDocument()
+  })
+
+  it('shows the dates of the selected relation', () => {
+    const { ac } = setup()
+    act(() => useGraphStore.getState().setSelection({ entityIds: [], relationIds: [ac.id] }))
+    expect(screen.getByLabelText(/^Créée le /)).toBeInTheDocument()
+  })
 })

@@ -260,3 +260,97 @@ describe('graph store: sources', () => {
     expect(retry.deleteSourceIds).toEqual([gone.id])
   })
 })
+
+describe('element dates', () => {
+  const T0 = '2026-01-01T10:00:00.000Z'
+  const T1 = '2026-01-01T11:00:00.000Z'
+
+  beforeEach(() => {
+    useGraphStore.getState().close()
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date(T0))
+  })
+  afterEach(() => vi.useRealTimers())
+
+  const later = () => vi.setSystemTime(new Date(T1))
+
+  it('creates entities and relations with equal dates', () => {
+    openEmpty()
+    const store = useGraphStore.getState()
+    const a = store.addEntity('person', { x: 0, y: 0 })
+    const b = store.addEntity('email', { x: 100, y: 0 })
+    const relation = store.addRelation(a.id, b.id, 'utilise')!
+    expect([a.createdAt, a.updatedAt, relation.createdAt, relation.updatedAt]).toEqual([T0, T0, T0, T0])
+  })
+
+  it('refreshes updatedAt on content edits and keeps createdAt', () => {
+    openEmpty()
+    const store = useGraphStore.getState()
+    const a = store.addEntity('person', { x: 0, y: 0 })
+    const b = store.addEntity('email', { x: 100, y: 0 })
+    const relation = store.addRelation(a.id, b.id, 'utilise')!
+    later()
+    useGraphStore.getState().updateEntity(a.id, { label: 'Alice' })
+    useGraphStore.getState().updateEntity(a.id, { properties: { k: 'v' } })
+    useGraphStore.getState().updateRelation(relation.id, { label: 'connaît' })
+    useGraphStore.getState().updateRelation(relation.id, { directed: false })
+    const state = useGraphStore.getState()
+    expect(state.entities[a.id]).toMatchObject({ createdAt: T0, updatedAt: T1 })
+    expect(state.relations[relation.id]).toMatchObject({ createdAt: T0, updatedAt: T1 })
+    expect(state.entities[b.id]?.updatedAt).toBe(T0)
+  })
+
+  it('refreshes the citing elements when a source is attached, detached or deleted', () => {
+    openEmpty()
+    const store = useGraphStore.getState()
+    const a = store.addEntity('person', { x: 0, y: 0 })
+    const b = store.addEntity('email', { x: 100, y: 0 })
+    const relation = store.addRelation(a.id, b.id, 'utilise')!
+    const source = store.createSource({ title: 'S' })!
+    later()
+    useGraphStore.getState().attachSource({ type: 'relation', id: relation.id }, source.id)
+    expect(useGraphStore.getState().relations[relation.id]?.updatedAt).toBe(T1)
+
+    useGraphStore.getState().attachSource({ type: 'entity', id: a.id }, source.id)
+    vi.setSystemTime(new Date('2026-01-01T12:00:00.000Z'))
+    useGraphStore.getState().detachSource({ type: 'entity', id: a.id }, source.id)
+    expect(useGraphStore.getState().entities[a.id]?.updatedAt).toBe('2026-01-01T12:00:00.000Z')
+
+    vi.setSystemTime(new Date('2026-01-01T13:00:00.000Z'))
+    useGraphStore.getState().removeSource(source.id)
+    expect(useGraphStore.getState().relations[relation.id]?.updatedAt).toBe('2026-01-01T13:00:00.000Z')
+  })
+
+  it('leaves entity dates alone on moves, source edits and new relations', () => {
+    const investigation = openEmpty()
+    const store = useGraphStore.getState()
+    const a = store.addEntity('person', { x: 0, y: 0 })
+    const b = store.addEntity('email', { x: 100, y: 0 })
+    const source = store.createSource({ title: 'S' }, undefined, { type: 'entity', id: a.id })!
+    later()
+    useGraphStore.getState().moveEntities({ [a.id]: { x: 50, y: 50 } })
+    useGraphStore.getState().updateSource(source.id, { title: 'Renamed' })
+    useGraphStore.getState().setSourceAttachment(source.id, fakeAttachment(investigation.id))
+    useGraphStore.getState().addRelation(a.id, b.id, 'utilise')
+    const { entities } = useGraphStore.getState()
+    expect(entities[a.id]?.position).toEqual({ x: 50, y: 50 })
+    expect(entities[a.id]?.updatedAt).toBe(T0)
+    expect(entities[b.id]?.updatedAt).toBe(T0)
+  })
+
+  it('restores dates with undo and redo', () => {
+    openEmpty()
+    const a = useGraphStore.getState().addEntity('person', { x: 0, y: 0 })
+    useGraphStore.temporal.getState().clear()
+    later()
+    useGraphStore.getState().updateEntity(a.id, { label: 'Alice' })
+    expect(useGraphStore.getState().entities[a.id]).toMatchObject({ label: 'Alice', updatedAt: T1 })
+
+    useGraphStore.getState().undo()
+    expect(useGraphStore.getState().entities[a.id]).toMatchObject({ label: '', updatedAt: T0 })
+
+    vi.setSystemTime(new Date('2026-01-01T12:00:00.000Z'))
+    useGraphStore.getState().redo()
+    expect(useGraphStore.getState().entities[a.id]).toMatchObject({ label: 'Alice', updatedAt: T1 })
+  })
+})

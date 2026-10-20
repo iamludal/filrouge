@@ -276,6 +276,14 @@ test.describe('detail drawer', () => {
     await expect(page.getByLabel('Libellé')).toHaveValue('Bob')
   })
 
+  test('shows the element dates only once the drawer is expanded', async ({ page }) => {
+    await createInvestigation(page, 'Dates')
+    await addEntityAt(page, 150, 150, 'Jean')
+    await expect(page.getByLabel(/^Créée le /)).toBeHidden()
+    await handle(page).click()
+    await expect(page.getByLabel(/^Créée le /)).toBeVisible()
+  })
+
   test('saves edits made in the drawer', async ({ page }) => {
     await createInvestigation(page, 'Édition')
     await addEntityAt(page, 150, 150, 'Alice')
