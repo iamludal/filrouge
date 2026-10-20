@@ -201,6 +201,7 @@ export const fr = {
       change: 'Changer de langue',
     },
     githubLink: 'Code source sur GitHub',
+    bugReport: 'Signaler un bug',
     theme: {
       change: 'Changer de thème',
       light: 'Clair',

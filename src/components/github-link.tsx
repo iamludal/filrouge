@@ -1,7 +1,9 @@
+import { Bug } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/i18n/locale'
 
 const REPOSITORY_URL = 'https://github.com/iamludal/filrouge'
+const NEW_ISSUE_URL = `${REPOSITORY_URL}/issues/new`
 
 // lucide-react no longer ships brand icons: GitHub mark (Octicons "mark-github", 16px grid).
 function GithubMark() {
@@ -24,6 +26,23 @@ export function GithubLink() {
         title={t.app.githubLink}
       >
         <GithubMark />
+      </a>
+    </Button>
+  )
+}
+
+export function BugReportLink() {
+  const { t } = useI18n()
+  return (
+    <Button variant="ghost" size="icon" asChild>
+      <a
+        href={NEW_ISSUE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t.app.bugReport}
+        title={t.app.bugReport}
+      >
+        <Bug />
       </a>
     </Button>
   )

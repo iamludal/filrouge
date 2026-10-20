@@ -27,6 +27,18 @@ describe('App shell', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
   })
 
+  it('links to a new GitHub issue to report a bug', () => {
+    render(
+      <Providers>
+        <App />
+      </Providers>,
+    )
+    const link = screen.getByRole('link', { name: 'Signaler un bug' })
+    expect(link).toHaveAttribute('href', 'https://github.com/iamludal/filrouge/issues/new')
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
   it('shows only the brand in the document title on the home screen', () => {
     window.location.hash = '#/'
     render(

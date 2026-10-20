@@ -198,6 +198,7 @@ export const en: Messages = {
       change: 'Change language',
     },
     githubLink: 'Source code on GitHub',
+    bugReport: 'Report a bug',
     theme: {
       change: 'Change theme',
       light: 'Light',

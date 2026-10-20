@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useRoute, routeHref } from '@/app/router'
-import { GithubLink } from '@/components/github-link'
+import { BugReportLink, GithubLink } from '@/components/github-link'
 import { LanguageMenu } from '@/components/language-menu'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { InvestigationsPage } from '@/features/investigations/investigations-page'
@@ -39,6 +39,7 @@ export function App() {
           {t.common.brand}
         </a>
         <div className="flex items-center gap-1">
+          <BugReportLink />
           <GithubLink />
           <LanguageMenu />
           <ThemeToggle />
