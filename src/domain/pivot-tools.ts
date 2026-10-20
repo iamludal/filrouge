@@ -9,10 +9,12 @@ export const TOOL_CATEGORIES = [
   'infrastructure',
   'archives',
   'registries',
+  'investigations',
   'blockchain',
   'images',
   'metadata',
   'maps',
+  'vehicles',
   'frameworks',
 ] as const
 
@@ -42,7 +44,8 @@ const exact = (base: string) => `${base}%22{value}%22`
 
 /**
  * Built-in tools. Query links only look up what already exists: none submits a scan, an archive
- * request or a report. Each link is to be opened by hand once (task 2.3 of `add-pivot-toolbox`).
+ * request or a report. Each link was opened by hand with a sample value (2026-10-20 for the first
+ * catalog, 2026-10-21 for `extend-pivot-catalog`).
  */
 export const PIVOT_TOOLS: readonly PivotTool[] = [
   {
@@ -162,6 +165,12 @@ export const PIVOT_TOOLS: readonly PivotTool[] = [
     },
   },
   {
+    id: 'dotdb',
+    name: 'dotDB',
+    category: 'whoisDns',
+    links: same(['organization', 'alias'], 'https://dotdb.com/search?keyword={value}&position=any'),
+  },
+  {
     id: 'securitytrails',
     name: 'SecurityTrails',
     category: 'whoisDns',
@@ -188,7 +197,7 @@ export const PIVOT_TOOLS: readonly PivotTool[] = [
     id: 'censys',
     name: 'Censys',
     category: 'infrastructure',
-    links: { ip: 'https://search.censys.io/hosts/{value}' },
+    links: { ip: 'https://platform.censys.io/hosts/{value}' },
   },
   {
     id: 'abuseipdb',
@@ -212,6 +221,18 @@ export const PIVOT_TOOLS: readonly PivotTool[] = [
     name: 'urlscan.io',
     category: 'infrastructure',
     links: { domain: 'https://urlscan.io/domain/{value}', ip: 'https://urlscan.io/ip/{value}' },
+  },
+  {
+    id: 'analyzeid',
+    name: 'Analyzeid',
+    category: 'infrastructure',
+    links: { domain: 'https://analyzeid.com/id/{value}' },
+  },
+  {
+    id: 'builtwith',
+    name: 'BuiltWith',
+    category: 'infrastructure',
+    links: { domain: 'https://builtwith.com/{value}' },
   },
 
   {
@@ -250,6 +271,19 @@ export const PIVOT_TOOLS: readonly PivotTool[] = [
     name: 'OpenCorporates',
     category: 'registries',
     links: { organization: 'https://opencorporates.com/companies?q={value}' },
+  },
+
+  {
+    id: 'aleph',
+    name: 'OCCRP Aleph',
+    category: 'investigations',
+    links: same(['person', 'organization'], 'https://aleph.occrp.org/search?q={value}'),
+  },
+  {
+    id: 'opensanctions',
+    name: 'OpenSanctions',
+    category: 'investigations',
+    links: same(['person', 'organization'], 'https://www.opensanctions.org/search/?q={value}'),
   },
 
   {
@@ -304,6 +338,43 @@ export const PIVOT_TOOLS: readonly PivotTool[] = [
     name: 'Google Maps',
     category: 'maps',
     links: { address: 'https://www.google.com/maps/search/?api=1&query={value}' },
+  },
+  {
+    id: 'yandex-maps',
+    name: 'Yandex Maps',
+    category: 'maps',
+    links: { address: 'https://yandex.com/maps/?text={value}' },
+  },
+  {
+    id: 'esri-wayback',
+    name: 'World Imagery Wayback',
+    category: 'maps',
+    links: { address: 'https://livingatlas.arcgis.com/wayback/' },
+  },
+  {
+    id: 'ign-remonter-le-temps',
+    name: 'Remonter le temps (IGN)',
+    category: 'maps',
+    links: { address: 'https://remonterletemps.ign.fr/' },
+  },
+  {
+    id: 'cartes-gouv',
+    name: 'cartes.gouv.fr',
+    category: 'maps',
+    links: { address: 'https://cartes.gouv.fr/explorer-les-cartes/' },
+  },
+
+  {
+    id: 'vindecoder-net',
+    name: 'vindecoder.net',
+    category: 'vehicles',
+    links: { vehicle: 'https://www.vindecoder.net/?vin={value}' },
+  },
+  {
+    id: 'vindecoder-pl',
+    name: 'vindecoder.pl',
+    category: 'vehicles',
+    links: { vehicle: 'https://vindecoder.pl/report/{value}' },
   },
 
   {

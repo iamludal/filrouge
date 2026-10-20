@@ -33,6 +33,10 @@ describe('resolveToolLink', () => {
     expect(open('person', 'google', 'valérie d’hont')).toContain('d%E2%80%99hont')
   })
 
+  it('opens a Censys host page on platform.censys.io', () => {
+    expect(open('ip', 'censys', '8.8.8.8')).toBe('https://platform.censys.io/hosts/8.8.8.8')
+  })
+
   it('fills a domain template', () => {
     expect(open('domain', 'crtsh', 'exemple.fr')).toBe('https://crt.sh/?q=exemple.fr')
   })
@@ -98,11 +102,47 @@ describe('toolsForType', () => {
   })
 
   it('lists only the search engines and frameworks for types without specific tools', () => {
-    for (const type of ['vehicle', 'event'] as const) {
+    for (const type of ['event'] as const) {
       expect(
         toolsForType(type).every((entry) => ['search', 'frameworks'].includes(entry.tool.category)),
       ).toBe(true)
     }
+  })
+
+  it('lists the investigative, web, map and vehicle tools for their types', () => {
+    expect(ids('domain')).toEqual(expect.arrayContaining(['analyzeid', 'builtwith']))
+    for (const type of ['person', 'organization'] as const) {
+      expect(ids(type)).toEqual(expect.arrayContaining(['aleph', 'opensanctions']))
+    }
+    const vehicle = toolsForType('vehicle')
+    expect(vehicle.map((entry) => entry.tool.id)).toEqual(
+      expect.arrayContaining(['vindecoder-net', 'vindecoder-pl']),
+    )
+    expect(vehicle.map((entry) => entry.tool.category)).toEqual([
+      'search',
+      'search',
+      'search',
+      'search',
+      'vehicles',
+      'vehicles',
+      'frameworks',
+      'frameworks',
+    ])
+    expect(
+      toolsForType('person')
+        .filter((entry) => ['aleph', 'opensanctions'].includes(entry.tool.id))
+        .every((entry) => entry.tool.category === 'investigations'),
+    ).toBe(true)
+  })
+
+  it('resolves the new query links', () => {
+    expect(open('organization', 'opensanctions', 'Gazprom')).toBe(
+      'https://www.opensanctions.org/search/?q=Gazprom',
+    )
+    expect(open('alias', 'dotdb', 'lemonde')).toBe('https://dotdb.com/search?keyword=lemonde&position=any')
+    expect(open('vehicle', 'vindecoder-pl', '1HGCM82633A004352')).toBe(
+      'https://vindecoder.pl/report/1HGCM82633A004352',
+    )
   })
 
   it('prefers the type-specific link over any', () => {
@@ -165,7 +205,8 @@ describe('catalog invariants', () => {
   })
 
   it('does not link to a scan, archive or report submission', () => {
-    for (const { tool, value } of links) {
+    // vindecoder.pl: `/report/<VIN>` is the read-only decoding page, not a report submission.
+    for (const { tool, value } of links.filter(({ tool }) => tool.id !== 'vindecoder-pl')) {
       expect(value, tool.id).not.toMatch(/\/(submit|scan|save|report)\b|[?&]url=|\/api\//i)
     }
   })
