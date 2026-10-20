@@ -119,7 +119,7 @@ function DrawerShell() {
       style={offset ? { transform: `translateY(${offset}px)` } : undefined}
       className={cn(
         'absolute inset-x-0 bottom-0 z-20 flex flex-col rounded-t-xl border-t bg-background shadow-[0_-4px_12px_rgb(0_0_0/0.12)]',
-        expanded && 'max-h-[85dvh]',
+        expanded && 'max-h-[85%]',
         offset === null && 'transition-transform motion-reduce:transition-none',
       )}
     >

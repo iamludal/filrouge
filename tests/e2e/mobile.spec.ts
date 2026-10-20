@@ -36,6 +36,20 @@ async function noHorizontalScroll(page: Page) {
 }
 
 test.describe('layout', () => {
+  test('keeps the page itself from scrolling and the drawer inside the window', async ({ page }) => {
+    await createInvestigation(page, 'Hauteur')
+    await addEntityAt(page, 100, 150, 'Alice')
+    await node(page, 'Alice').tap()
+    const { scroll, inner } = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollHeight,
+      inner: window.innerHeight,
+    }))
+    expect(scroll).toBeLessThanOrEqual(inner)
+    const box = (await drawer(page).boundingBox())!
+    expect(box.y + box.height).toBeLessThanOrEqual(inner)
+    await expect(page.locator('.react-flow__controls')).toBeInViewport({ ratio: 1 })
+  })
+
   test('uses the narrow layout on a phone and the desktop one from 768 px', async ({ page }) => {
     await createInvestigation(page, 'Mise en page')
     await expect(menuButton(page)).toBeVisible()

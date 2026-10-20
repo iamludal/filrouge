@@ -26,7 +26,10 @@ export function App() {
   }, [openName, t])
 
   return (
-    <div className="flex h-dvh flex-col">
+    // Pinned to the window rather than sized in `dvh`: Chrome on iOS reports a `100dvh` taller than
+    // what its bottom toolbar leaves visible, which hid the canvas controls and the detail drawer
+    // under the toolbar and let the whole page scroll.
+    <div className="fixed inset-0 flex flex-col">
       <header className="flex h-12 shrink-0 items-center justify-between border-b px-4">
         <a
           href={routeHref({ name: 'home' })}
