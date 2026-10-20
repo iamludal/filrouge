@@ -9,7 +9,15 @@ import { useGraphStore } from '@/store/graph-store'
 const LABELS: Record<HistoryAction, string> = { undo: 'Annuler', redo: 'Rétablir' }
 const ICONS: Record<HistoryAction, LucideIcon> = { undo: Undo2, redo: Redo2 }
 
-function HistoryButton({ action, enabled }: { action: HistoryAction; enabled: boolean }) {
+function HistoryButton({
+  action,
+  enabled,
+  className,
+}: {
+  action: HistoryAction
+  enabled: boolean
+  className?: string
+}) {
   const Icon = ICONS[action]
   const label = LABELS[action]
   return (
@@ -20,6 +28,7 @@ function HistoryButton({ action, enabled }: { action: HistoryAction; enabled: bo
           <Button
             variant="ghost"
             size="icon-sm"
+            className={className}
             aria-label={label}
             disabled={!enabled}
             onClick={() => useGraphStore.getState()[action]()}
@@ -35,15 +44,18 @@ function HistoryButton({ action, enabled }: { action: HistoryAction; enabled: bo
   )
 }
 
-/** The undo/redo buttons of the graph toolbar, and the keyboard shortcuts that go with them. */
-export function HistoryControls() {
+/**
+ * The undo/redo buttons of the graph toolbar, and the keyboard shortcuts that go with them. With
+ * `undoOnly` (narrow screens) only "Annuler" is shown, "Rétablir" living in the toolbar menu.
+ */
+export function HistoryControls({ undoOnly = false }: { undoOnly?: boolean }) {
   useHistoryShortcuts()
   const canUndo = useStore(useGraphStore.temporal, (state) => state.pastStates.length > 0)
   const canRedo = useStore(useGraphStore.temporal, (state) => state.futureStates.length > 0)
   return (
     <div className="flex items-center">
-      <HistoryButton action="undo" enabled={canUndo} />
-      <HistoryButton action="redo" enabled={canRedo} />
+      <HistoryButton action="undo" enabled={canUndo} className={undoOnly ? 'size-11' : undefined} />
+      {!undoOnly && <HistoryButton action="redo" enabled={canRedo} />}
     </div>
   )
 }

@@ -180,6 +180,8 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 
 ### v0.3 — Analyse et productivité
 
+- [x] Mise en page responsive mobile et tablette (dès 360 px de large, mise en page étroite sous le breakpoint `md`) : barre d'outils du graphe compactée (recherche dépliable, Annuler, menu « Plus d'actions » avec Rétablir, Filtres, Sources et exports), panneau de détail en tiroir ancré en bas, non modal, masqué sans sélection, réduit (résumé de la sélection) ou déplié (éditeur complet) au toucher ou au glisser de sa poignée, minimap masquée, bouton « Supprimer la sélection » pour la sélection multiple, cibles tactiles ≥ 44 px, dialogues contenus dans l'écran, aucun défilement horizontal. Tests E2E Playwright sur un viewport mobile (`devices['Pixel 7']`)
+- [x] Gestes tactiles sur le canvas : pan à un doigt et zoom au pincement, appui long sur le canvas pour ajouter une entité (équivalent du double-clic), création de relation au doigt depuis la poignée d'une entité sélectionnée (zone tactile de 44 px)
 - [ ] Layouts automatiques (force, hiérarchique, radial) via elkjs dans un Web Worker
 - [ ] Plus court chemin entre deux entités sélectionnées (graphology), mis en évidence
 - [ ] Mise en évidence des voisins à N sauts
@@ -207,7 +209,6 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [ ] Export STIX 2.1 (bundle) pour OpenCTI/MISP
 - [ ] Rapport d'enquête Markdown et PDF (graphe, entités, sources)
 - [ ] Types d'entités personnalisés (schéma de propriétés, icône, couleur)
-- [ ] Responsive mobile et tablette (dès 360 px de large) : en-tête et barre d'outils compactés (menu de débordement), panneau de détail en tiroir (`Sheet`) plein écran sous le breakpoint `md`, minimap masquée sur petit écran. Gestes tactiles sur le canvas : pan à un doigt, zoom au pincement, appui long pour ajouter une entité (équivalent du double-clic), création de relation par toucher des poignées, suppression via le panneau ou un menu contextuel (pas de touche Suppr). Cibles tactiles ≥ 44 px, aucun défilement horizontal de la page. Tests E2E Playwright sur un viewport mobile (ex. `devices['Pixel 7']`)
 - [ ] PWA installable et fonctionnement hors ligne complet
 - [ ] Système de migrations de `schemaVersion` + tests de migration
 - [ ] Tests E2E Playwright des parcours principaux

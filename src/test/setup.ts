@@ -2,6 +2,8 @@
 import '@testing-library/jest-dom/vitest'
 import 'fake-indexeddb/auto'
 import { Blob as NodeBlob } from 'node:buffer'
+import { afterEach } from 'vitest'
+import { resetViewport } from './viewport'
 
 // fake-indexeddb clones values with Node's structuredClone, which turns jsdom's Blob into a plain
 // object. Node's own Blob survives the round trip and supports arrayBuffer().
@@ -39,3 +41,6 @@ Element.prototype.hasPointerCapture ??= () => false
 Element.prototype.setPointerCapture ??= () => {}
 Element.prototype.releasePointerCapture ??= () => {}
 Element.prototype.scrollIntoView ??= () => {}
+
+// A test that mocked the viewport never leaks it into the next one.
+afterEach(resetViewport)

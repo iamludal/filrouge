@@ -29,4 +29,5 @@ Guide pour les agents de développement travaillant sur filrouge.
 - Aucune requête réseau au runtime ; la CSP (dans `vite.config.ts`) doit rester stricte.
 - Ne jamais logguer le contenu d'une enquête (`no-console` actif, sauf warn/error).
 - Toute donnée importée passe par un schéma Zod avant d'atteindre le store.
+- Toute nouvelle action de la barre d'outils du graphe doit aussi figurer dans le menu « Plus d'actions » de la barre compacte (`compact-graph-toolbar.tsx`, écrans étroits).
 - Changement du modèle : incrémenter `SCHEMA_VERSION` et ajouter une migration testée.

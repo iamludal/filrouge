@@ -7,6 +7,7 @@ import type { ElementRef } from '@/domain/graph-view'
 import { useGraphView } from '@/features/graph-search/use-graph-view'
 import { useSearchShortcut } from '@/features/graph-search/use-search-shortcut'
 import { isApplePlatform, shortcutLabel } from '@/lib/platform'
+import { cn } from '@/lib/utils'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
 
@@ -19,7 +20,7 @@ function counterText(count: number, position: number): string {
 }
 
 /** Search box of the graph toolbar: finds elements, shows how many, and walks through them. */
-export function SearchField() {
+export function SearchField({ fullWidth = false }: { fullWidth?: boolean }) {
   const query = useViewStore((state) => state.query)
   const currentResult = useViewStore((state) => state.currentResult)
   const view = useGraphView()
@@ -60,8 +61,8 @@ export function SearchField() {
   const label = 'Rechercher dans le graphe'
 
   return (
-    <div role="search" className="flex items-center gap-1">
-      <div className="relative">
+    <div role="search" className={cn('flex items-center gap-1', fullWidth && 'min-w-0 flex-1')}>
+      <div className={cn('relative', fullWidth && 'min-w-0 flex-1')}>
         <Search
           aria-hidden
           className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground"
@@ -76,7 +77,8 @@ export function SearchField() {
           placeholder="Rechercher…"
           autoComplete="off"
           spellCheck={false}
-          className="h-7 w-64 pr-28 pl-7"
+          className={cn('pr-28 pl-7', fullWidth ? 'h-9 w-full' : 'h-7 w-64')}
+          autoFocus={fullWidth}
         />
         <span
           aria-live="polite"

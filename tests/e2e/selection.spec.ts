@@ -47,3 +47,23 @@ test('box selection picks entities it touches, not the empty space around them',
   await boxSelect(page, { x: 60, y: 110 }, { x: 150, y: 160 })
   await expect(entity).toHaveClass(/selected/)
 })
+
+test('a multiple selection can be deleted from the panel, in one undoable step', async ({ page }) => {
+  await createInvestigation(page, 'Suppression groupée')
+  await addEntityAt(page, 150, 150, 'A')
+  await addEntityAt(page, 450, 150, 'B')
+  await addEntityAt(page, 300, 400, 'C')
+  await connect(page, 'A', 'C', 'connaît')
+
+  await boxSelect(page, { x: 40, y: 60 }, { x: 600, y: 260 })
+  await expect(page.getByRole('complementary')).toContainText('3 éléments sélectionnés')
+  await page.getByRole('button', { name: 'Supprimer la sélection' }).click()
+
+  await expect(page.locator('.react-flow__node')).toHaveCount(1)
+  await expect(page.locator('.react-flow__node', { hasText: 'C' })).toBeVisible()
+  await expect(page.locator('.react-flow__edge')).toHaveCount(0)
+
+  await page.keyboard.press('ControlOrMeta+z')
+  await expect(page.locator('.react-flow__node')).toHaveCount(3)
+  await expect(page.locator('.react-flow__edge')).toHaveCount(1)
+})

@@ -3,11 +3,14 @@ import { ArrowLeft } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { routeHref } from '@/app/router'
+import { useIsNarrow } from '@/app/use-media-query'
 import { Button } from '@/components/ui/button'
 import { graph } from '@/db/repositories/graph'
 import { investigations } from '@/db/repositories/investigations'
 import { useExportInvestigation } from '@/features/import-export/use-import-export'
 import { ExportMenu } from '@/features/graph-export/export-menu'
+import { CompactGraphToolbar } from '@/features/graph/compact-graph-toolbar'
+import { DetailDrawer } from '@/features/graph/detail-drawer'
 import { DetailPanel } from '@/features/graph/detail-panel'
 import { GraphCanvas } from '@/features/graph/graph-canvas'
 import { HistoryControls } from '@/features/graph/history-controls'
@@ -16,6 +19,7 @@ import { FiltersButton } from '@/features/graph-search/filters-panel'
 import { SearchField } from '@/features/graph-search/search-field'
 import { PasteScreenshot } from '@/features/sources/paste-screenshot'
 import { SourcesLibrary } from '@/features/sources/sources-library-dialog'
+import { cn } from '@/lib/utils'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
 import { startAutosave, type Autosave } from '@/store/persistence'
@@ -26,6 +30,8 @@ export function InvestigationPage({ id }: { id: string }) {
   const [state, setState] = useState<LoadState>('loading')
   const autosave = useRef<Autosave | null>(null)
   const investigation = useGraphStore((s) => s.investigation)
+  const narrow = useIsNarrow()
+  const hasSelection = useGraphStore((s) => s.selection.entityIds.length + s.selection.relationIds.length > 0)
   const { exportInvestigation, exportDialog } = useExportInvestigation()
 
   useEffect(() => {
@@ -74,6 +80,11 @@ export function InvestigationPage({ id }: { id: string }) {
     }
   }, [id])
 
+  const exportJson = async () => {
+    await autosave.current?.flush()
+    await exportInvestigation(id)
+  }
+
   if (state === 'missing') {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
@@ -90,32 +101,32 @@ export function InvestigationPage({ id }: { id: string }) {
   return (
     <ReactFlowProvider>
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="flex h-11 shrink-0 items-center gap-2 border-b px-2">
-          <Button variant="ghost" size="icon-sm" asChild>
-            <a href={routeHref({ name: 'home' })} aria-label="Retour aux enquêtes">
-              <ArrowLeft />
-            </a>
-          </Button>
-          <h1 className="min-w-0 truncate font-medium">{investigation.name}</h1>
-          <div className="ml-auto flex items-center gap-3">
-            <SearchField />
-            <FiltersButton />
-            <HistoryControls />
-            <SaveIndicator />
-            <SourcesLibrary />
-            <ExportMenu
-              onExportJson={async () => {
-                await autosave.current?.flush()
-                await exportInvestigation(id)
-              }}
-            />
+        {narrow ? (
+          <CompactGraphToolbar name={investigation.name} onExportJson={exportJson} />
+        ) : (
+          <div className="flex h-11 shrink-0 items-center gap-2 border-b px-2">
+            <Button variant="ghost" size="icon-sm" asChild>
+              <a href={routeHref({ name: 'home' })} aria-label="Retour aux enquêtes">
+                <ArrowLeft />
+              </a>
+            </Button>
+            <h1 className="min-w-0 truncate font-medium">{investigation.name}</h1>
+            <div className="ml-auto flex items-center gap-3">
+              <SearchField />
+              <FiltersButton />
+              <HistoryControls />
+              <SaveIndicator />
+              <SourcesLibrary />
+              <ExportMenu onExportJson={exportJson} />
+            </div>
           </div>
-        </div>
-        <div className="flex min-h-0 flex-1">
-          <div className="min-w-0 flex-1">
+        )}
+        <div className="relative flex min-h-0 flex-1">
+          {/* Room for the collapsed drawer, so the canvas controls stay above it. */}
+          <div className={cn('min-w-0 flex-1', narrow && hasSelection && 'pb-14')}>
             <GraphCanvas />
           </div>
-          <DetailPanel />
+          {narrow ? <DetailDrawer /> : <DetailPanel />}
         </div>
         {exportDialog}
         <PasteScreenshot />

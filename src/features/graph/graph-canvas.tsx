@@ -19,6 +19,7 @@ import '@xyflow/react/dist/style.css'
 import { Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { useTheme } from '@/app/theme'
+import { useIsNarrow } from '@/app/use-media-query'
 import { Button } from '@/components/ui/button'
 import { ENTITY_TYPES } from '@/domain/entity-types'
 import type { GraphView } from '@/domain/graph-view'
@@ -27,6 +28,7 @@ import { AddEntityDialog } from '@/features/entities/add-entity-dialog'
 import { EntityNode } from '@/features/graph/entity-node'
 import { FloatingEdge } from '@/features/graph/floating-edge'
 import type { EntityNode as EntityNodeType, RelationEdge } from '@/features/graph/types'
+import { useLongPress } from '@/features/graph/use-long-press'
 import { useGraphView } from '@/features/graph-search/use-graph-view'
 import { RelationDialog } from '@/features/relations/relation-dialog'
 import { useGraphStore, type Selection } from '@/store/graph-store'
@@ -124,6 +126,7 @@ export function GraphCanvas() {
   const { addEntity, moveEntities, addRelation, removeElements, setSelection } = useGraphStore.getState()
   const view = useGraphView()
   const { resolved } = useTheme()
+  const narrow = useIsNarrow()
   const { screenToFlowPosition } = useReactFlow()
 
   const [nodes, setNodes] = useState<EntityNodeType[]>(() => {
@@ -224,6 +227,8 @@ export function GraphCanvas() {
     [openAddEntityAt],
   )
 
+  const longPress = useLongPress(openAddEntityAt)
+
   const addAtViewportCenter = () => {
     const bounds = document.querySelector('.react-flow')?.getBoundingClientRect()
     if (bounds) openAddEntityAt(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2)
@@ -241,7 +246,11 @@ export function GraphCanvas() {
   )
 
   return (
-    <div className="size-full" onDoubleClick={onDoubleClick}>
+    <div
+      className="size-full [&_.react-flow__pane]:select-none [&_.react-flow__pane]:[-webkit-touch-callout:none]"
+      onDoubleClick={onDoubleClick}
+      {...longPress}
+    >
       <ReactFlow<EntityNodeType, RelationEdge>
         nodes={shownNodes}
         edges={shownEdges}
@@ -259,6 +268,8 @@ export function GraphCanvas() {
         nodeOrigin={NODE_ORIGIN}
         selectionMode={SelectionMode.Partial}
         zoomOnDoubleClick={false}
+        panOnDrag
+        zoomOnPinch
         minZoom={0.1}
         fitView={fitView}
         fitViewOptions={{ maxZoom: 1.2 }}
@@ -267,7 +278,7 @@ export function GraphCanvas() {
       >
         <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} />
         <Controls showInteractive={false} />
-        <MiniMap pannable zoomable nodeColor={minimapColor} ariaLabel="Mini-carte" />
+        {!narrow && <MiniMap pannable zoomable nodeColor={minimapColor} ariaLabel="Mini-carte" />}
         <Panel position="top-left">
           <Button size="sm" onClick={addAtViewportCenter}>
             <Plus /> Entité
@@ -280,7 +291,7 @@ export function GraphCanvas() {
         )}
         {nodes.length === 0 && (
           <Panel position="top-center" className="pointer-events-none mt-16 text-sm text-muted-foreground">
-            Double-cliquez sur le canevas ou utilisez « Entité » pour commencer.
+            Double-cliquez (ou appuyez longuement) sur le canevas, ou utilisez « Entité », pour commencer.
           </Panel>
         )}
       </ReactFlow>

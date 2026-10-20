@@ -1,5 +1,5 @@
 import { ReactFlowProvider, type NodeProps } from '@xyflow/react'
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createEntity } from '@/domain/factories'
 import type { Confidence, Status } from '@/domain/schemas'
@@ -70,5 +70,16 @@ describe('EntityNode', () => {
   it('shows no badge when ungraded', () => {
     renderNode('verified')
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
+  })
+
+  it('gives the connection handle of a selected node a 44 px touch hit area, and none otherwise', () => {
+    renderNode('verified', undefined, {}, true)
+    const handle = screen.getByLabelText('Créer une relation depuis Alice')
+    expect(handle.className).toContain('pointer-coarse:before:size-11')
+    cleanup()
+    renderNode('verified')
+    expect(screen.getByLabelText('Créer une relation depuis Alice').className).not.toContain(
+      'pointer-coarse:before:size-11',
+    )
   })
 })

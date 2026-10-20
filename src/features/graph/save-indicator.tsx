@@ -1,29 +1,36 @@
 import { AlertCircle, Check, Loader2 } from 'lucide-react'
 import { useGraphStore } from '@/store/graph-store'
 
-export function SaveIndicator() {
+const TEXTS = {
+  saved: 'Enregistré',
+  pending: 'Enregistrement…',
+  saving: 'Enregistrement…',
+  error: 'Échec de l’enregistrement',
+} as const
+
+/** The save status. With `iconOnly` (narrow screens) the text is only the accessible name. */
+export function SaveIndicator({ iconOnly = false }: { iconOnly?: boolean }) {
   const status = useGraphStore((state) => state.saveStatus)
+  const text = TEXTS[status]
+  const Icon = status === 'saved' ? Check : status === 'error' ? AlertCircle : Loader2
+
   return (
     <span
-      className="flex items-center gap-1.5 text-xs text-muted-foreground"
+      className={
+        status === 'error'
+          ? 'flex items-center gap-1.5 text-xs text-destructive'
+          : 'flex items-center gap-1.5 text-xs text-muted-foreground'
+      }
       role="status"
       aria-live="polite"
+      aria-label={iconOnly ? text : undefined}
+      title={iconOnly ? text : undefined}
     >
-      {status === 'saved' && (
-        <>
-          <Check className="size-3.5" /> Enregistré
-        </>
-      )}
-      {(status === 'pending' || status === 'saving') && (
-        <>
-          <Loader2 className="size-3.5 animate-spin" /> Enregistrement…
-        </>
-      )}
-      {status === 'error' && (
-        <span className="flex items-center gap-1.5 text-destructive">
-          <AlertCircle className="size-3.5" /> Échec de l’enregistrement
-        </span>
-      )}
+      <Icon
+        aria-hidden
+        className={status === 'pending' || status === 'saving' ? 'size-3.5 animate-spin' : 'size-3.5'}
+      />
+      {!iconOnly && text}
     </span>
   )
 }

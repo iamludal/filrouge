@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -213,5 +214,27 @@ export function FiltersButton() {
         <FiltersForm filters={filters} />
       </PopoverContent>
     </Popover>
+  )
+}
+
+/** The filters panel as a dialog, for narrow screens where the toolbar has no room for a popover. */
+export function FiltersDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  const filters = useViewStore((state) => state.filters)
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Filtres</DialogTitle>
+          <DialogDescription>Les éléments qui ne correspondent pas sont estompés.</DialogDescription>
+        </DialogHeader>
+        <FiltersForm filters={filters} />
+      </DialogContent>
+    </Dialog>
   )
 }

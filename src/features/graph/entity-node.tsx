@@ -6,6 +6,14 @@ import { EntityIcon } from '@/features/entities/entity-icon'
 import type { EntityNode as EntityNodeType } from '@/features/graph/types'
 import { cn } from '@/lib/utils'
 
+/*
+ * On touch screens the 12px dot is far too small for a finger: a selected node's handle gets an
+ * invisible 44px hit area. An unselected node's handle is invisible, so it gets none and the node
+ * stays easy to pan around and to drag.
+ */
+const TOUCH_HIT_AREA =
+  "pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-1/2 pointer-coarse:before:content-['']"
+
 /**
  * Drag the node body to move it, drag the small dot to create a relation. While a connection is
  * in progress, the whole node becomes a drop target.
@@ -55,7 +63,7 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
           aria-label={`Créer une relation depuis ${label}`}
           className={cn(
             'size-3! border-2! border-background! bg-primary! opacity-0 transition-opacity group-hover:opacity-100',
-            selected && 'opacity-100',
+            selected && ['opacity-100', TOUCH_HIT_AREA],
             connection.inProgress && 'opacity-0!',
           )}
         />
