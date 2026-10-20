@@ -119,6 +119,22 @@ describe('renderGraphSvg', () => {
     ).toContain('lucide-flag')
   })
 
+  it('draws an important entity with a thicker border and a light fill of its own colour', () => {
+    const important = entity('A', 0, 0, { important: true, color: 'green' })
+    const plain = entity('B', 300, 0)
+    const { doc } = draw([important, plain])
+    const circle = (e: Entity) => doc.querySelector(`[data-entity="${e.id}"] circle`)!
+    expect(circle(important).getAttribute('stroke-width')).toBe('4')
+    // Centred on the circle's edge, so the extra width lies outside it.
+    expect(circle(important).getAttribute('r')).toBe('24')
+    expect(circle(plain).getAttribute('r')).toBe('23')
+    // Green #16a34a at 18 % over white.
+    expect(circle(important).getAttribute('fill')).toBe('#d5eede')
+    expect(circle(plain).getAttribute('stroke-width')).toBe('2')
+    expect(circle(plain).getAttribute('fill')).toBe('#ffffff')
+    expect(Number(doc.querySelector('[data-flag] circle')?.getAttribute('r'))).toBe(12)
+  })
+
   it('keeps the flag of an entity alone at the top left inside the image bounds', () => {
     const { doc } = draw([entity('A', 0, 0, { important: true })])
     const [x, y, width, height] = doc.documentElement.getAttribute('viewBox')!.split(' ').map(Number)

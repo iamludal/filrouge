@@ -92,7 +92,7 @@ describe('AppearanceField', () => {
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
   })
 
-  it('offers the type icon then the 44 icons and picks one', async () => {
+  it('offers the type icon then the 95 icons and picks one', async () => {
     const { a } = setup()
     await userEvent.click(iconButton())
     const group = await screen.findByRole('radiogroup', { name: 'Icône' })

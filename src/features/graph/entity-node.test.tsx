@@ -2,7 +2,7 @@ import { ReactFlowProvider, type NodeProps } from '@xyflow/react'
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { createEntity } from '@/domain/factories'
-import { ENTITY_COLORS } from '@/domain/entity-appearance'
+import { ENTITY_COLORS, importantTint } from '@/domain/entity-appearance'
 import type { Confidence, Entity, Status } from '@/domain/schemas'
 import { EntityNode } from '@/features/graph/entity-node'
 import type { EntityNode as EntityNodeType, ViewFlags } from '@/features/graph/types'
@@ -111,11 +111,33 @@ describe('EntityNode', () => {
     expect(screen.getByRole('img', { name: 'Important' })).toBeInTheDocument()
   })
 
+  it('gives an important entity a thicker border tinted with its own colour, and a 24 px flag', () => {
+    renderNode('verified', undefined, {}, false, { important: true, color: 'green' })
+    // Thickened outwards: the 2 px border stays and a 2 px outline of the same colour is added.
+    expect(circle()).toHaveClass('border-2')
+    expect(circle()).toHaveStyle({ outline: `2px solid ${ENTITY_COLORS.green}` })
+    expect(importantTint(ENTITY_COLORS.green)).toBe(
+      'linear-gradient(rgba(22, 163, 74, 0.18), rgba(22, 163, 74, 0.18))',
+    )
+    expect(circle().style.backgroundImage).toBe(importantTint(ENTITY_COLORS.green))
+    expect(screen.getByRole('img', { name: 'Important' })).toHaveClass('size-6')
+    cleanup()
+    renderNode('verified')
+    expect(circle()).toHaveClass('border-2')
+    expect(circle().style.outline).toBe('')
+    expect(circle().style.backgroundImage).toBe('')
+  })
+
   it('shows the grade and the flag badges together, on opposite sides of the circle', () => {
     renderNode('verified', { reliability: 'B', credibility: 2 }, {}, false, { important: true })
     const flag = screen.getByRole('img', { name: 'Important' })
     const grade = screen.getByText('B2')
-    expect(flag).toHaveClass('-left-2')
+    expect(flag).toHaveClass('-left-3')
     expect(grade).toHaveClass('-right-4')
+  })
+
+  it('keeps the outline of an important hypothesis dashed, like its border', () => {
+    renderNode('hypothesis', undefined, {}, false, { important: true, color: 'green' })
+    expect(circle()).toHaveStyle({ outline: `2px dashed ${ENTITY_COLORS.green}` })
   })
 })

@@ -2,7 +2,7 @@ import { Handle, Position, useConnection, type NodeProps } from '@xyflow/react'
 import { Flag } from 'lucide-react'
 import { memo } from 'react'
 import { describeConfidence, formatConfidence } from '@/domain/assessment'
-import { entityAppearance } from '@/domain/entity-appearance'
+import { entityAppearance, importantTint } from '@/domain/entity-appearance'
 import { EntityIcon } from '@/features/entities/entity-icon'
 import type { EntityNode as EntityNodeType } from '@/features/graph/types'
 import { cn } from '@/lib/utils'
@@ -48,7 +48,16 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
           selected && 'ring-4 ring-ring/40',
           isDropTarget && 'ring-4 ring-primary/30',
         )}
-        style={{ borderColor: appearance.color, color: appearance.color }}
+        style={{
+          borderColor: appearance.color,
+          color: appearance.color,
+          // An important entity stands out at a glance: its border grows outwards (an outline, so the
+          // node keeps its size for edges and box selection) and its background takes its colour.
+          ...(entity.important && {
+            outline: `2px ${entity.status === 'hypothesis' ? 'dashed' : 'solid'} ${appearance.color}`,
+            backgroundImage: importantTint(appearance.color),
+          }),
+        }}
       >
         <EntityIcon icon={appearance.icon} className="size-5" />
         {entity.important && (
@@ -56,9 +65,9 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
             role="img"
             title={t.appearance.important}
             aria-label={t.appearance.important}
-            className="absolute -top-2 -left-2 flex size-4 items-center justify-center rounded-full border bg-background text-red-600 shadow-sm"
+            className="absolute -top-3 -left-3 flex size-6 items-center justify-center rounded-full border bg-background text-red-600 shadow-sm"
           >
-            <Flag aria-hidden className="size-2.5 fill-current" />
+            <Flag aria-hidden className="size-3.5 fill-current" />
           </span>
         )}
         {entity.confidence && (

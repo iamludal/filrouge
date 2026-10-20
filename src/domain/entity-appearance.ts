@@ -76,6 +76,57 @@ export const ENTITY_ICON_IDS = [
   'plane',
   'ship',
   'gavel',
+  'user-check',
+  'user-x',
+  'id-card',
+  'contact',
+  'baby',
+  'crown',
+  'handshake',
+  'scale',
+  'siren',
+  'factory',
+  'store',
+  'school',
+  'hospital',
+  'hotel',
+  'mountain',
+  'map',
+  'anchor',
+  'train-front',
+  'bus',
+  'truck',
+  'bike',
+  'satellite',
+  'radio-tower',
+  'wifi',
+  'cpu',
+  'code',
+  'terminal',
+  'qr-code',
+  'video',
+  'mic',
+  'coins',
+  'bitcoin',
+  'receipt',
+  'package',
+  'clock',
+  'target',
+  'scan-face',
+  'radar',
+  'drone',
+  'helicopter',
+  'sailboat',
+  'fuel',
+  'warehouse',
+  'church',
+  'tent',
+  'printer',
+  'headphones',
+  'gamepad',
+  'film',
+  'gem',
+  'book-open',
 ] as const
 
 export type EntityIconId = (typeof ENTITY_ICON_IDS)[number]
@@ -103,4 +154,14 @@ export function entityAppearance(entity: {
     color: entity.color ? ENTITY_COLORS[entity.color] : fallback.color,
     icon: entity.icon ?? fallback.icon,
   }
+}
+
+/** Opacity of the veil of its own colour over an important entity's card background. */
+export const IMPORTANT_TINT = 0.18
+
+/** A veil of the entity's colour, `hex` being `#rrggbb`, over the card background. */
+export function importantTint(hex: string): string {
+  const [r, g, b] = [1, 3, 5].map((index) => parseInt(hex.slice(index, index + 2), 16))
+  const veil = `rgba(${r}, ${g}, ${b}, ${IMPORTANT_TINT})`
+  return `linear-gradient(${veil}, ${veil})`
 }

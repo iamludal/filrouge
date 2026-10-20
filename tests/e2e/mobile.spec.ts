@@ -464,8 +464,8 @@ test.describe('entity appearance', () => {
       .getByRole('button', { name: /^Icône ?:/ })
       .click()
     const cells = page.getByRole('radiogroup', { name: 'Icône' }).getByRole('radio')
-    await expect(cells).toHaveCount(45)
-    for (let index = 0; index < 45; index++) {
+    await expect(cells).toHaveCount(96)
+    for (let index = 0; index < 96; index++) {
       const cell = cells.nth(index)
       await cell.scrollIntoViewIfNeeded()
       const box = (await cell.boundingBox())!

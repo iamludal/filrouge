@@ -1,6 +1,6 @@
 import { Flag } from 'lucide-react'
 import { CIRCLE_RADIUS } from '@/domain/graph-geometry'
-import { entityAppearance } from '@/domain/entity-appearance'
+import { entityAppearance, IMPORTANT_TINT } from '@/domain/entity-appearance'
 import { ENTITY_ICONS } from '@/features/entities/entity-icons'
 import { EXPORT_FONT_FAMILY } from '@/features/graph-export/measure-text'
 import type { GraphLayout } from '@/features/graph-export/graph-layout'
@@ -14,7 +14,17 @@ const PALETTE = {
   flag: '#dc2626',
 }
 const ICON_SIZE = 20
-const FLAG_ICON_SIZE = 10
+const FLAG_ICON_SIZE = 14
+/** `hex` at `alpha` over white, as one opaque colour: the export background is always white. */
+function overWhite(hex: string, alpha: number): string {
+  const channel = (index: number) => {
+    const value = parseInt(hex.slice(index, index + 2), 16)
+    return Math.round(255 - (255 - value) * alpha)
+      .toString(16)
+      .padStart(2, '0')
+  }
+  return `#${channel(1)}${channel(3)}${channel(5)}`
+}
 
 /** Standalone drawing of an investigation graph: shapes and text only, no external reference. */
 export function GraphImage({ title, layout }: { title: string; layout: GraphLayout }) {
@@ -92,10 +102,11 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
               <circle
                 cx={center.x}
                 cy={center.y}
-                r={CIRCLE_RADIUS - 1}
-                fill={PALETTE.background}
+                // An important entity's border grows outwards, as on the canvas: 4 px centred on the edge.
+                r={entity.important ? CIRCLE_RADIUS : CIRCLE_RADIUS - 1}
+                fill={entity.important ? overWhite(appearance.color, IMPORTANT_TINT) : PALETTE.background}
                 stroke={appearance.color}
-                strokeWidth={2}
+                strokeWidth={entity.important ? 4 : 2}
                 strokeDasharray={entity.status === 'hypothesis' ? '4 3' : undefined}
               />
               <Icon

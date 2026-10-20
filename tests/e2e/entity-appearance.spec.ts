@@ -32,6 +32,13 @@ test('styles an entity: shown on the node, undone, kept after a reload and expor
 
   await style(page)
   await expect(circle(page, 'Alice')).toHaveCSS('border-color', RED)
+  // Important: border thickened outwards and a veil of the entity's own colour (red, its custom colour).
+  await expect(circle(page, 'Alice')).toHaveCSS('border-top-width', '2px')
+  await expect(circle(page, 'Alice')).toHaveCSS('outline', `${RED} solid 2px`)
+  await expect(circle(page, 'Alice')).toHaveCSS(
+    'background-image',
+    /linear-gradient\(rgba\(220, 38, 38, 0\.18\)/,
+  )
   await expect(circle(page, 'Alice').locator('svg.lucide-skull')).toBeVisible()
   await expect(node(page, 'Alice').getByRole('img', { name: 'Important' })).toBeVisible()
   // The history is lost on reload, so undo first: the mark, then the icon, then the colour.

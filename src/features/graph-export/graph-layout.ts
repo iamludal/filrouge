@@ -14,10 +14,10 @@ export const EDGE_LABEL_FONT = `400 11px ${EXPORT_FONT_FAMILY}`
 
 /**
  * Offsets from the circle, as drawn on the canvas (grade badge: -top-2 -right-4, h 16; important
- * flag: -top-2 -left-2, 16 square).
+ * flag: -top-3 -left-3, 24 square).
  */
 const BADGE_HEIGHT = 16
-export const FLAG_SIZE = 16
+export const FLAG_SIZE = 24
 const BADGE_PADDING = 6
 const LABEL_TOP = 54
 const LABEL_CENTER_Y = 62
@@ -88,7 +88,7 @@ export function layoutGraph(
       boxes.push(node.badge.box)
     }
     if (entity.important) {
-      node.flag = { x: center.x - CIRCLE_RADIUS - 8, y: top - 8, width: FLAG_SIZE, height: FLAG_SIZE }
+      node.flag = { x: center.x - CIRCLE_RADIUS - 12, y: top - 12, width: FLAG_SIZE, height: FLAG_SIZE }
       boxes.push(node.flag)
     }
     return node

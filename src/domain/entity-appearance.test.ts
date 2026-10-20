@@ -13,9 +13,9 @@ describe('entity appearance', () => {
     expect(new Set(Object.values(ENTITY_COLORS)).size).toBe(16)
   })
 
-  it('offers 44 distinct kebab-case icons, without flag nor star', () => {
-    expect(ENTITY_ICON_IDS).toHaveLength(44)
-    expect(new Set(ENTITY_ICON_IDS).size).toBe(44)
+  it('offers 95 distinct kebab-case icons, without flag nor star', () => {
+    expect(ENTITY_ICON_IDS).toHaveLength(95)
+    expect(new Set(ENTITY_ICON_IDS).size).toBe(95)
     for (const id of ENTITY_ICON_IDS) expect(id).toMatch(/^[a-z]+(-[a-z]+)*$/)
     expect(ENTITY_ICON_IDS).not.toContain('flag')
     expect(ENTITY_ICON_IDS).not.toContain('star')
