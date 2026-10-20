@@ -21,9 +21,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Investigation } from '@/domain/schemas'
+import { ElementTimestamps } from '@/features/entities/element-timestamps'
 import { useExportInvestigation, useImportInvestigation } from '@/features/import-export/use-import-export'
 import { InvestigationFormDialog } from '@/features/investigations/investigation-form-dialog'
-import { formatDateTime } from '@/lib/format'
 import { useInvestigationsStore } from '@/store/investigations-store'
 
 export function InvestigationsPage() {
@@ -66,7 +66,7 @@ export function InvestigationsPage() {
         {items.map((investigation) => (
           <li
             key={investigation.id}
-            className="group flex items-start gap-3 rounded-xl border bg-card p-4 transition-colors hover:bg-muted/50"
+            className="group flex items-start gap-3 rounded-xl border bg-card px-4 py-5 transition-colors hover:bg-muted/50"
           >
             <a
               href={routeHref({ name: 'investigation', id: investigation.id })}
@@ -74,10 +74,14 @@ export function InvestigationsPage() {
             >
               <div className="truncate font-medium">{investigation.name}</div>
               {investigation.description && (
-                <p className="line-clamp-2 text-sm text-muted-foreground">{investigation.description}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{investigation.description}</p>
               )}
-              <div className="mt-1 text-xs text-muted-foreground">
-                Modifiée le {formatDateTime(investigation.updatedAt)}
+              <div className="mt-2.5">
+                <ElementTimestamps
+                  createdAt={investigation.createdAt}
+                  updatedAt={investigation.updatedAt}
+                  showTime
+                />
               </div>
             </a>
             <DropdownMenu>
