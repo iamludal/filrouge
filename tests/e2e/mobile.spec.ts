@@ -48,6 +48,8 @@ test.describe('layout', () => {
     const box = (await drawer(page).boundingBox())!
     expect(box.y + box.height).toBeLessThanOrEqual(inner)
     await expect(page.locator('.react-flow__controls')).toBeInViewport({ ratio: 1 })
+    // A reload must not bring back a scroll offset that would shift the whole app.
+    expect(await page.evaluate(() => history.scrollRestoration)).toBe('manual')
   })
 
   test('uses the narrow layout on a phone and the desktop one from 768 px', async ({ page }) => {
