@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
-import { addEntityAt, connect, createInvestigation } from './helpers.js'
+import { addEntityAt, connect, createInvestigation, exportJson } from './helpers.js'
 
 // A valid 1×1 PNG.
 const PNG = Buffer.from(
@@ -140,7 +140,7 @@ test('export with screenshots round-trips the bytes; files from before screensho
   await expect(page.getByRole('status')).toHaveText('Enregistré')
 
   const exportAs = async (include: boolean) => {
-    await page.getByRole('button', { name: 'Exporter' }).click()
+    await exportJson(page)
     const dialog = page.getByRole('dialog')
     await expect(dialog.getByLabel(/Inclure les captures/)).toBeChecked()
     await dialog.getByLabel(/Inclure les captures/).setChecked(include)

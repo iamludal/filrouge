@@ -176,7 +176,7 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [ ] Recherche plein texte (labels, propriétés, notes) avec mise en évidence sur le graphe
 - [ ] Filtres par type, tag, statut et confiance (les éléments filtrés sont estompés)
 - [x] Undo/redo (Cmd/Ctrl+Z, Cmd/Ctrl+Shift+Z) via zundo
-- [ ] Export PNG et SVG du graphe
+- [x] Export PNG et SVG du graphe
 
 ### v0.3 — Analyse et productivité
 

@@ -1,5 +1,5 @@
 import { ReactFlowProvider } from '@xyflow/react'
-import { ArrowLeft, FileDown } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { routeHref } from '@/app/router'
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { graph } from '@/db/repositories/graph'
 import { investigations } from '@/db/repositories/investigations'
 import { useExportInvestigation } from '@/features/import-export/use-import-export'
+import { ExportMenu } from '@/features/graph-export/export-menu'
 import { DetailPanel } from '@/features/graph/detail-panel'
 import { GraphCanvas } from '@/features/graph/graph-canvas'
 import { HistoryControls } from '@/features/graph/history-controls'
@@ -93,16 +94,12 @@ export function InvestigationPage({ id }: { id: string }) {
           <HistoryControls />
           <SaveIndicator />
           <SourcesLibrary />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
+          <ExportMenu
+            onExportJson={async () => {
               await autosave.current?.flush()
               await exportInvestigation(id)
             }}
-          >
-            <FileDown /> Exporter
-          </Button>
+          />
         </div>
       </div>
       <div className="flex min-h-0 flex-1">

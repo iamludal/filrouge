@@ -1,13 +1,13 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test, type Page } from '@playwright/test'
-import { addEntityAt, connect } from './helpers.js'
+import { addEntityAt, connect, exportJson } from './helpers.js'
 
 const COUNT = 10
 const label = (index: number) => `Entité ${String(index).padStart(2, '0')}`
 
 async function exportCurrent(page: Page) {
   const downloadPromise = page.waitForEvent('download')
-  await page.getByRole('button', { name: 'Exporter' }).click()
+  await exportJson(page)
   const download = await downloadPromise
   const path = await download.path()
   return { path, json: JSON.parse(await readFile(path, 'utf8')) }

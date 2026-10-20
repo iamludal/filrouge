@@ -6,19 +6,14 @@ import {
   type InternalNode,
 } from '@xyflow/react'
 import { describeConfidence, relationLabelText } from '@/domain/assessment'
+import { CIRCLE_CENTER_Y, edgeSegment } from '@/domain/graph-geometry'
 import { cn } from '@/lib/utils'
 import type { RelationEdge as RelationEdgeType } from '@/features/graph/types'
 
-// Entity nodes draw a 48px circle at the top of the node; edges attach to that circle.
-const CIRCLE_RADIUS = 26
-const CIRCLE_CENTER_Y = 24
-
-function circleCenter(node: InternalNode) {
-  const width = node.measured.width ?? 0
-  return {
-    x: node.internals.positionAbsolute.x + width / 2,
-    y: node.internals.positionAbsolute.y + CIRCLE_CENTER_Y,
-  }
+/** React Flow nodes are as wide as their content, so the circle is centred on the measured width. */
+function measuredCircleCenter(node: InternalNode) {
+  const { x, y } = node.internals.positionAbsolute
+  return { x: x + (node.measured.width ?? 0) / 2, y: y + CIRCLE_CENTER_Y }
 }
 
 /** Straight edge between the two entity circles, independent of handle positions. */
@@ -27,18 +22,8 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
   const targetNode = useInternalNode(target)
   if (!sourceNode || !targetNode) return null
 
-  const from = circleCenter(sourceNode)
-  const to = circleCenter(targetNode)
-  const dx = to.x - from.x
-  const dy = to.y - from.y
-  const length = Math.hypot(dx, dy) || 1
-  const ux = dx / length
-  const uy = dy / length
-  const sx = from.x + ux * CIRCLE_RADIUS
-  const sy = from.y + uy * CIRCLE_RADIUS
-  const tx = to.x - ux * (CIRCLE_RADIUS + 2)
-  const ty = to.y - uy * (CIRCLE_RADIUS + 2)
-  const path = `M ${sx},${sy} L ${tx},${ty}`
+  const { from, to, middle } = edgeSegment(measuredCircleCenter(sourceNode), measuredCircleCenter(targetNode))
+  const path = `M ${from.x},${from.y} L ${to.x},${to.y}`
   const relation = data?.relation
   const label = relation && relationLabelText(relation.label, relation.confidence)
   const description = relation?.confidence ? describeConfidence(relation.confidence) : undefined
@@ -63,7 +48,7 @@ export function FloatingEdge({ id, source, target, markerEnd, selected, data }: 
               'nodrag nopan pointer-events-none absolute max-w-40 truncate rounded-md border bg-background px-1.5 py-0.5 text-[11px] text-muted-foreground',
               selected && 'border-primary text-foreground',
             )}
-            style={{ transform: `translate(-50%, -50%) translate(${(sx + tx) / 2}px, ${(sy + ty) / 2}px)` }}
+            style={{ transform: `translate(-50%, -50%) translate(${middle.x}px, ${middle.y}px)` }}
             title={description ? `${label} — ${description}` : label}
           >
             {label}

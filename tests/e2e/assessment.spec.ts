@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { addEntityAt, connect, createInvestigation } from './helpers.js'
+import { addEntityAt, connect, createInvestigation, exportJson } from './helpers.js'
 
 const node = (page: Page, name: string) => page.locator('.react-flow__node', { hasText: name })
 const circle = (page: Page, name: string) => node(page, name).locator('div.rounded-full').first()
@@ -13,7 +13,7 @@ async function pick(panel: Locator, selector: string, option: string) {
 
 async function exportCurrent(page: Page) {
   const downloadPromise = page.waitForEvent('download')
-  await page.getByRole('button', { name: 'Exporter' }).click()
+  await exportJson(page)
   const path = await (await downloadPromise).path()
   return { path, json: JSON.parse(await readFile(path, 'utf8')) }
 }

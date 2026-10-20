@@ -41,3 +41,9 @@ export async function createInvestigation(page: Page, name: string) {
   await page.getByRole('button', { name: 'Créer', exact: true }).click()
   await expect(page.getByRole('heading', { name })).toBeVisible()
 }
+
+/** Starts the JSON export from the graph view's "Exporter" menu. */
+export async function exportJson(page: Page) {
+  await page.getByRole('button', { name: 'Exporter' }).click()
+  await page.getByRole('menuitem', { name: 'JSON' }).click()
+}

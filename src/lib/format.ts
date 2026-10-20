@@ -6,3 +6,9 @@ export function formatBytes(bytes: number): string {
   const mib = kib / 1024
   return `${mib.toLocaleString('fr-FR', { maximumFractionDigits: mib < 10 ? 1 : 0 })} Mo`
 }
+
+/** Cuts `text` to `max` characters (code points) with a trailing "…". */
+export function truncate(text: string, max: number): string {
+  const chars = Array.from(text)
+  return chars.length <= max ? text : `${chars.slice(0, max - 1).join('')}…`
+}
