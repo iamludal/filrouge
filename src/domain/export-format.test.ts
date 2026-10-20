@@ -144,6 +144,51 @@ describe('export format', () => {
     })
   })
 
+  describe('tool checks', () => {
+    const checks = [
+      { toolId: 'crtsh', checkedAt: '2026-10-19T10:00:00.000Z' },
+      { toolId: 'future-tool', checkedAt: '2026-10-20T10:00:00.000Z' },
+    ]
+    const withChecks = () => {
+      const snapshot = sampleSnapshot()
+      const [a, ...others] = snapshot.entities
+      return { ...snapshot, entities: [{ ...a!, toolChecks: checks }, ...others] }
+    }
+
+    it('round-trips the checks, unknown tools included', async () => {
+      const snapshot = withChecks()
+      const json = await serializeExport(snapshot)
+      expect(JSON.parse(json).entities[0].toolChecks).toEqual(checks)
+      expect(await parseExport(json)).toEqual({ ok: true, snapshot, attachments: [] })
+    })
+
+    it('exports an entity without checks without the field', async () => {
+      const json = JSON.parse(await serializeExport(sampleSnapshot()))
+      expect(json.entities[0]).not.toHaveProperty('toolChecks')
+    })
+
+    it('keeps the checks when importing as a copy', async () => {
+      const { snapshot } = remapIds({ snapshot: withChecks(), attachments: [] })
+      expect(snapshot.entities[0]?.toolChecks).toEqual(checks)
+    })
+
+    it('refuses a duplicate check, naming the field', async () => {
+      const json = JSON.parse(await serializeExport(withChecks()))
+      json.entities[0].toolChecks = [checks[0], { ...checks[0], checkedAt: '2026-10-21T10:00:00.000Z' }]
+      const result = await parseExport(JSON.stringify(json))
+      expect(!result.ok && result.errors[0]).toMatchObject({
+        code: 'duplicateToolCheck',
+        path: 'entities.0.toolChecks',
+      })
+    })
+
+    it('refuses an invalid tool id', async () => {
+      const json = JSON.parse(await serializeExport(withChecks()))
+      json.entities[0].toolChecks = [{ toolId: '<script>', checkedAt: checks[0]!.checkedAt }]
+      expect((await parseExport(JSON.stringify(json))).ok).toBe(false)
+    })
+  })
+
   it('remaps every id while preserving references', async () => {
     const snapshot = sampleSnapshot()
     const { snapshot: copy } = remapIds({ snapshot, attachments: [] })

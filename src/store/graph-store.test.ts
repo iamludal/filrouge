@@ -353,4 +353,33 @@ describe('element dates', () => {
     useGraphStore.getState().redo()
     expect(useGraphStore.getState().entities[a.id]).toMatchObject({ label: 'Alice', updatedAt: T1 })
   })
+
+  it('checks and unchecks a tool, refreshing updatedAt to the check instant', () => {
+    openEmpty()
+    const a = useGraphStore.getState().addEntity('domain', { x: 0, y: 0 }, 'exemple.fr')
+    const b = useGraphStore.getState().addEntity('domain', { x: 100, y: 0 }, 'autre.fr')
+    later()
+    useGraphStore.getState().setToolCheck(a.id, 'crtsh', true)
+    expect(useGraphStore.getState().entities[a.id]).toMatchObject({
+      createdAt: T0,
+      updatedAt: T1,
+      toolChecks: [{ toolId: 'crtsh', checkedAt: T1 }],
+    })
+    expect(useGraphStore.getState().entities[b.id]?.toolChecks).toBeUndefined()
+
+    useGraphStore.getState().setToolCheck(a.id, 'crtsh', false)
+    expect(useGraphStore.getState().entities[a.id]).not.toHaveProperty('toolChecks')
+    expect(useGraphStore.getState().dirty.entities.has(a.id)).toBe(true)
+  })
+
+  it('ignores an unknown entity and the unchecking of a tool that is not checked', () => {
+    openEmpty()
+    const a = useGraphStore.getState().addEntity('domain', { x: 0, y: 0 })
+    later()
+    const before = useGraphStore.getState().entities
+    useGraphStore.getState().setToolCheck('missing', 'crtsh', true)
+    useGraphStore.getState().setToolCheck(a.id, 'crtsh', false)
+    expect(useGraphStore.getState().entities).toBe(before)
+    expect(useGraphStore.getState().entities[a.id]?.updatedAt).toBe(T0)
+  })
 })

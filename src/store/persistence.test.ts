@@ -34,6 +34,27 @@ describe('autosave', () => {
     autosave.stop()
   })
 
+  it('saves tool checks and reads them back, including after an uncheck', async () => {
+    const { repository, investigation, investigations } = await setup()
+    const autosave = startAutosave(repository, 60_000)
+    const a = useGraphStore.getState().addEntity('domain', { x: 0, y: 0 }, 'exemple.fr')
+    useGraphStore.getState().setToolCheck(a.id, 'crtsh', true)
+    useGraphStore.getState().setToolCheck(a.id, 'shodan', true)
+    await autosave.flush()
+    const saved = (await investigations.loadSnapshot(investigation.id))?.entities[0]
+    expect(saved?.toolChecks?.map((check) => check.toolId)).toEqual(['crtsh', 'shodan'])
+    expect(saved?.toolChecks?.[0]?.checkedAt).toBe(
+      useGraphStore.getState().entities[a.id]?.toolChecks?.[0]?.checkedAt,
+    )
+
+    useGraphStore.getState().setToolCheck(a.id, 'crtsh', false)
+    useGraphStore.getState().setToolCheck(a.id, 'shodan', false)
+    await autosave.flush()
+    const cleared = (await investigations.loadSnapshot(investigation.id))?.entities[0]
+    expect(cleared).not.toHaveProperty('toolChecks')
+    autosave.stop()
+  })
+
   it('flushes immediately on demand', async () => {
     const { repository, investigation } = await setup()
     const autosave = startAutosave(repository, 60_000)

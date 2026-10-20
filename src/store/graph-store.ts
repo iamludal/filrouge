@@ -20,6 +20,7 @@ import type {
   Source,
   Status,
 } from '@/domain/schemas'
+import { withToolCheck } from '@/domain/tool-checks'
 import type { GraphChanges } from '@/db/repositories/graph'
 import { nowIso } from '@/lib/ids'
 import {
@@ -73,6 +74,8 @@ export interface GraphState {
 
   addEntity: (type: EntityTypeId, position: Position, label?: string) => Entity
   updateEntity: (id: string, patch: EntityPatch) => void
+  /** Marks a tool as used (or not) on an entity. Its own history step, even in quick succession. */
+  setToolCheck: (entityId: string, toolId: string, checked: boolean) => void
   moveEntities: (positions: Record<string, Position>) => void
   addRelation: (
     from: string,
@@ -337,6 +340,19 @@ export const useGraphStore = create<GraphState>()(
               }
             }),
           ),
+
+        setToolCheck: (entityId, toolId, checked) =>
+          set((state) => {
+            const current = state.entities[entityId]
+            if (!current) return state
+            if (!checked && !current.toolChecks?.some((check) => check.toolId === toolId)) return state
+            const now = nowIso()
+            // Drop the key rather than store `undefined`: an entity without checks exports as before.
+            const { toolChecks: _previous, ...rest } = current
+            const toolChecks = withToolCheck(current.toolChecks, toolId, checked, now)
+            const entity: Entity = { ...rest, ...(toolChecks ? { toolChecks } : {}), updatedAt: now }
+            return { entities: { ...state.entities, [entityId]: entity }, ...touch(state, [entityId], []) }
+          }),
 
         moveEntities: (positions) =>
           grouping.group(`move:${fieldsOf(positions)}`, () =>

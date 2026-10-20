@@ -368,4 +368,32 @@ describe('graph store history', () => {
     store().close()
     expect(temporal().pastStates).toHaveLength(0)
   })
+
+  it('undoes the unchecking of a tool, restoring its date', () => {
+    openEmpty()
+    const a = store().addEntity('domain', { x: 0, y: 0 }, 'exemple.fr')
+    advance(86_400_000)
+    store().setToolCheck(a.id, 'crtsh', true)
+    const checkedAt = store().entities[a.id]?.toolChecks?.[0]?.checkedAt
+    advance(86_400_000)
+    store().setToolCheck(a.id, 'crtsh', false)
+    expect(store().entities[a.id]?.toolChecks).toBeUndefined()
+
+    store().undo()
+    expect(store().entities[a.id]?.toolChecks).toEqual([{ toolId: 'crtsh', checkedAt }])
+  })
+
+  it('records two checks made within a second as two steps', () => {
+    openEmpty()
+    const a = store().addEntity('domain', { x: 0, y: 0 }, 'exemple.fr')
+    advance(5_000)
+    store().setToolCheck(a.id, 'crtsh', true)
+    advance(200)
+    store().setToolCheck(a.id, 'shodan', true)
+
+    store().undo()
+    expect(store().entities[a.id]?.toolChecks?.map((check) => check.toolId)).toEqual(['crtsh'])
+    store().undo()
+    expect(store().entities[a.id]?.toolChecks).toBeUndefined()
+  })
 })

@@ -19,6 +19,7 @@ export const LIMITS = {
   propertyValue: 10_000,
   properties: 200,
   sourceIds: 500,
+  toolChecks: 200,
   attachmentBytes: 20 * 1024 * 1024,
 } as const
 
@@ -63,6 +64,12 @@ export const investigationSchema = z.object({
   encrypted: z.boolean(),
 })
 
+/** A tool the investigator marked as used on an entity. The id refers to the built-in catalog. */
+export const toolCheckSchema = z.object({
+  toolId: z.string().regex(/^[a-z0-9-]{1,64}$/),
+  checkedAt: isoDate,
+})
+
 export const entitySchema = z.object({
   id,
   investigationId: id,
@@ -73,6 +80,15 @@ export const entitySchema = z.object({
   notes: z.string().max(LIMITS.text).optional(),
   sourceIds: z.array(id).max(LIMITS.sourceIds),
   confidence: confidenceSchema.optional(),
+  /** At most one check per tool; absent when no tool was checked. */
+  toolChecks: z
+    .array(toolCheckSchema)
+    .max(LIMITS.toolChecks)
+    .refine((checks) => new Set(checks.map((check) => check.toolId)).size === checks.length, {
+      message: 'duplicateToolCheck',
+      params: { importCode: 'duplicateToolCheck' },
+    })
+    .optional(),
   status: statusSchema,
   position: positionSchema,
   createdAt: isoDate,
@@ -129,6 +145,7 @@ export type Status = z.infer<typeof statusSchema>
 export type PropertyValue = z.infer<typeof propertyValueSchema>
 export type Position = z.infer<typeof positionSchema>
 export type Investigation = z.infer<typeof investigationSchema>
+export type ToolCheck = z.infer<typeof toolCheckSchema>
 export type Entity = z.infer<typeof entitySchema>
 export type Relation = z.infer<typeof relationSchema>
 export type Source = z.infer<typeof sourceSchema>

@@ -9,9 +9,10 @@ change, saved automatically, can be reverted.
 
 ### Requirement: Undoable edits
 Every edit to the open investigation's entities, relations and sources SHALL be undoable:
-creating, editing, moving and deleting entities and relations, and creating, editing, deleting,
-attaching and detaching sources, screenshot changes included. Undoing SHALL restore the graph
-exactly as it was before the edit; redoing SHALL apply the edit again.
+creating, editing, moving and deleting entities and relations, checking and unchecking a tool on
+an entity, and creating, editing, deleting, attaching and detaching sources, screenshot changes
+included. Undoing SHALL restore the graph exactly as it was before the edit; redoing SHALL apply
+the edit again.
 
 #### Scenario: Undo a deletion
 - **WHEN** entity A, linked to B by relation R, is deleted and the user presses Cmd/Ctrl+Z
@@ -33,6 +34,10 @@ exactly as it was before the edit; redoing SHALL apply the edit again.
 - **WHEN** the user attaches source S to A and undoes
 - **THEN** S is no longer listed for A and is still in the investigation's sources
 
+#### Scenario: Undo unchecking a tool
+- **WHEN** crt.sh, checked on A yesterday, is unchecked and the user undoes
+- **THEN** crt.sh is checked again on A with yesterday's date
+
 ### Requirement: Edits outside the history
 Selection, viewport (pan and zoom), the investigation's name, import and export SHALL NOT be
 recorded: undo and redo SHALL neither change nor revert them.
@@ -44,7 +49,7 @@ recorded: undo and redo SHALL neither change nor revert them.
 ### Requirement: Step grouping
 Each user action SHALL be one history step, whatever the number of records it changes. Consecutive
 changes to the same field of the same element, each less than one second after the previous one,
-SHALL form a single step.
+SHALL form a single step, except tool checks: each check or uncheck SHALL be its own step.
 
 #### Scenario: Typing a label
 - **WHEN** the user types "Jean Dupont" in A's label field, then leaves the field and undoes
@@ -61,6 +66,10 @@ SHALL form a single step.
 #### Scenario: Cascade deletion
 - **WHEN** the user deletes entity A, which removes its three relations, and undoes once
 - **THEN** A and its three relations are restored
+
+#### Scenario: Quick successive checks
+- **WHEN** the user checks crt.sh then Shodan on A within one second, and undoes once
+- **THEN** only Shodan is unchecked
 
 ### Requirement: Keyboard shortcuts
 On the graph view, Cmd/Ctrl+Z SHALL undo, and Cmd/Ctrl+Shift+Z and Ctrl+Y SHALL redo. These

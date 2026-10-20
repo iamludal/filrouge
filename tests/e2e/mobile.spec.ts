@@ -379,3 +379,57 @@ test.describe('language', () => {
     await noHorizontalScroll(page)
   })
 })
+
+test.describe('pivot tools', () => {
+  test('makes the tools section targets at least 44 px in the drawer', async ({ page }) => {
+    await createInvestigation(page, 'Outils mobile')
+    await addEntityAt(page, 100, 150, 'exemple.fr')
+    await node(page, 'exemple.fr').tap()
+    await handle(page).click()
+    await expect(handle(page)).toHaveAttribute('aria-expanded', 'true')
+
+    await drawer(page).getByRole('combobox', { name: 'Type' }).click()
+    await page.getByRole('option', { name: 'Domaine' }).click()
+
+    const toggle = drawer(page).getByRole('tab', { name: /^Outils/ })
+    await toggle.scrollIntoViewIfNeeded()
+    await toggle.click()
+    const targets = {
+      'onglet Outils': toggle,
+      'lien crt.sh': drawer(page).getByRole('link', { name: /crt\.sh/ }),
+      'case crt.sh': drawer(page).getByRole('checkbox', { name: 'Marquer crt.sh comme utilisé' }),
+    }
+    for (const [name, target] of Object.entries(targets)) {
+      await target.scrollIntoViewIfNeeded()
+      const box = (await target.boundingBox())!
+      expect(box.width, name).toBeGreaterThanOrEqual(44)
+      expect(box.height, name).toBeGreaterThanOrEqual(44)
+    }
+    await noHorizontalScroll(page)
+  })
+
+  test('keeps each tool checkbox on the line of its link at 360 px', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 640 })
+    await createInvestigation(page, 'Lignes outils')
+    await addEntityAt(page, 100, 150, 'jean@example.org')
+    await node(page, 'jean@example.org').tap()
+    await handle(page).click()
+    await drawer(page).getByRole('combobox', { name: 'Type' }).click()
+    await page.getByRole('option', { name: 'Email' }).click()
+    await drawer(page)
+      .getByRole('tab', { name: /^Outils/ })
+      .click()
+
+    const rows = drawer(page).getByRole('listitem')
+    const count = await rows.count()
+    expect(count).toBeGreaterThan(5)
+    for (let index = 0; index < count; index++) {
+      const row = rows.nth(index)
+      await row.scrollIntoViewIfNeeded()
+      const box = (await row.getByRole('checkbox').boundingBox())!
+      const link = (await row.getByRole('link').boundingBox())!
+      expect(Math.abs(box.y + box.height / 2 - (link.y + link.height / 2)), `row ${index}`).toBeLessThan(4)
+    }
+    await noHorizontalScroll(page)
+  })
+})

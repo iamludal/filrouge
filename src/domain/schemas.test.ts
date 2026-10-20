@@ -114,4 +114,43 @@ describe('schemas', () => {
       expect(sourceSchema.safeParse({ ...source, originalSha256: 'c'.repeat(64) }).success).toBe(true)
     })
   })
+
+  describe('tool checks', () => {
+    const entity = createEntity(investigation.id, 'domain', { x: 0, y: 0 }, 'exemple.fr')
+    const check = (toolId: string, checkedAt = '2026-10-20T10:00:00.000Z') => ({ toolId, checkedAt })
+    const parse = (toolChecks: unknown) => entitySchema.safeParse({ ...entity, toolChecks })
+
+    it('accepts an entity without the field and a list of distinct tools', () => {
+      expect(entitySchema.safeParse(entity).success).toBe(true)
+      expect(parse([check('crtsh'), check('shodan')]).success).toBe(true)
+      expect(parse([]).success).toBe(true)
+    })
+
+    it('rejects a check without a date or with a non-UTC date', () => {
+      expect(parse([{ toolId: 'crtsh' }]).success).toBe(false)
+      expect(parse([check('crtsh', '2026-10-20T12:00:00+02:00')]).success).toBe(false)
+      expect(parse([check('crtsh', 'yesterday')]).success).toBe(false)
+    })
+
+    it('rejects a tool id outside lowercase letters, digits and hyphens', () => {
+      expect(parse([check('<script>')]).success).toBe(false)
+      expect(parse([check('Crtsh')]).success).toBe(false)
+      expect(parse([check('')]).success).toBe(false)
+      expect(parse([check('a'.repeat(65))]).success).toBe(false)
+      expect(parse([check('a'.repeat(64))]).success).toBe(true)
+    })
+
+    it('rejects two checks for the same tool, tagged for the import error', () => {
+      const result = parse([check('crtsh'), check('crtsh', '2026-10-21T10:00:00.000Z')])
+      expect(result.success).toBe(false)
+      const issue = !result.success ? result.error.issues[0] : undefined
+      expect(issue?.code === 'custom' && issue.params).toMatchObject({ importCode: 'duplicateToolCheck' })
+    })
+
+    it('limits the number of checks', () => {
+      const many = (count: number) => Array.from({ length: count }, (_, index) => check(`tool-${index}`))
+      expect(parse(many(LIMITS.toolChecks)).success).toBe(true)
+      expect(parse(many(LIMITS.toolChecks + 1)).success).toBe(false)
+    })
+  })
 })

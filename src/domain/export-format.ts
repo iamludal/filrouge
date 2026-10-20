@@ -31,6 +31,7 @@ export type ImportErrorCode =
   | 'tooManyProperties'
   | 'schema'
   | 'duplicateId'
+  | 'duplicateToolCheck'
   | 'inconsistentInvestigation'
   | 'unknownEntity'
   | 'unknownSource'
