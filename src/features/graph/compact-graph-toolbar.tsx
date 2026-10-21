@@ -1,4 +1,4 @@
-import { ArrowLeft, Ellipsis, ListFilter, Paperclip, Redo2, Search, X } from 'lucide-react'
+import { ArrowLeft, Ellipsis, Eye, ListFilter, Paperclip, Redo2, Search, X } from 'lucide-react'
 import { useState } from 'react'
 import { useStore } from 'zustand'
 import { routeHref } from '@/app/router'
@@ -11,15 +11,21 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { isDefaultDisplay } from '@/domain/display-options'
 import { activeCriteriaCount } from '@/domain/graph-view'
 import { useGraphExports } from '@/features/graph-export/use-graph-exports'
+import { DisplayMenuItems } from '@/features/graph/display-menu'
 import { HistoryControls } from '@/features/graph/history-controls'
 import { SaveIndicator } from '@/features/graph/save-indicator'
 import { FiltersDialog } from '@/features/graph-search/filters-panel'
 import { SearchField } from '@/features/graph-search/search-field'
 import { SourcesLibraryDialog } from '@/features/sources/sources-library-dialog'
+import { useDisplayStore } from '@/store/display-store'
 import { useGraphStore } from '@/store/graph-store'
 import { useViewStore } from '@/store/view-store'
 import { useI18n } from '@/i18n/locale'
@@ -34,6 +40,7 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [sourcesOpen, setSourcesOpen] = useState(false)
   const activeFilters = useViewStore((state) => activeCriteriaCount(state.filters))
+  const displayChanged = useDisplayStore((state) => !isDefaultDisplay(state.options))
   const canRedo = useStore(useGraphStore.temporal, (state) => state.futureStates.length > 0)
   const sourceCount = useGraphStore((state) => Object.keys(state.sources).length)
   const { empty, exportPng, exportSvg, pngDialog } = useGraphExports()
@@ -81,10 +88,10 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
                 aria-label={t.graph.toolbar.moreActions}
               >
                 <Ellipsis />
-                {activeFilters > 0 && (
+                {(activeFilters > 0 || displayChanged) && (
                   <span
                     aria-hidden
-                    data-testid="filters-dot"
+                    data-testid="menu-dot"
                     className="absolute top-2.5 right-2.5 size-2 rounded-full bg-primary"
                   />
                 )}
@@ -102,6 +109,14 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
                   </Badge>
                 )}
               </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Eye /> {t.graph.display.menu}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DisplayMenuItems />
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <DropdownMenuItem onSelect={() => setSourcesOpen(true)}>
                 <Paperclip /> {t.graph.toolbar.sources(sourceCount)}
               </DropdownMenuItem>

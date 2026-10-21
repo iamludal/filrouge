@@ -2,6 +2,7 @@ import { ENTITY_COLORS, typeAppearance } from '@/domain/entity-appearance'
 import { fr } from '@/i18n/messages/fr'
 import { circleCenter, edgeSegment } from '@/domain/graph-geometry'
 import { createEntity, createRelation } from '@/domain/factories'
+import { DEFAULT_DISPLAY, type DisplayOptions } from '@/domain/display-options'
 import type { Confidence, Entity, Relation, Status } from '@/domain/schemas'
 import { estimateTextWidth } from '@/features/graph-export/measure-text'
 import { renderGraphSvg } from '@/features/graph-export/render-graph-svg'
@@ -45,13 +46,14 @@ function relation(
 
 const byId = <T extends { id: string }>(items: T[]) => Object.fromEntries(items.map((i) => [i.id, i]))
 
-function draw(entities: Entity[], relations: Relation[] = []) {
+function draw(entities: Entity[], relations: Relation[] = [], display?: Partial<DisplayOptions>) {
   const out = renderGraphSvg({
     name: 'Test',
     entities: byId(entities),
     relations: byId(relations),
     measureText: estimateTextWidth,
     unnamedLabel: (type) => `${fr.entityTypes[type].label} sans nom`,
+    display: { ...DEFAULT_DISPLAY, ...display },
   })
   const doc = new DOMParser().parseFromString(out.svg, 'image/svg+xml')
   expect(doc.querySelector('parsererror')).toBeNull()
@@ -260,6 +262,84 @@ describe('renderGraphSvg', () => {
     const ghost = entity('G', 300, 0)
     const { doc } = draw([a], [relation(a, ghost, 'x')])
     expect(doc.querySelectorAll('line')).toHaveLength(0)
+  })
+
+  describe('display options', () => {
+    const viewBox = (doc: Document) =>
+      doc.documentElement.getAttribute('viewBox')!.split(' ').map(Number) as [number, number, number, number]
+
+    it('draws everything with the default display', () => {
+      const a = entity('Jean', 0, 0, { important: true, confidence: { reliability: 'B', credibility: 2 } })
+      const { doc } = draw([a])
+      const text = doc.documentElement.textContent
+      expect(text).toContain('Jean')
+      expect(text).toContain('B2')
+      expect(doc.querySelectorAll('[data-flag]')).toHaveLength(1)
+    })
+
+    it('leaves out the entity labels and narrows the frame to what is drawn', () => {
+      const long = entity('Société anonyme des transports', 0, 0)
+      const shown = draw([long])
+      const hidden = draw([long], [], { entityLabels: false })
+      expect(hidden.doc.documentElement.textContent).not.toContain('Société')
+      expect(hidden.width).toBeLessThan(shown.width)
+      expect(hidden.height).toBeLessThan(shown.height)
+      const [x, y, width, height] = viewBox(hidden.doc)
+      const center = circleCenter(long.position)
+      expect(center.x - 24 - x).toBeGreaterThanOrEqual(32)
+      expect(center.y - 24 - y).toBeGreaterThanOrEqual(32)
+      expect(x + width - (center.x + 24)).toBeGreaterThanOrEqual(32)
+      expect(y + height - (center.y + 24)).toBeGreaterThanOrEqual(32)
+    })
+
+    it('leaves out the ratings of entities and relations, keeping the relation label', () => {
+      const a = entity('A', 0, 0, { confidence: { reliability: 'B', credibility: 2 } })
+      const b = entity('B', 300, 0)
+      const r = relation(a, b, 'connaît', { confidence: { reliability: 'C', credibility: 3 } })
+      const { doc } = draw([a, b], [r], { ratings: false })
+      const text = doc.documentElement.textContent
+      expect(text).toContain('connaît')
+      expect(text).not.toContain('B2')
+      expect(text).not.toContain('C3')
+    })
+
+    it('draws no label for a relation reduced to its rating', () => {
+      const a = entity('A', 0, 0)
+      const b = entity('B', 300, 0)
+      const r = relation(a, b, '', { confidence: { reliability: 'A', credibility: 1 } })
+      const { doc } = draw([a, b], [r], { ratings: false })
+      expect(doc.documentElement.textContent).not.toContain('A1')
+    })
+
+    it('leaves out the relation labels, grade included, and keeps the line', () => {
+      const a = entity('A', 0, 0)
+      const b = entity('B', 300, 0)
+      const r = relation(a, b, 'connaît', {
+        directed: true,
+        confidence: { reliability: 'C', credibility: 3 },
+      })
+      const { doc } = draw([a, b], [r], { relationLabels: false })
+      expect(doc.documentElement.textContent).not.toContain('connaît')
+      expect(doc.documentElement.textContent).not.toContain('C3')
+      expect(
+        doc.querySelector(`[data-relation="${r.id}"] line, [data-relation="${r.id}"] path`),
+      ).not.toBeNull()
+    })
+
+    it('draws an important entity like any other when the mark is hidden', () => {
+      const important = entity('A', 0, 0, { important: true, color: 'green' })
+      const { doc } = draw([important], [], { importantMark: false })
+      const circle = doc.querySelector(`[data-entity="${important.id}"] circle`)!
+      expect(doc.querySelectorAll('[data-flag]')).toHaveLength(0)
+      expect(circle.getAttribute('stroke-width')).toBe('2')
+      expect(circle.getAttribute('r')).toBe('23')
+      expect(circle.getAttribute('fill')).toBe('#ffffff')
+    })
+
+    it('ignores the mini-map option', () => {
+      const a = entity('A', 0, 0)
+      expect(draw([a], [], { minimap: false }).svg).toBe(draw([a]).svg)
+    })
   })
 
   describe('self-contained vector output', () => {

@@ -5,6 +5,7 @@ import { createEntity } from '@/domain/factories'
 import { ENTITY_COLORS, importantTint } from '@/domain/entity-appearance'
 import type { Confidence, Entity, Status } from '@/domain/schemas'
 import { EntityNode } from '@/features/graph/entity-node'
+import { useDisplayStore } from '@/store/display-store'
 import type { EntityNode as EntityNodeType, ViewFlags } from '@/features/graph/types'
 
 function renderNode(
@@ -31,6 +32,8 @@ function renderNode(
     </ReactFlowProvider>,
   )
 }
+
+beforeEach(() => useDisplayStore.getState().reset())
 
 const circle = () => screen.getByTitle('Alice').firstElementChild as HTMLElement
 
@@ -139,5 +142,42 @@ describe('EntityNode', () => {
   it('keeps the outline of an important hypothesis dashed, like its border', () => {
     renderNode('hypothesis', undefined, {}, false, { important: true, color: 'green' })
     expect(circle()).toHaveStyle({ outline: `2px dashed ${ENTITY_COLORS.green}` })
+  })
+  describe('display options', () => {
+    const hide = (option: Parameters<ReturnType<typeof useDisplayStore.getState>['toggle']>[0]) =>
+      useDisplayStore.getState().toggle(option)
+
+    it('hides the label but keeps the name on hover and for assistive technologies', () => {
+      hide('entityLabels')
+      renderNode('verified')
+      expect(screen.queryByText('Alice')).not.toBeInTheDocument()
+      expect(screen.getByTitle('Alice')).toBeInTheDocument()
+      expect(screen.getByRole('group', { name: 'Alice' })).toBeInTheDocument()
+    })
+
+    it('hides the grade badge', () => {
+      hide('ratings')
+      renderNode('verified', { reliability: 'B', credibility: 2 })
+      expect(screen.queryByText('B2')).not.toBeInTheDocument()
+    })
+
+    it('draws an important entity like any other when the mark is hidden', () => {
+      hide('importantMark')
+      renderNode('verified', undefined, {}, false, { important: true, color: 'green' })
+      expect(screen.queryByRole('img', { name: 'Important' })).not.toBeInTheDocument()
+      expect(circle().style.outline).toBe('')
+      expect(circle().style.backgroundImage).toBe('')
+    })
+
+    it('shows the icon and colour only with every decoration hidden', () => {
+      hide('entityLabels')
+      hide('ratings')
+      hide('importantMark')
+      renderNode('verified', { reliability: 'B', credibility: 2 }, {}, false, { important: true })
+      expect(screen.queryByRole('img')).not.toBeInTheDocument()
+      expect(screen.queryByText('Alice')).not.toBeInTheDocument()
+      expect(circle()).toHaveStyle({ borderColor: ENTITY_COLORS.blue })
+      expect(circle().querySelector('svg')).toHaveClass('lucide-user')
+    })
   })
 })

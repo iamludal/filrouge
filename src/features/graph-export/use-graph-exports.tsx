@@ -6,6 +6,7 @@ import { renderGraphSvg } from '@/features/graph-export/render-graph-svg'
 import { svgToPng, type PngScale } from '@/features/graph-export/png'
 import { PngExportDialog, type PendingPng } from '@/features/graph-export/png-export-dialog'
 import { downloadBlob, safeFilename } from '@/lib/download'
+import { useDisplayStore } from '@/store/display-store'
 import { useGraphStore } from '@/store/graph-store'
 
 // The error is not logged: it could echo investigation content.
@@ -17,7 +18,13 @@ function drawGraph(unnamedLabel: (type: EntityTypeId) => string): PendingPng | n
   if (!investigation) return null
   return {
     name: investigation.name,
-    ...renderGraphSvg({ name: investigation.name, entities, relations, unnamedLabel }),
+    ...renderGraphSvg({
+      name: investigation.name,
+      entities,
+      relations,
+      unnamedLabel,
+      display: useDisplayStore.getState().options,
+    }),
   }
 }
 

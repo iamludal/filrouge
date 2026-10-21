@@ -4,6 +4,7 @@ import { createRelation } from '@/domain/factories'
 import type { Confidence, Status } from '@/domain/schemas'
 import { FloatingEdge } from '@/features/graph/floating-edge'
 import type { RelationEdge, ViewFlags } from '@/features/graph/types'
+import { useDisplayStore } from '@/store/display-store'
 
 vi.mock('@xyflow/react', () => {
   const node = { measured: { width: 144 }, internals: { positionAbsolute: { x: 0, y: 0 } } }
@@ -33,6 +34,8 @@ function renderEdge(label: string, status: Status, confidence?: Confidence, flag
     </svg>,
   )
 }
+
+beforeEach(() => useDisplayStore.getState().reset())
 
 describe('FloatingEdge', () => {
   it('dashes the line of a hypothesis only', () => {
@@ -72,5 +75,27 @@ describe('FloatingEdge', () => {
   it('shows no label when there is nothing to show', () => {
     renderEdge('', 'verified')
     expect(screen.queryByTitle(/./)).not.toBeInTheDocument()
+  })
+
+  it('drops the grade from the label when ratings are hidden', () => {
+    useDisplayStore.getState().toggle('ratings')
+    renderEdge('connaît', 'verified', { reliability: 'C', credibility: 3 })
+    expect(screen.getByText('connaît')).toHaveAttribute('title', 'connaît')
+    expect(screen.queryByText(/C3/)).not.toBeInTheDocument()
+  })
+
+  it('shows no label for a grade-only relation when ratings are hidden', () => {
+    useDisplayStore.getState().toggle('ratings')
+    renderEdge('', 'verified', { reliability: 'A', credibility: 1 })
+    expect(screen.queryByText('A1')).not.toBeInTheDocument()
+    expect(screen.queryByTitle(/./)).not.toBeInTheDocument()
+  })
+
+  it('shows no label, grade included, when relation labels are hidden, and keeps the line', () => {
+    useDisplayStore.getState().toggle('relationLabels')
+    renderEdge('connaît', 'hypothesis', { reliability: 'C', credibility: 3 })
+    expect(screen.queryByText(/connaît/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/C3/)).not.toBeInTheDocument()
+    expect(screen.getByTestId('edge').getAttribute('class')).toContain('stroke-dasharray')
   })
 })

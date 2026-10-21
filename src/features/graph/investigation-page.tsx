@@ -15,6 +15,7 @@ import { DetailPanel } from '@/features/graph/detail-panel'
 import { GraphCanvas } from '@/features/graph/graph-canvas'
 import { HistoryControls } from '@/features/graph/history-controls'
 import { SaveIndicator } from '@/features/graph/save-indicator'
+import { DisplayMenu } from '@/features/graph/display-menu'
 import { FiltersButton } from '@/features/graph-search/filters-panel'
 import { SearchField } from '@/features/graph-search/search-field'
 import { PasteScreenshot } from '@/features/sources/paste-screenshot'
@@ -121,6 +122,7 @@ export function InvestigationPage({ id }: { id: string }) {
             <div className="ml-auto flex items-center gap-3">
               <SearchField />
               <FiltersButton />
+              <DisplayMenu />
               <HistoryControls />
               <SaveIndicator />
               <SourcesLibrary />

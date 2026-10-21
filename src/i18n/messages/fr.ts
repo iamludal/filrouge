@@ -250,6 +250,16 @@ export const fr = {
       sources: (count: number) => `Sources (${count})`,
       export: 'Exporter',
     },
+    display: {
+      menu: 'Affichage',
+      entityLabels: 'Libellés des entités',
+      relationLabels: 'Libellés des relations',
+      ratings: 'Cotations',
+      importantMark: 'Marque « Important »',
+      reset: `Réinitialiser l'affichage`,
+      hideMinimap: 'Masquer la mini-carte',
+      showMinimap: 'Afficher la mini-carte',
+    },
     history: { undo: 'Annuler', redo: 'Rétablir' },
     save: {
       saved: 'Enregistré',

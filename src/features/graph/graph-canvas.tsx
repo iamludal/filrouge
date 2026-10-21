@@ -3,6 +3,7 @@ import {
   applyNodeChanges,
   Background,
   BackgroundVariant,
+  ControlButton,
   Controls,
   MarkerType,
   MiniMap,
@@ -16,7 +17,7 @@ import {
   type OnSelectionChangeParams,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { Plus } from 'lucide-react'
+import { Compass, Plus } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { useTheme } from '@/app/theme'
 import { useIsNarrow } from '@/app/use-media-query'
@@ -31,6 +32,8 @@ import type { EntityNode as EntityNodeType, RelationEdge } from '@/features/grap
 import { useLongPress } from '@/features/graph/use-long-press'
 import { useGraphView } from '@/features/graph-search/use-graph-view'
 import { RelationDialog } from '@/features/relations/relation-dialog'
+import { cn } from '@/lib/utils'
+import { useDisplayStore } from '@/store/display-store'
 import { useGraphStore, type Selection } from '@/store/graph-store'
 import { useI18n } from '@/i18n/locale'
 
@@ -129,6 +132,7 @@ export function GraphCanvas() {
   const view = useGraphView()
   const { resolved } = useTheme()
   const narrow = useIsNarrow()
+  const minimap = useDisplayStore((state) => state.options.minimap)
   const { screenToFlowPosition } = useReactFlow()
 
   const [nodes, setNodes] = useState<EntityNodeType[]>(() => {
@@ -279,8 +283,21 @@ export function GraphCanvas() {
         aria-label={t.graph.canvasLabel}
       >
         <Background variant={BackgroundVariant.Dots} gap={GRID_SIZE} />
-        <Controls showInteractive={false} />
-        {!narrow && <MiniMap pannable zoomable nodeColor={minimapColor} ariaLabel={t.graph.minimap} />}
+        <Controls showInteractive={false}>
+          {!narrow && (
+            <ControlButton
+              onClick={() => useDisplayStore.getState().toggle('minimap')}
+              aria-label={minimap ? t.graph.display.hideMinimap : t.graph.display.showMinimap}
+              title={minimap ? t.graph.display.hideMinimap : t.graph.display.showMinimap}
+              className={cn(minimap && 'bg-(--xy-controls-button-border-color-default)!')}
+            >
+              <Compass className="size-4! max-h-none! max-w-none! fill-none!" />
+            </ControlButton>
+          )}
+        </Controls>
+        {!narrow && minimap && (
+          <MiniMap pannable zoomable nodeColor={minimapColor} ariaLabel={t.graph.minimap} />
+        )}
         <Panel position="top-left">
           <Button size="sm" onClick={addAtViewportCenter}>
             <Plus /> {t.graph.addEntity}

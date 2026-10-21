@@ -194,6 +194,7 @@ tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'ide
 - [ ] Palette de commandes (Cmd/Ctrl+K)
 - [ ] Captures similaires : hash perceptuel (dHash 64 bits, calculé localement) de chaque capture, signalement « Capture très proche de celle de la source X » sous un seuil de distance de Hamming, et comparaison côte à côte de deux captures (ex. un post capturé à deux dates)
 - [x] Mise en forme des entités : couleur (palette de 16) et icône (jeu lucide de 44, sans import d'image) personnalisées par entité, remplaçant celles du type, et marqueur « important » (drapeau sur le nœud, critère de filtre « Importance », présent dans les exports PNG et SVG)
+- [x] Options d'affichage du graphe : libellés des entités, libellés des relations, cotations et marque « Important » masquables depuis un menu « Affichage » (une icône par option, sous-menu de « Plus d'actions » sur écran étroit), point d'alerte tant qu'une option est modifiée ; mini-carte masquable à part, par un bouton dans les contrôles de zoom (ni pastille ni réinitialisation). Préférence de l'appareil (`localStorage`, validée par Zod) commune à toutes les enquêtes, ni enregistrée ni exportée en JSON ni annulable ; les exports PNG et SVG ne dessinent que ce qui est affiché (OpenSpec `add-graph-display-options`)
 - [ ] Groupes / clusters visuels de nœuds
 
 ### v0.4 – Vues complémentaires

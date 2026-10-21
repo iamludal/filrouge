@@ -155,6 +155,31 @@ test.describe('compact toolbar', () => {
     expect((await download).suggestedFilename()).toMatch(/\.svg$/)
   })
 
+  test('hides labels from the Affichage submenu, signals it, and has no mini-map control', async ({
+    page,
+  }) => {
+    await createInvestigation(page, 'Affichage')
+    await addEntityAt(page, 150, 150, 'Alice')
+    await saved(page)
+    await expect(page.getByRole('button', { name: /mini-carte/i })).toHaveCount(0)
+    await expect(page.getByTestId('menu-dot')).toHaveCount(0)
+
+    await openMenu(page)
+    await page.getByRole('menuitem', { name: 'Affichage' }).click()
+    await expect(page.getByRole('menuitemcheckbox', { name: 'Mini-carte' })).toHaveCount(0)
+    await page.getByRole('menuitemcheckbox', { name: 'Libellés des entités' }).tap()
+    await page.keyboard.press('Escape')
+    await expect(node(page, 'Alice').getByText('Alice')).toHaveCount(0)
+    await expect(page.getByTestId('menu-dot')).toBeVisible()
+
+    await openMenu(page)
+    await page.getByRole('menuitem', { name: 'Affichage' }).click()
+    await page.getByRole('menuitem', { name: `Réinitialiser l'affichage` }).click()
+    await page.keyboard.press('Escape')
+    await expect(node(page, 'Alice').getByText('Alice')).toBeVisible()
+    await expect(page.getByTestId('menu-dot')).toHaveCount(0)
+  })
+
   test('opens the filters in a dialog, signals them on the menu and dims the rest', async ({ page }) => {
     await createInvestigation(page, 'Filtres')
     await addEntityAt(page, 100, 150, 'Alice')
@@ -171,7 +196,7 @@ test.describe('compact toolbar', () => {
     await dialog.getByRole('checkbox', { name: /Email/ }).check()
     await page.keyboard.press('Escape')
 
-    await expect(page.getByTestId('filters-dot')).toBeVisible()
+    await expect(page.getByTestId('menu-dot')).toBeVisible()
     await expect(node(page, 'Alice').locator('[title]').first()).toHaveClass(/opacity-25/)
     await expect(node(page, 'Courriel').locator('[title]').first()).not.toHaveClass(/opacity-25/)
     await openMenu(page)

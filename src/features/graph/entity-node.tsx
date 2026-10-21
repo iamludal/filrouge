@@ -8,6 +8,7 @@ import type { EntityNode as EntityNodeType } from '@/features/graph/types'
 import { cn } from '@/lib/utils'
 import { useI18n } from '@/i18n/locale'
 import { entityName } from '@/i18n/names'
+import { useDisplayStore } from '@/store/display-store'
 
 /*
  * On touch screens the 12px dot is far too small for a finger: a selected node's handle gets an
@@ -31,6 +32,9 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
   const connection = useConnection()
   const isDropTarget = connection.inProgress && connection.fromNode.id !== id
   const label = entityName(t, entity)
+  const { entityLabels, ratings, importantMark } = useDisplayStore((state) => state.options)
+  // A hidden mark leaves an important entity looking like any other.
+  const important = entity.important && importantMark
 
   return (
     <div
@@ -39,6 +43,8 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
         dimmed && 'opacity-25',
       )}
       title={label}
+      // Without its visible label, the node keeps its name for assistive technologies.
+      {...(!entityLabels && { role: 'group', 'aria-label': label })}
     >
       <div
         className={cn(
@@ -53,14 +59,14 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
           color: appearance.color,
           // An important entity stands out at a glance: its border grows outwards (an outline, so the
           // node keeps its size for edges and box selection) and its background takes its colour.
-          ...(entity.important && {
+          ...(important && {
             outline: `2px ${entity.status === 'hypothesis' ? 'dashed' : 'solid'} ${appearance.color}`,
             backgroundImage: importantTint(appearance.color),
           }),
         }}
       >
         <EntityIcon icon={appearance.icon} className="size-5" />
-        {entity.important && (
+        {important && (
           <span
             role="img"
             title={t.appearance.important}
@@ -70,7 +76,7 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
             <Flag aria-hidden className="size-3.5 fill-current" />
           </span>
         )}
-        {entity.confidence && (
+        {ratings && entity.confidence && (
           <span
             role="img"
             title={describeConfidence(entity.confidence, t.assessment)}
@@ -91,14 +97,16 @@ export const EntityNode = memo(function EntityNode({ id, data, selected }: NodeP
           )}
         />
       </div>
-      <div
-        className={cn(
-          'max-w-full truncate rounded-md bg-background/80 px-1.5 text-center text-xs font-medium',
-          !entity.label && 'text-muted-foreground italic',
-        )}
-      >
-        {label}
-      </div>
+      {entityLabels && (
+        <div
+          className={cn(
+            'max-w-full truncate rounded-md bg-background/80 px-1.5 text-center text-xs font-medium',
+            !entity.label && 'text-muted-foreground italic',
+          )}
+        >
+          {label}
+        </div>
+      )}
       {/* Invisible full-size target, only active while connecting. */}
       <Handle
         type="target"

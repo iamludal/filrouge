@@ -247,6 +247,16 @@ export const en: Messages = {
       sources: (count) => `Sources (${count})`,
       export: 'Export',
     },
+    display: {
+      menu: 'Display',
+      entityLabels: 'Entity labels',
+      relationLabels: 'Relation labels',
+      ratings: 'Ratings',
+      importantMark: 'Important mark',
+      reset: 'Reset display',
+      hideMinimap: 'Hide minimap',
+      showMinimap: 'Show minimap',
+    },
     history: { undo: 'Undo', redo: 'Redo' },
     save: {
       saved: 'Saved',

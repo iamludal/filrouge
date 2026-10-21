@@ -94,7 +94,7 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
       </g>
 
       <g data-layer="nodes">
-        {nodes.map(({ entity, center, label, labelY, unnamed, badge, flag }) => {
+        {nodes.map(({ entity, center, label, labelY, unnamed, important, badge, flag }) => {
           const appearance = entityAppearance(entity)
           const Icon = ENTITY_ICONS[appearance.icon]
           return (
@@ -103,10 +103,10 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
                 cx={center.x}
                 cy={center.y}
                 // An important entity's border grows outwards, as on the canvas: 4 px centred on the edge.
-                r={entity.important ? CIRCLE_RADIUS : CIRCLE_RADIUS - 1}
-                fill={entity.important ? overWhite(appearance.color, IMPORTANT_TINT) : PALETTE.background}
+                r={important ? CIRCLE_RADIUS : CIRCLE_RADIUS - 1}
+                fill={important ? overWhite(appearance.color, IMPORTANT_TINT) : PALETTE.background}
                 stroke={appearance.color}
-                strokeWidth={entity.important ? 4 : 2}
+                strokeWidth={important ? 4 : 2}
                 strokeDasharray={entity.status === 'hypothesis' ? '4 3' : undefined}
               />
               <Icon
@@ -116,18 +116,20 @@ export function GraphImage({ title, layout }: { title: string; layout: GraphLayo
                 height={ICON_SIZE}
                 color={appearance.color}
               />
-              <text
-                x={center.x}
-                y={labelY}
-                dy="0.35em"
-                textAnchor="middle"
-                fontSize={12}
-                fontWeight={500}
-                fontStyle={unnamed ? 'italic' : undefined}
-                fill={unnamed ? PALETTE.muted : PALETTE.text}
-              >
-                {label}
-              </text>
+              {label !== undefined && (
+                <text
+                  x={center.x}
+                  y={labelY}
+                  dy="0.35em"
+                  textAnchor="middle"
+                  fontSize={12}
+                  fontWeight={500}
+                  fontStyle={unnamed ? 'italic' : undefined}
+                  fill={unnamed ? PALETTE.muted : PALETTE.text}
+                >
+                  {label}
+                </text>
+              )}
               {badge && (
                 <>
                   <rect

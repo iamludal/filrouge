@@ -10,7 +10,8 @@ displayed, added, moved, selected and deleted on the canvas.
 The graph view SHALL display every entity of the investigation as a node and every relation as a
 link between its two entities, with pan, zoom, zoom controls and a mini-map. The mini-map SHALL
 draw each entity in its own colour (see entity-appearance). On narrow screens (see
-responsive-layout) the mini-map SHALL be hidden.
+responsive-layout), or while the user has hidden it with the mini-map button (see
+graph-display-options), the mini-map SHALL be hidden.
 
 #### Scenario: Existing graph
 - **WHEN** an investigation with 10 entities and 9 relations is opened
@@ -28,6 +29,10 @@ responsive-layout) the mini-map SHALL be hidden.
 - **WHEN** a "Personne" entity has the custom colour "Rouge"
 - **THEN** the mini-map draws it in red
 
+#### Scenario: Mini-map hidden by the user
+- **WHEN** an investigation is opened in a 1280 px wide viewport with the mini-map hidden with its button
+- **THEN** no mini-map is shown
+
 ### Requirement: Entity node appearance
 Each node SHALL show the entity's icon and colour (its custom ones, otherwise its type's, see
 entity-appearance) and the entity label. An entity without a label SHALL be shown as "<type label>
@@ -36,7 +41,8 @@ graded entity SHALL show its grade (e.g. "B2") in a badge on its node; an ungrad
 show no badge. An important entity SHALL show a 24 px flag badge, named "Important", at the top
 left of its circle, and its circle's border SHALL grow outwards from 2 to 4 px, so the circle
 looks larger without moving its relations, and get a translucent background of the entity's
-colour; an unmarked entity SHALL show none of them.
+colour; an unmarked entity SHALL show none of them. The label, the grade badge and the important
+mark SHALL each be shown only while its display option is checked (see graph-display-options).
 
 #### Scenario: Unlabelled entity
 - **WHEN** an entity of type "Personne" has an empty label
@@ -73,6 +79,10 @@ colour; an unmarked entity SHALL show none of them.
 #### Scenario: Tint follows the mark
 - **WHEN** an important entity's mark is removed
 - **THEN** its circle has a 2 px border and the plain card background again
+
+#### Scenario: Decorations hidden by the display options
+- **WHEN** an important entity graded "B2" is shown with "Libellés des entités", "Cotations" and "Marque « Important »" unchecked
+- **THEN** its node shows its icon and colour only: no label, no "B2" badge, no flag badge, a 2 px border and the plain card background
 
 ### Requirement: Add an entity
 The user SHALL be able to add an entity by double-clicking the empty canvas, by a long press (at
@@ -155,7 +165,9 @@ entity SHALL also delete every relation attached to it.
 ### Requirement: Relation link appearance
 A hypothetical relation SHALL be drawn with a dashed line and a verified relation with a solid
 line. A graded relation SHALL show its grade after its label, separated by " · " (e.g.
-"connaît · B2"), or the grade alone when its label is empty.
+"connaît · B2"), or the grade alone when its label is empty. The link label SHALL be shown only
+while "Libellés des relations" is checked, and the grade only while "Cotations" is checked (see
+graph-display-options).
 
 #### Scenario: Hypothetical relation
 - **WHEN** a relation has the status "hypothesis"
@@ -168,6 +180,10 @@ line. A graded relation SHALL show its grade after its label, separated by " · 
 #### Scenario: Graded relation without label
 - **WHEN** a relation with an empty label is graded "A1"
 - **THEN** its link label reads "A1"
+
+#### Scenario: Line kept when labels are hidden
+- **WHEN** a directed hypothetical relation is shown with "Libellés des relations" unchecked
+- **THEN** its link is drawn dashed with its arrow, and without label
 
 ### Requirement: Grade explained on hover
 Hovering a node's grade badge or a graded link label SHALL show the full meaning of the grade in
