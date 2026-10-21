@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Lets the user take the graph of an open investigation out of filrouge as a PNG or SVG image, to
+Lets the user take the graph of an open investigation out of Filrouge as a PNG or SVG image, to
 put it in a report or a presentation, without any data leaving the device.
 
 ## Requirements

@@ -127,7 +127,7 @@ entity's label.
 
 ### Requirement: Opening a tool
 Every tool link SHALL be a link whose target is its resolved `https` address, opening in a new tab
-without giving the new page access to filrouge and without sending a referrer. The host of the
+without giving the new page access to Filrouge and without sending a referrer. The host of the
 address SHALL be displayed next to the tool's name.
 
 #### Scenario: Link attributes

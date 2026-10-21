@@ -1,7 +1,7 @@
 schema: spec-driven
 
 context: |
-  filrouge: open-source, local-first static web app for building OSINT investigation graphs
+  Filrouge: open-source, local-first static web app for building OSINT investigation graphs
   (entities, relations, sources). No backend, no account; all data stays in the browser.
   Product reference and task order: ROADMAP.md. Agent guide and architecture: CLAUDE.md.
 
@@ -19,8 +19,8 @@ context: |
   - Never log investigation content.
   - Data model change: bump SCHEMA_VERSION and add a tested migration.
 
-  Conventions: Conventional Commits, one commit per task. Code, comments, commits and specs in
-  English; user-facing UI strings in French and English (src/i18n/), ROADMAP/CLAUDE.md in French.
+  Conventions: Conventional Commits, one commit per task. Code, comments, commits, specs and docs
+  in English; user-facing UI strings in French and English (src/i18n/).
 
 rules:
   specs:

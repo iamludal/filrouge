@@ -11,7 +11,7 @@ describe('formatImportError', () => {
 
   it('fills in the version and the count', () => {
     expect(formatImportError(fr, { code: 'newerVersion', value: 9 })).toBe(
-      'Format v9 produit par une version plus récente de filrouge',
+      'Format v9 produit par une version plus récente de Filrouge',
     )
     expect(formatImportError(fr, { code: 'more', value: 4 })).toBe('… et 4 autre(s) erreur(s)')
   })

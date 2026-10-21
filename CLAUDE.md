@@ -1,35 +1,36 @@
 # CLAUDE.md
 
-Guide pour les agents de développement travaillant sur filrouge.
+Guide for development agents working on Filrouge.
 
-- Référence produit et ordre des tâches : `ROADMAP.md` (une tâche à la fois, cocher la case une fois la DoD remplie).
-- Gestionnaire de paquets : Bun (version épinglée dans `packageManager`). Les outils (Vite, Vitest,
-  Playwright) tournent sous Node via `bun run`. Attention : `bun test` lance le runner de Bun, pas Vitest.
-- Vérifications obligatoires : `bun run lint && bun run format:check && bun run typecheck && bun run test`
-  (+ `bun run test:e2e` pour les parcours UI).
-- Commits : Conventional Commits, un commit par tâche de la roadmap.
-- Les agents n'ont pas le droit de commiter, c'est l'utilisateur qui le fait : les commits sont signés en SSH (`~/.ssh/github`, protégée par passphrase)
-  et, sans terminal pour la saisir, `git commit` reste bloqué. L'agent laisse les changements dans l'arbre
-  de travail (vérifications au vert), coche les tâches, puis propose le message de commit Conventional
-  Commits du groupe terminé. L'utilisateur commite. L'agent poursuit sans attendre le commit.
+- Product reference and task order: `ROADMAP.md` (one task at a time, check the box once the DoD is met).
+- Package manager: Bun (version pinned in `packageManager`). The tools (Vite, Vitest,
+  Playwright) run under Node through `bun run`. Beware: `bun test` runs Bun's own runner, not Vitest.
+- Mandatory checks: `bun run lint && bun run format:check && bun run typecheck && bun run test`
+  (+ `bun run test:e2e` for UI flows).
+- Commits: Conventional Commits, one commit per roadmap task.
+- Agents are not allowed to commit, the user does: commits are SSH-signed (`~/.ssh/github`, passphrase-protected)
+  and, without a terminal to type it, `git commit` hangs. The agent leaves the changes in the working
+  tree (checks green), checks the tasks, then proposes the Conventional Commits message of the
+  finished group. The user commits. The agent carries on without waiting for the commit.
 
 ## Architecture
 
-- `src/domain/` : schémas Zod (source de vérité des types), types d'entités, migrations. Pur, sans DOM.
-- `src/db/` : Dexie + repositories. Seuls les repositories touchent Dexie.
-- `src/store/` : stores Zustand. L'enquête ouverte est chargée en mémoire ; les modifications sont
-  persistées par une sauvegarde debouncée (`src/store/persistence.ts`).
-- `src/features/<feature>/` : composants et hooks par fonctionnalité.
-- `src/components/ui/` : composants shadcn/ui générés (`bunx shadcn@latest add <name>`).
-- `src/lib/` : utilitaires purs.
+- `src/domain/`: Zod schemas (source of truth for types), entity types, migrations. Pure, no DOM.
+- `src/db/`: Dexie + repositories. Only repositories touch Dexie.
+- `src/store/`: Zustand stores. The open investigation is loaded in memory; changes are
+  persisted by a debounced save (`src/store/persistence.ts`).
+- `src/features/<feature>/`: components and hooks per feature.
+- `src/components/ui/`: generated shadcn/ui components (`bunx shadcn@latest add <name>`).
+- `src/lib/`: pure utilities.
 
-## Règles
+## Rules
 
-- Jamais `dangerouslySetInnerHTML` (règle ESLint) ; Markdown via `src/lib/markdown.tsx` uniquement.
-- Tout texte affiché à l'utilisateur passe par `src/i18n/` (dictionnaires `fr` et `en`, `useI18n()`), jamais en dur dans un composant ; ajouter la clé dans les deux langues (le typecheck échoue sinon). Le domaine renvoie des identifiants ou des codes, l'interface les traduit. Le contenu des enquêtes n'est jamais traduit.
-- Aucune requête réseau au runtime ; la CSP (dans `vite.config.ts`) doit rester stricte.
-- Ne jamais logguer le contenu d'une enquête (`no-console` actif, sauf warn/error).
-- Toute donnée importée passe par un schéma Zod avant d'atteindre le store.
-- Toute nouvelle action de la barre d'outils du graphe doit aussi figurer dans le menu « Plus d'actions » de la barre compacte (`compact-graph-toolbar.tsx`, écrans étroits).
-- Ne jamais utiliser le tiret cadratin « — » (trop long) : utiliser le tiret demi-cadratin « – » à la place (code, docs, textes, messages de commit).
-- Changement du modèle : incrémenter `SCHEMA_VERSION` et ajouter une migration testée.
+- Never `dangerouslySetInnerHTML` (ESLint rule); Markdown through `src/lib/markdown.tsx` only.
+- Every text shown to the user goes through `src/i18n/` (`fr` and `en` dictionaries, `useI18n()`), never hard-coded in a component; add the key in both languages (typecheck fails otherwise). The domain returns identifiers or codes, the interface translates them. Investigation content is never translated.
+- No network request at runtime; the CSP (in `vite.config.ts`) must stay strict.
+- Never log investigation content (`no-console` enabled, except warn/error).
+- All imported data goes through a Zod schema before reaching the store.
+- Every new action of the graph toolbar must also appear in the "More actions" menu of the compact toolbar (`compact-graph-toolbar.tsx`, narrow screens).
+- Never use the em dash "—" (too long): use the en dash "–" instead (code, docs, texts, commit messages).
+- Model change: bump `SCHEMA_VERSION` and add a tested migration.
+- Repository docs (README, ROADMAP, CONTRIBUTING, SECURITY, this file) are written in English.

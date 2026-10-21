@@ -1,88 +1,88 @@
-# ROADMAP – filrouge
+# ROADMAP – Filrouge
 
-> **filrouge** est une application web **100 % statique**, **local-first** et open source pour relier visuellement
-> les trouvailles d'une enquête OSINT : entités, liens, sources et niveaux de confiance.
-> Aucune donnée d'enquête ne quitte le navigateur de l'utilisateur.
+> **Filrouge** is a **100% static**, **local-first** and open-source web app to visually connect
+> the findings of an OSINT investigation: entities, links, sources and confidence levels.
+> No investigation data ever leaves the user's browser.
 
-Ce document sert de référence de développement. Les jalons sont à traiter **dans l'ordre**,
-une tâche à la fois. Chaque tâche n'est terminée que si sa « Definition of Done » est respectée.
-
----
-
-## 1. Principes non négociables
-
-1. **Local-first** : aucun backend. Toutes les données vivent dans IndexedDB.
-2. **Zéro fuite** : pas de télémétrie, pas d'analytics, pas de script tiers, pas de CDN au runtime.
-   Toute requête réseau sortante (tuiles de carte, favicon distant…) doit être **opt-in** et signalée dans l'UI.
-3. **Données hostiles** : tout contenu importé ou saisi (labels, notes, URLs, fichiers JSON) est considéré comme
-   potentiellement malveillant. Il est validé avec Zod et assaini avant tout rendu HTML (DOMPurify).
-   `dangerouslySetInnerHTML` est interdit, sauf derrière DOMPurify.
-4. **Traçabilité** : chaque entité et chaque relation peut être rattachée à une ou plusieurs sources.
-5. **Modèle versionné** : chaque enquête porte un `schemaVersion`, et tout changement de modèle s'accompagne d'une migration testée.
-6. **Accessibilité et clavier** : toutes les actions principales sont utilisables au clavier.
+This document is the development reference. Milestones are tackled **in order**,
+one task at a time. A task is only done when its "Definition of Done" is met.
 
 ---
 
-## 2. Stack technique
+## 1. Non-negotiable principles
 
-| Domaine                 | Choix                                                             |
-| ----------------------- | ----------------------------------------------------------------- |
-| Build                   | Vite + React 19 + TypeScript (`strict: true`)                     |
-| Gestionnaire de paquets | Bun                                                               |
-| UI                      | Tailwind CSS v4 + shadcn/ui + lucide-react                        |
-| Graphe (rendu/édition)  | @xyflow/react (React Flow)                                        |
-| Algorithmes de graphe   | graphology (+ graphology-shortest-path, graphology-metrics)       |
-| Layouts automatiques    | elkjs (dans un Web Worker)                                        |
-| État                    | Zustand + zundo (undo/redo)                                       |
-| Persistance             | Dexie.js (IndexedDB)                                              |
-| Validation              | Zod (source de vérité unique des schémas)                         |
-| Markdown                | react-markdown + DOMPurify                                        |
-| Carte                   | Leaflet + OpenStreetMap (opt-in)                                  |
-| Crypto                  | WebCrypto (AES-GCM + PBKDF2)                                      |
-| Tests                   | Vitest + Testing Library + fake-indexeddb ; Playwright pour l'E2E |
-| Qualité                 | ESLint + Prettier + typecheck en CI                               |
-| Distribution            | PWA (vite-plugin-pwa), déploiement GitHub Pages                   |
+1. **Local-first**: no backend. All data lives in IndexedDB.
+2. **Zero leak**: no telemetry, no analytics, no third-party script, no CDN at runtime.
+   Any outgoing network request (map tiles, remote favicon…) must be **opt-in** and flagged in the UI.
+3. **Hostile data**: any imported or typed content (labels, notes, URLs, JSON files) is considered
+   potentially malicious. It is validated with Zod and sanitized before any HTML rendering (DOMPurify).
+   `dangerouslySetInnerHTML` is forbidden, except behind DOMPurify.
+4. **Traceability**: every entity and every relation can be linked to one or more sources.
+5. **Versioned model**: every investigation carries a `schemaVersion`, and every model change comes with a tested migration.
+6. **Accessibility and keyboard**: every main action can be performed with the keyboard.
 
 ---
 
-## 3. Arborescence cible
+## 2. Tech stack
+
+| Area                | Choice                                                        |
+| ------------------- | ------------------------------------------------------------- |
+| Build               | Vite + React 19 + TypeScript (`strict: true`)                 |
+| Package manager     | Bun                                                           |
+| UI                  | Tailwind CSS v4 + shadcn/ui + lucide-react                    |
+| Graph (render/edit) | @xyflow/react (React Flow)                                    |
+| Graph algorithms    | graphology (+ graphology-shortest-path, graphology-metrics)   |
+| Automatic layouts   | elkjs (in a Web Worker)                                       |
+| State               | Zustand + zundo (undo/redo)                                   |
+| Persistence         | Dexie.js (IndexedDB)                                          |
+| Validation          | Zod (single source of truth for schemas)                      |
+| Markdown            | react-markdown + DOMPurify                                    |
+| Map                 | Leaflet + OpenStreetMap (opt-in)                              |
+| Crypto              | WebCrypto (AES-GCM + PBKDF2)                                  |
+| Tests               | Vitest + Testing Library + fake-indexeddb; Playwright for E2E |
+| Quality             | ESLint + Prettier + typecheck in CI                           |
+| Distribution        | PWA (vite-plugin-pwa), GitHub Pages deployment                |
+
+---
+
+## 3. Target layout
 
 ```
 src/
-  app/                # bootstrap, routing, layout global, providers
+  app/                # bootstrap, routing, global layout, providers
   features/
-    investigations/   # liste, création, renommage, suppression d'enquêtes
-    graph/            # canvas React Flow, nœuds, arêtes, toolbar, layouts
-    entities/         # panneau de détail, formulaires, types d'entités
+    investigations/   # list, create, rename, delete investigations
+    graph/            # React Flow canvas, nodes, edges, toolbar, layouts
+    entities/         # detail panel, forms, entity types
     relations/
-    sources/          # sources, pièces jointes, confiance
-    search/           # recherche, filtres, palette de commandes
+    sources/          # sources, attachments, confidence
+    search/           # search, filters, command palette
     timeline/
     map/
     import-export/
-    extraction/       # extraction d'entités depuis du texte brut
+    extraction/       # entity extraction from raw text
     pivots/
     crypto/
   domain/
-    schemas.ts        # schémas Zod + types inférés
-    entity-types.ts   # définition des types d'entités (icône, couleur, propriétés)
-    migrations/       # migrations de schemaVersion
+    schemas.ts        # Zod schemas + inferred types
+    entity-types.ts   # entity type definitions (icon, color, properties)
+    migrations/       # schemaVersion migrations
   db/
-    dexie.ts          # définition de la base et des index
-    repositories/     # accès aux données (aucun accès Dexie direct depuis les composants)
-  store/              # stores Zustand
-  lib/                # utilitaires purs (sanitize, hash, ids, regex…)
-  workers/            # layout elkjs, calculs lourds
+    dexie.ts          # database and index definition
+    repositories/     # data access (no direct Dexie access from components)
+  store/              # Zustand stores
+  lib/                # pure utilities (sanitize, hash, ids, regex…)
+  workers/            # elkjs layout, heavy computations
 tests/
   e2e/                # Playwright
 ```
 
 ---
 
-## 4. Modèle de données (v1)
+## 4. Data model (v1)
 
 ```ts
-// src/domain/schemas.ts – à implémenter avec Zod, types inférés via z.infer
+// src/domain/schemas.ts – implemented with Zod, types inferred via z.infer
 Investigation { id: string; name: string; description?: string;
                 createdAt: string; updatedAt: string;
                 schemaVersion: number; encrypted: boolean }
@@ -97,7 +97,7 @@ Entity        { id: string; investigationId: string;
                 createdAt: string; updatedAt: string }
 
 Relation      { id: string; investigationId: string;
-                from: string; to: string;                // ids d'entités
+                from: string; to: string;                // entity ids
                 label: string; directed: boolean;
                 sourceIds: string[]; confidence?: Confidence;
                 status: "verified" | "hypothesis";
@@ -111,130 +111,131 @@ Source        { id: string; investigationId: string;
 Attachment    { id: string; investigationId: string;
                 blob: Blob; mime: string; size: number; sha256: string }
 
-Confidence    { reliability: "A"|"B"|"C"|"D"|"E"|"F";   // code Amirauté : fiabilité de la source
-                credibility: 1|2|3|4|5|6 }              // crédibilité de l'information
+Confidence    { reliability: "A"|"B"|"C"|"D"|"E"|"F";   // Admiralty code: source reliability
+                credibility: 1|2|3|4|5|6 }              // information credibility
 ```
 
-Types d'entités par défaut : `person`, `alias` (pseudo/compte), `email`, `phone`, `domain`, `ip`, `url`,
+Default entity types: `person`, `alias` (handle/account), `email`, `phone`, `domain`, `ip`, `url`,
 `organization`, `address`, `image`, `document`, `crypto_wallet`, `vehicle`, `event`.
 
-IDs : `crypto.randomUUID()`. Dates : ISO 8601 UTC.
+IDs: `crypto.randomUUID()`. Dates: ISO 8601 UTC.
 
 ---
 
-## 5. Definition of Done (pour chaque tâche)
+## 5. Definition of Done (for every task)
 
-- [ ] Code TypeScript strict, sans `any` non justifié
-- [ ] Tests unitaires pour la logique métier (domain, repositories, lib)
-- [ ] `bun run lint`, `bun run typecheck` et `bun run test` passent
-- [ ] Aucune nouvelle requête réseau au runtime (sauf opt-in documenté)
-- [ ] Toute donnée affichée provenant de l'utilisateur ou d'un import est assainie
-- [ ] UI fonctionnelle en thème clair et sombre
-- [ ] Une case cochée dans ce fichier
+- [ ] Strict TypeScript code, no unjustified `any`
+- [ ] Unit tests for business logic (domain, repositories, lib)
+- [ ] `bun run lint`, `bun run typecheck` and `bun run test` pass
+- [ ] No new network request at runtime (except documented opt-in)
+- [ ] Any displayed data coming from the user or an import is sanitized
+- [ ] UI works in light and dark themes
+- [ ] One box checked in this file
 
 ---
 
-## 6. Jalons
+## 6. Milestones
 
-### v0.0 – Fondations
+### v0.0 – Foundations
 
-- [x] Initialiser le projet Vite + React + TS (strict) avec Bun
-- [x] Configurer Tailwind v4, shadcn/ui, thème clair/sombre (suivi du système + bascule manuelle)
-- [x] Configurer ESLint, Prettier, Vitest, Playwright
-- [x] Ajouter une CSP stricte via `<meta http-equiv="Content-Security-Policy">` (`default-src 'self'`, pas d'`unsafe-eval`)
-- [x] CI GitHub Actions : lint, typecheck, tests, build
-- [x] Déploiement automatique sur GitHub Pages depuis `main`
-- [x] Fichiers repo : `LICENSE`, `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CLAUDE.md`
+- [x] Initialize the Vite + React + TS (strict) project with Bun
+- [x] Set up Tailwind v4, shadcn/ui, light/dark theme (follows the system + manual toggle)
+- [x] Set up ESLint, Prettier, Vitest, Playwright
+- [x] Add a strict CSP via `<meta http-equiv="Content-Security-Policy">` (`default-src 'self'`, no `unsafe-eval`)
+- [x] GitHub Actions CI: lint, typecheck, tests, build
+- [x] Automatic deployment to GitHub Pages from `main`
+- [x] Repository files: `LICENSE`, `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CLAUDE.md`
 
-**Critère d'acceptation** : `bun run dev` affiche une coquille d'app vide et la CI est verte.
+**Acceptance criterion**: `bun run dev` shows an empty app shell and CI is green.
 
-### v0.1 – MVP : graphe éditable et persistant
+### v0.1 – MVP: editable and persistent graph
 
-- [x] Schémas Zod du modèle (§4) + tests de validation
-- [x] Base Dexie (tables `investigations`, `entities`, `relations`, `sources`, `attachments`, index par `investigationId`)
-- [x] Repositories CRUD + tests avec fake-indexeddb
-- [x] Écran d'accueil : liste des enquêtes, créer, renommer, supprimer (avec confirmation)
-- [x] Canvas React Flow : zoom, pan, minimap, grille magnétique
-- [x] Nœud personnalisé par type d'entité (icône, couleur, label)
-- [x] Ajout d'entité (barre d'outils + double-clic sur le canvas)
-- [x] Création de relation par glisser d'un nœud à l'autre, avec saisie du label
-- [x] Panneau latéral de détail : édition du label, des propriétés, des tags et des notes Markdown (rendu assaini)
-- [x] Suppression d'entités/relations (touche Suppr), suppression en cascade des relations orphelines
-- [x] Sauvegarde automatique debouncée de toutes les modifications, y compris les positions
-- [x] Export / import JSON d'une enquête (format versionné, validé par Zod, rejet propre en cas d'erreur)
+- [x] Zod schemas of the model (§4) + validation tests
+- [x] Dexie database (tables `investigations`, `entities`, `relations`, `sources`, `attachments`, indexed by `investigationId`)
+- [x] CRUD repositories + tests with fake-indexeddb
+- [x] Home screen: list investigations, create, rename, delete (with confirmation)
+- [x] React Flow canvas: zoom, pan, minimap, snap grid
+- [x] Custom node per entity type (icon, color, label)
+- [x] Add an entity (toolbar + double-click on the canvas)
+- [x] Create a relation by dragging from one node to another, with a label prompt
+- [x] Detail side panel: edit the label, properties, tags and Markdown notes (sanitized rendering)
+- [x] Delete entities/relations (Delete key), cascading deletion of orphan relations
+- [x] Debounced autosave of every change, positions included
+- [x] JSON export / import of an investigation (versioned format, validated by Zod, clean rejection on error)
 
-**Critère d'acceptation** : je crée une enquête, ajoute 10 entités reliées, recharge la page,
-tout est intact ; j'exporte en JSON, supprime l'enquête, la réimporte à l'identique.
+**Acceptance criterion**: I create an investigation, add 10 linked entities, reload the page,
+everything is intact; I export to JSON, delete the investigation, re-import it identically.
 
-### v0.2 – Sources, confiance, navigation
+### v0.2 – Sources, confidence, navigation
 
-- [x] CRUD des sources, rattachement à une entité ou une relation
-- [x] Pièces jointes (captures d'écran) stockées en Blob + calcul SHA-256
-- [x] Champ « lien archive.org » et date de capture
-- [x] Niveau de confiance (code Amirauté) et statut vérifié/hypothèse
-- [x] Rendu visuel : relations hypothétiques en pointillés, badge de confiance sur les nœuds
-- [x] Recherche plein texte (labels, propriétés, notes) avec mise en évidence sur le graphe
-- [x] Filtres par type, tag, statut et confiance (les éléments filtrés sont estompés)
+- [x] Source CRUD, attached to an entity or a relation
+- [x] Attachments (screenshots) stored as Blobs + SHA-256 computation
+- [x] "archive.org link" field and capture date
+- [x] Confidence level (Admiralty code) and verified/hypothesis status
+- [x] Visual rendering: hypothetical relations dashed, confidence badge on nodes
+- [x] Full-text search (labels, properties, notes) with highlighting on the graph
+- [x] Filters by type, tag, status and confidence (filtered-out elements are dimmed)
 - [x] Undo/redo (Cmd/Ctrl+Z, Cmd/Ctrl+Shift+Z) via zundo
-- [x] Export PNG et SVG du graphe
+- [x] PNG and SVG export of the graph
 
-### v0.3 – Analyse et productivité
+### v0.3 – Analysis and productivity
 
-- [x] Mise en page responsive mobile et tablette (dès 360 px de large, mise en page étroite sous le breakpoint `md`) : barre d'outils du graphe compactée (recherche dépliable, Annuler, menu « Plus d'actions » avec Rétablir, Filtres, Sources et exports), panneau de détail en tiroir ancré en bas, non modal, masqué sans sélection, réduit (résumé de la sélection) ou déplié (éditeur complet) au toucher ou au glisser de sa poignée, minimap masquée, bouton « Supprimer la sélection » pour la sélection multiple, cibles tactiles ≥ 44 px, dialogues contenus dans l'écran, aucun défilement horizontal. Tests E2E Playwright sur un viewport mobile (`devices['Pixel 7']`)
-- [x] Gestes tactiles sur le canvas : pan à un doigt et zoom au pincement, appui long sur le canvas pour ajouter une entité (équivalent du double-clic), création de relation au doigt depuis la poignée d'une entité sélectionnée (zone tactile de 44 px)
-- [x] Dates de création et de dernière modification des entités et relations, affichées dans le panneau de détail (et le tiroir mobile) ; le déplacement d'un nœud ne compte pas comme une modification (OpenSpec `add-element-timestamps`)
-- [x] Internationalisation FR/EN : interface en français et en anglais, langue détectée depuis la langue du navigateur ou du système (repli sur l'anglais), menu de langue dans l'en-tête, choix persisté dans ce navigateur, dates, nombres et tailles formatés selon la langue, vocabulaire OSINT usuel (échelle de l'Amirauté OTAN) ; le contenu des enquêtes n'est jamais traduit et le format d'export reste inchangé (OpenSpec `add-i18n`)
-- [ ] Layouts automatiques (force, hiérarchique, radial) via elkjs dans un Web Worker
-- [ ] Plus court chemin entre deux entités sélectionnées (graphology), mis en évidence
-- [ ] Mise en évidence des voisins à N sauts
-- [ ] Fusion de deux entités (propriétés, tags, sources et relations fusionnés, sans perte)
-- [ ] Extraction depuis du texte : coller un texte, détection par regex (emails, IP v4/v6, domaines, URLs, téléphones, wallets BTC/ETH), aperçu puis création sélective
-- [x] Boîte à outils de pivots : section « Outils » du panneau de détail (et du tiroir mobile) listant les outils d'un catalogue intégré applicables au type de l'entité (moteurs de recherche, fuites, whois/DNS, comptes, archives, explorateurs de blocs, registres d'entreprises, recherche d'image inversée). Par outil et par type : modèle d'URL avec le label encodé (ex. `https://crt.sh/?q={value}`, `https` seulement ; numéros de téléphone sans espaces ni séparateurs, label enregistré inchangé) ou simple lien vers le site ou le dépôt GitHub (outils en ligne de commande, mode « boîte à outils ») ; ouverture dans un nouvel onglet (`noopener noreferrer`), URL résolue visible avant le clic, jamais de lien qui lance un scan public. Coche manuelle par outil et par entité, séparée du lien, datée (`toolChecks: { toolId, checkedAt }[]`, champ optionnel validé par Zod, inclus dans l'export), annulable, conservée lors d'une fusion d'entités. Catalogue non modifiable dans l'app. Cocher ou décocher compte comme une modification (`updatedAt`) (OpenSpec `add-pivot-toolbox`)
-- [x] Catalogue de pivots étendu : OCCRP Aleph et OpenSanctions (catégorie « Bases d'enquête »), Analyzeid et BuiltWith (domaines), dotDB (organisations et alias), Yandex Maps et imagerie historique (Esri Wayback, Remonter le temps IGN, cartes.gouv.fr) pour les adresses, décodeurs VIN (catégorie « Véhicules ») ; lien Censys corrigé vers `platform.censys.io` (OpenSpec `extend-pivot-catalog`)
-- [ ] Palette de commandes (Cmd/Ctrl+K)
-- [ ] Captures similaires : hash perceptuel (dHash 64 bits, calculé localement) de chaque capture, signalement « Capture très proche de celle de la source X » sous un seuil de distance de Hamming, et comparaison côte à côte de deux captures (ex. un post capturé à deux dates)
-- [x] Mise en forme des entités : couleur (palette de 16) et icône (jeu lucide de 44, sans import d'image) personnalisées par entité, remplaçant celles du type, et marqueur « important » (drapeau sur le nœud, critère de filtre « Importance », présent dans les exports PNG et SVG)
-- [x] Options d'affichage du graphe : libellés des entités, libellés des relations, cotations et marque « Important » masquables depuis un menu « Affichage » (une icône par option, sous-menu de « Plus d'actions » sur écran étroit), point d'alerte tant qu'une option est modifiée ; mini-carte masquable à part, par un bouton dans les contrôles de zoom (ni pastille ni réinitialisation). Préférence de l'appareil (`localStorage`, validée par Zod) commune à toutes les enquêtes, ni enregistrée ni exportée en JSON ni annulable ; les exports PNG et SVG ne dessinent que ce qui est affiché (OpenSpec `add-graph-display-options`)
-- [ ] Groupes / clusters visuels de nœuds
+- [x] Responsive mobile and tablet layout (from 360 px wide, narrow layout below the `md` breakpoint): compact graph toolbar (collapsible search, Undo, "More actions" menu with Redo, Filters, Sources and exports), detail panel as a drawer anchored at the bottom, non-modal, hidden with no selection, collapsed (selection summary) or expanded (full editor) by tapping or dragging its handle, minimap hidden, "Delete selection" button for multiple selection, touch targets ≥ 44 px, dialogs contained in the screen, no horizontal scrolling. Playwright E2E tests on a mobile viewport (`devices['Pixel 7']`)
+- [x] Touch gestures on the canvas: one-finger pan and pinch zoom, long press on the canvas to add an entity (equivalent of double-click), relation creation by finger from the handle of a selected entity (44 px touch area)
+- [x] Creation and last-modification dates of entities and relations, shown in the detail panel (and the mobile drawer); moving a node does not count as a modification (OpenSpec `add-element-timestamps`)
+- [x] FR/EN internationalization: interface in French and English, language detected from the browser or system language (English fallback), language menu in the header, choice persisted in this browser, dates, numbers and sizes formatted for the language, standard OSINT vocabulary (NATO Admiralty scale); investigation content is never translated and the export format stays unchanged (OpenSpec `add-i18n`)
+- [ ] Automatic layouts (force, hierarchical, radial) via elkjs in a Web Worker
+- [ ] Shortest path between two selected entities (graphology), highlighted
+- [ ] Highlight neighbors within N hops
+- [ ] Merge two entities (properties, tags, sources and relations merged, without loss)
+- [ ] Extraction from text: paste a text, regex detection (emails, IPv4/v6, domains, URLs, phone numbers, BTC/ETH wallets), preview then selective creation
+- [x] Pivot toolbox: "Tools" section of the detail panel (and the mobile drawer) listing the tools of a built-in catalog that apply to the entity's type (search engines, leaks, whois/DNS, accounts, archives, block explorers, company registries, reverse image search). Per tool and per type: URL template with the encoded label (e.g. `https://crt.sh/?q={value}`, `https` only; phone numbers without spaces or separators, stored label unchanged) or plain link to the website or GitHub repository (command-line tools, "toolbox" mode); opens in a new tab (`noopener noreferrer`), resolved URL visible before clicking, never a link that launches a public scan. Manual check per tool and per entity, separate from the link, dated (`toolChecks: { toolId, checkedAt }[]`, optional field validated by Zod, included in the export), undoable, kept when merging entities. Catalog not editable in the app. Checking or unchecking counts as a modification (`updatedAt`) (OpenSpec `add-pivot-toolbox`)
+- [x] Extended pivot catalog: OCCRP Aleph and OpenSanctions ("Investigative databases" category), Analyzeid and BuiltWith (domains), dotDB (organizations and aliases), Yandex Maps and historical imagery (Esri Wayback, Remonter le temps IGN, cartes.gouv.fr) for addresses, VIN decoders ("Vehicles" category); Censys link fixed to `platform.censys.io` (OpenSpec `extend-pivot-catalog`)
+- [ ] Command palette (Cmd/Ctrl+K)
+- [ ] Similar screenshots: perceptual hash (64-bit dHash, computed locally) of each screenshot, "Screenshot very close to the one of source X" warning below a Hamming distance threshold, and side-by-side comparison of two screenshots (e.g. a post captured on two dates)
+- [x] Entity styling: per-entity color (palette of 16) and icon (lucide set of 44, no image import), replacing the type's ones, and "important" marker (flag on the node, "Importance" filter criterion, present in PNG and SVG exports)
+- [x] Graph display options: entity labels, relation labels, ratings and "Important" mark can be hidden from a "Display" menu (one icon per option, submenu of "More actions" on narrow screens), alert dot while an option is changed; minimap can be hidden separately, with a button in the zoom controls (no dot, no reset). Device preference (`localStorage`, validated by Zod) shared by all investigations, neither saved, nor exported to JSON, nor undoable; PNG and SVG exports only draw what is displayed (OpenSpec `add-graph-display-options`)
+- [ ] Visual groups / clusters of nodes
 
-### v0.4 – Vues complémentaires
+### v0.4 – Complementary views
 
-- [ ] Vue tableau de toutes les entités (tri, filtres, édition rapide)
-- [ ] Timeline des entités et relations datées (type `event` et propriétés date)
-- [ ] Carte Leaflet des entités géolocalisées. **Désactivée par défaut**, avec un avertissement expliquant que les tuiles sont chargées depuis un serveur tiers
-- [ ] Dossiers d'enquêtes sur l'écran d'accueil (un seul niveau, sans imbrication) : créer, renommer, supprimer un dossier (ses enquêtes reviennent à la racine, jamais supprimées), déplacer une enquête, filtrer la liste par dossier. Le dossier est une organisation locale : non inclus dans l'export
-- [ ] Archivage d'enquêtes (alternative réversible à la suppression, les données étant uniquement locales) : archiver / désarchiver depuis la liste, enquêtes archivées masquées par défaut (section repliée ou filtre « Archivées »), lecture seule ou ouverture possible sans édition accidentelle, suppression définitive toujours disponible depuis les archives. Champ `archivedAt` : migration de schéma testée (`SCHEMA_VERSION`). À préciser : inclusion ou non dans l'export
-- [ ] Outils personnalisés : ajouter, modifier et supprimer ses propres outils (nom, types, modèle d'URL `https` seulement ou simple lien) depuis un écran Paramètres ; les outils du catalogue intégré ne sont ni modifiables ni supprimables. Outils personnalisés communs à toutes les enquêtes de ce navigateur, non exportés ; la coche garde une copie du nom de l'outil (`toolName`) pour rester lisible après sa suppression ou dans un autre navigateur. À préciser : export/import des outils personnalisés
+- [ ] Table view of all entities (sorting, filters, quick editing)
+- [ ] Timeline of dated entities and relations (`event` type and date properties)
+- [ ] Leaflet map of geolocated entities. **Disabled by default**, with a warning explaining that tiles are loaded from a third-party server
+- [ ] Investigation folders on the home screen (a single level, no nesting): create, rename, delete a folder (its investigations go back to the root, never deleted), move an investigation, filter the list by folder. The folder is a local organization: not included in the export
+- [ ] Investigation archiving (reversible alternative to deletion, since data is local only): archive / unarchive from the list, archived investigations hidden by default (collapsed section or "Archived" filter), read-only or opening possible without accidental editing, permanent deletion always available from the archives. `archivedAt` field: tested schema migration (`SCHEMA_VERSION`). To be decided: included in the export or not
+- [ ] Custom tools: add, edit and delete your own tools (name, types, `https`-only URL template or plain link) from a Settings screen; the built-in catalog tools can be neither edited nor deleted. Custom tools shared by all investigations of this browser, not exported; the check keeps a copy of the tool name (`toolName`) to stay readable after its deletion or in another browser. To be decided: export/import of custom tools
 
-### v1.0 – Sécurité, interopérabilité, distribution
+### v1.0 – Security, interoperability, distribution
 
-- [ ] Chiffrement optionnel par enquête : AES-GCM, clé dérivée par PBKDF2 (≥ 600 000 itérations, sel aléatoire), déverrouillage par passphrase, clé gardée uniquement en mémoire
-- [ ] Verrouillage automatique après inactivité
-- [ ] Export chiffré (le JSON exporté reste chiffré)
-- [ ] Export/import ZIP (`.filrouge.zip`) : `investigation.json` + une image par capture, lues entrée par entrée pour lever la limite de 200 Mo du JSON. Limites conservées : 20 Mo par capture, nombre d'entrées et taille du JSON bornés, protection contre les zip bombs (taille décompressée vérifiée). Dépendance sans réseau (ex. fflate)
-- [ ] Export CSV (entités, relations) et GraphML (Gephi)
-- [ ] Export STIX 2.1 (bundle) pour OpenCTI/MISP
-- [ ] Rapport d'enquête Markdown et PDF (graphe, entités, sources)
-- [ ] Types d'entités personnalisés (schéma de propriétés, icône, couleur)
-- [ ] PWA installable et fonctionnement hors ligne complet
-- [ ] Système de migrations de `schemaVersion` + tests de migration
-- [ ] Tests E2E Playwright des parcours principaux
-- [ ] Documentation utilisateur et captures pour le README
+- [ ] Optional per-investigation encryption: AES-GCM, key derived with PBKDF2 (≥ 600,000 iterations, random salt), unlocking with a passphrase, key kept in memory only
+- [ ] Automatic lock after inactivity
+- [ ] Encrypted export (the exported JSON stays encrypted)
+- [ ] ZIP export/import (`.filrouge.zip`): `investigation.json` + one image per screenshot, read entry by entry to lift the 200 MB JSON limit. Limits kept: 20 MB per screenshot, bounded number of entries and JSON size, zip bomb protection (uncompressed size checked). Network-free dependency (e.g. fflate)
+- [ ] CSV export (entities, relations) and GraphML (Gephi)
+- [ ] STIX 2.1 export (bundle) for OpenCTI/MISP
+- [ ] Markdown and PDF investigation report (graph, entities, sources)
+- [ ] Custom entity types (property schema, icon, color)
+- [ ] Installable PWA and full offline operation
+- [ ] `schemaVersion` migration system + migration tests
+- [ ] Playwright E2E tests of the main user journeys
+- [x] README screenshots and open-source front page: English README, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT, English demos, `bun run screenshots` (OpenSpec `prepare-open-source-release`)
+- [ ] User documentation
 
-### Idées post-1.0 (non prioritaires)
+### Post-1.0 ideas (not prioritized)
 
-- Rendu Sigma.js pour les très gros graphes (> 5 000 nœuds)
-- Import depuis Maltego (.mtgx) et OSINTracker
-- Comparaison de deux enquêtes / détection d'entités communes
-- Plugins de pivots communautaires
+- Sigma.js rendering for very large graphs (> 5,000 nodes)
+- Import from Maltego (.mtgx) and OSINTracker
+- Comparison of two investigations / detection of common entities
+- Community pivot plugins
 
 ---
 
-## 7. Notes pour l'agent de développement
+## 7. Notes for the development agent
 
-- Traiter **une seule tâche à la fois**, dans l'ordre, puis cocher la case correspondante dans ce fichier.
-- Avant d'ajouter une dépendance, vérifier qu'elle n'effectue aucun appel réseau au runtime et justifier son ajout.
-- Les composants n'accèdent jamais directement à Dexie : ils passent par les repositories et les stores.
-- La logique métier (domain, lib) reste pure et testable sans DOM.
-- Ne jamais logguer le contenu des enquêtes dans la console en production.
-- En cas d'ambiguïté sur un comportement produit, s'arrêter et demander plutôt que d'inventer.
+- Handle **one task at a time**, in order, then check the matching box in this file.
+- Before adding a dependency, check that it makes no network call at runtime and justify its addition.
+- Components never access Dexie directly: they go through repositories and stores.
+- Business logic (domain, lib) stays pure and testable without a DOM.
+- Never log investigation content to the console in production.
+- When a product behavior is ambiguous, stop and ask rather than invent.

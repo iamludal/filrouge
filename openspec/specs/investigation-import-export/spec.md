@@ -99,7 +99,7 @@ supported, with an explicit message.
 
 #### Scenario: Newer version
 - **WHEN** the file has `schemaVersion` 2
-- **THEN** the import is rejected with a message saying it was produced by a newer filrouge
+- **THEN** the import is rejected with a message saying it was produced by a newer Filrouge
 
 #### Scenario: Too large
 - **WHEN** the file is larger than 200 MB

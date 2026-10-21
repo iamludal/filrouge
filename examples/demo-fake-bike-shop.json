@@ -4,8 +4,8 @@
   "exportedAt": "2026-09-15T10:00:00.000Z",
   "investigation": {
     "id": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-    "name": "Démo – Faux site de vente de vélos (escroquerie en ligne)",
-    "description": "Scénario fictif et volontairement court (10 entités) destiné à la démonstration. Personnes, organisation, domaines (`.example`), IP (plage de documentation), téléphone (plage ARCEP réservée à la fiction) et portefeuille sont inventés.\n\nUne victime a payé un vélo jamais livré sur une boutique en ligne éphémère. Deux chaînes de pivots convergent vers un suspect :\n\n1. domaine, puis WHOIS historique, puis email, puis profil de forum ;\n2. raison sociale du site, puis registre des entreprises, puis dirigeant.\n\nLe lien entre le portefeuille et le suspect reste à établir.",
+    "name": "Demo – Fake bike shop (online scam)",
+    "description": "Fictional and deliberately short scenario (10 entities) made for demonstration. People, organization, domains (`.example`), IP (documentation range), phone number (range reserved for fiction by the French regulator ARCEP) and wallet are made up.\n\nA victim paid for a bike that was never delivered, on a short-lived online shop. Two chains of pivots converge on a suspect:\n\n1. domain, then historical WHOIS, then email, then forum profile;\n2. the website's company name, then the company register, then its director.\n\nThe link between the wallet and the suspect remains to be established.",
     "createdAt": "2026-09-14T09:00:00.000Z",
     "updatedAt": "2026-09-15T10:00:00.000Z",
     "schemaVersion": 1,
@@ -16,12 +16,12 @@
       "id": "69e5195b-5e5d-5361-b669-afcffa6001a6",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "type": "document",
-      "label": "Plainte – vélo jamais livré",
+      "label": "Complaint – bike never delivered",
       "properties": {
-        "auteur": "Mme L. Garnier (victime fictive)"
+        "author": "Ms L. Garnier (fictional victim)"
       },
-      "tags": ["point de départ"],
-      "notes": "**Point de départ.** Achat d'un vélo électrique à 890 € le 2 septembre 2026, payé en crypto à la demande du « vendeur ». Aucune livraison, site injoignable depuis.",
+      "tags": ["starting point"],
+      "notes": "**Starting point.** Purchase of an e-bike for €890 on 2 September 2026, paid in crypto at the \"seller's\" request. No delivery, website unreachable since.",
       "sourceIds": ["57001030-c861-52bb-9503-e84982336cd6"],
       "confidence": {
         "reliability": "A",
@@ -42,10 +42,10 @@
       "label": "veloccasion-direct.example",
       "properties": {
         "registrar": "Registrar Example SAS",
-        "date de création": "2026-08-03"
+        "creation date": "2026-08-03"
       },
       "tags": ["pivot"],
-      "notes": "Domaine créé un mois avant les faits : typique des boutiques éphémères.",
+      "notes": "Domain created one month before the facts: typical of short-lived shops.",
       "sourceIds": ["57001030-c861-52bb-9503-e84982336cd6", "5f82ea77-e6fc-5b20-85e8-9b6470b27ce7"],
       "confidence": {
         "reliability": "A",
@@ -65,11 +65,11 @@
       "type": "ip",
       "label": "192.0.2.44",
       "properties": {
-        "ASN": "AS64500 (hébergeur fictif)",
-        "pays": "Pays-Bas"
+        "ASN": "AS64500 (fictional host)",
+        "country": "Netherlands"
       },
       "tags": [],
-      "notes": "Hébergement mutualisé : pivot faible, des centaines de sites sur la même IP. Adresse de la plage de documentation.",
+      "notes": "Shared hosting: weak pivot, hundreds of websites on the same IP. Address from the documentation range.",
       "sourceIds": ["5f82ea77-e6fc-5b20-85e8-9b6470b27ce7"],
       "confidence": {
         "reliability": "B",
@@ -89,11 +89,11 @@
       "type": "phone",
       "label": "+33 6 39 98 12 07",
       "properties": {
-        "pays": "France",
-        "opérateur": "inconnu"
+        "country": "France",
+        "carrier": "unknown"
       },
       "tags": [],
-      "notes": "Numéro affiché sur la page « Contact », messagerie seule. Plage ARCEP réservée à la fiction.",
+      "notes": "Number shown on the \"Contact\" page, voicemail only. Range reserved for fiction by ARCEP, the French regulator.",
       "sourceIds": ["32c22200-8692-5e35-8067-fa622296b4d4"],
       "confidence": {
         "reliability": "B",
@@ -113,10 +113,10 @@
       "type": "email",
       "label": "k.morand33@mail.example",
       "properties": {
-        "fournisseur": "mail.example"
+        "provider": "mail.example"
       },
       "tags": ["pivot"],
-      "notes": "Email du titulaire dans le WHOIS historique. **Pivot clé** : retrouvé sur un forum de petites annonces.",
+      "notes": "Registrant email in the historical WHOIS. **Key pivot**: found again on a classified ads forum.",
       "sourceIds": ["5f82ea77-e6fc-5b20-85e8-9b6470b27ce7"],
       "confidence": {
         "reliability": "B",
@@ -138,8 +138,8 @@
       "properties": {
         "blockchain": "Bitcoin"
       },
-      "tags": ["flux financier"],
-      "notes": "Adresse communiquée à la victime pour le paiement. À signaler à la plateforme d’échange si un retrait est observé.",
+      "tags": ["money flow"],
+      "notes": "Address given to the victim for payment. To report to the exchange platform if a withdrawal is seen.",
       "sourceIds": ["57001030-c861-52bb-9503-e84982336cd6"],
       "confidence": {
         "reliability": "A",
@@ -159,12 +159,12 @@
       "type": "alias",
       "label": "kmorand33",
       "properties": {
-        "plateforme": "Cycl’Annonces",
-        "identifiant": "kmorand33",
-        "url du profil": "https://cyclannonces.example/membres/kmorand33"
+        "platform": "Cycl’Annonces",
+        "username": "kmorand33",
+        "profile url": "https://cyclannonces.example/membres/kmorand33"
       },
       "tags": [],
-      "notes": "Annonces de vélos à prix anormalement bas, mêmes photos que sur le site frauduleux.",
+      "notes": "Bike listings at abnormally low prices, same photos as on the fraudulent website.",
       "sourceIds": ["ac3f6eda-38d7-5301-b670-b8140f4a3dab"],
       "confidence": {
         "reliability": "B",
@@ -184,12 +184,12 @@
       "type": "organization",
       "label": "KM Négoce SASU",
       "properties": {
-        "pays": "France",
-        "identifiant légal": "000 000 000 (fictif)",
-        "secteur": "Commerce de cycles"
+        "country": "France",
+        "legal identifier": "000 000 000 (fictional)",
+        "sector": "Bicycle retail"
       },
       "tags": [],
-      "notes": "Raison sociale citée sur le site. Créée en juin 2026, aucun dépôt de comptes.",
+      "notes": "Company name shown on the website. Incorporated in June 2026, no accounts filed.",
       "sourceIds": ["32c22200-8692-5e35-8067-fa622296b4d4", "d55857e4-2a27-5ada-b85e-9bbd183c6bf3"],
       "confidence": {
         "reliability": "A",
@@ -209,12 +209,12 @@
       "type": "person",
       "label": "Kévin Morand",
       "properties": {
-        "prénom": "Kévin",
-        "nom": "Morand",
-        "nationalité": "française"
+        "first name": "Kévin",
+        "last name": "Morand",
+        "nationality": "French"
       },
-      "tags": ["cible"],
-      "notes": "## Suspect\nPersonnage **entièrement fictif**.\n\nDeux chaînes indépendantes convergent :\n- WHOIS, email, profil de forum ;\n- raison sociale du site, registre, dirigeant.\n\nReste une **hypothèse** tant que l'email n'est pas formellement rattaché à la personne (homonymie possible).",
+      "tags": ["target"],
+      "notes": "## Suspect\n**Entirely fictional** character.\n\nTwo independent chains converge:\n- WHOIS, email, forum profile;\n- the website's company name, register, director.\n\nStays a **hypothesis** until the email is formally tied to the person (possible namesake).",
       "sourceIds": ["d55857e4-2a27-5ada-b85e-9bbd183c6bf3", "ac3f6eda-38d7-5301-b670-b8140f4a3dab"],
       "confidence": {
         "reliability": "C",
@@ -232,15 +232,15 @@
       "id": "53c95d29-e1b4-593f-8f43-74917873e8fd",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "type": "address",
-      "label": "Domiciliation, Bordeaux",
+      "label": "Registered office, Bordeaux",
       "properties": {
-        "ville": "Bordeaux",
-        "pays": "France",
+        "city": "Bordeaux",
+        "country": "France",
         "latitude": 44.8412,
         "longitude": -0.58
       },
       "tags": [],
-      "notes": "Siège social chez une société de domiciliation : adresse administrative, **pas** un domicile.",
+      "notes": "Registered office at a business address provider: an administrative address, **not** a home.",
       "sourceIds": ["d55857e4-2a27-5ada-b85e-9bbd183c6bf3"],
       "confidence": {
         "reliability": "A",
@@ -261,7 +261,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "69e5195b-5e5d-5361-b669-afcffa6001a6",
       "to": "8297dbce-a021-5ee1-9393-c4bc0b31321c",
-      "label": "mentionne",
+      "label": "mentions",
       "directed": true,
       "sourceIds": ["57001030-c861-52bb-9503-e84982336cd6"],
       "confidence": {
@@ -277,7 +277,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "69e5195b-5e5d-5361-b669-afcffa6001a6",
       "to": "5c2314a8-bb4e-5a7e-b8cc-2f32d9493471",
-      "label": "paiement vers",
+      "label": "payment to",
       "directed": true,
       "sourceIds": ["57001030-c861-52bb-9503-e84982336cd6"],
       "confidence": {
@@ -293,7 +293,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "8297dbce-a021-5ee1-9393-c4bc0b31321c",
       "to": "af5e6c33-5e3f-5be5-9536-3f27698cf479",
-      "label": "résout vers",
+      "label": "resolves to",
       "directed": true,
       "sourceIds": ["5f82ea77-e6fc-5b20-85e8-9b6470b27ce7"],
       "confidence": {
@@ -309,7 +309,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "8297dbce-a021-5ee1-9393-c4bc0b31321c",
       "to": "9f18e161-e33f-56fc-b81f-8bb5c2d7d681",
-      "label": "affiche",
+      "label": "displays",
       "directed": true,
       "sourceIds": ["32c22200-8692-5e35-8067-fa622296b4d4"],
       "confidence": {
@@ -325,7 +325,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "8297dbce-a021-5ee1-9393-c4bc0b31321c",
       "to": "9c6f067e-7415-5c8e-a54a-f4c51f4d3970",
-      "label": "enregistré par",
+      "label": "registered by",
       "directed": true,
       "sourceIds": ["5f82ea77-e6fc-5b20-85e8-9b6470b27ce7"],
       "confidence": {
@@ -341,7 +341,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "8297dbce-a021-5ee1-9393-c4bc0b31321c",
       "to": "5058bae5-f0b0-5ce9-8b4a-d54af18b0261",
-      "label": "site de",
+      "label": "website of",
       "directed": true,
       "sourceIds": ["32c22200-8692-5e35-8067-fa622296b4d4"],
       "confidence": {
@@ -357,7 +357,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "4f3d08a3-a161-58f9-9650-c0fc43791d47",
       "to": "9c6f067e-7415-5c8e-a54a-f4c51f4d3970",
-      "label": "contact du profil",
+      "label": "profile contact",
       "directed": true,
       "sourceIds": ["ac3f6eda-38d7-5301-b670-b8140f4a3dab"],
       "confidence": {
@@ -373,7 +373,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "5058bae5-f0b0-5ce9-8b4a-d54af18b0261",
       "to": "53c95d29-e1b4-593f-8f43-74917873e8fd",
-      "label": "siège à",
+      "label": "registered office at",
       "directed": true,
       "sourceIds": ["d55857e4-2a27-5ada-b85e-9bbd183c6bf3"],
       "confidence": {
@@ -389,7 +389,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "e5b3a3b4-2a9b-58c7-b4ff-5b4ce3cbdedc",
       "to": "5058bae5-f0b0-5ce9-8b4a-d54af18b0261",
-      "label": "dirige",
+      "label": "runs",
       "directed": true,
       "sourceIds": ["d55857e4-2a27-5ada-b85e-9bbd183c6bf3"],
       "confidence": {
@@ -405,7 +405,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "e5b3a3b4-2a9b-58c7-b4ff-5b4ce3cbdedc",
       "to": "4f3d08a3-a161-58f9-9650-c0fc43791d47",
-      "label": "compte présumé de",
+      "label": "presumed account of",
       "directed": true,
       "sourceIds": ["ac3f6eda-38d7-5301-b670-b8140f4a3dab"],
       "confidence": {
@@ -421,7 +421,7 @@
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
       "from": "5c2314a8-bb4e-5a7e-b8cc-2f32d9493471",
       "to": "e5b3a3b4-2a9b-58c7-b4ff-5b4ce3cbdedc",
-      "label": "contrôlé par ?",
+      "label": "controlled by?",
       "directed": true,
       "sourceIds": [],
       "confidence": {
@@ -437,43 +437,43 @@
     {
       "id": "57001030-c861-52bb-9503-e84982336cd6",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "Plainte de Mme L. Garnier (fictive)",
+      "title": "Complaint by Ms L. Garnier (fictional)",
       "capturedAt": "2026-09-14T09:05:00.000Z",
-      "note": "Récépissé de plainte transmis par la victime : capture de la commande, lien du site, coordonnées de paiement."
+      "note": "Complaint receipt sent by the victim: screenshot of the order, link to the website, payment details."
     },
     {
       "id": "32c22200-8692-5e35-8067-fa622296b4d4",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "Page « Contact » de veloccasion-direct.example",
+      "title": "\"Contact\" page of veloccasion-direct.example",
       "url": "https://veloccasion-direct.example/contact",
       "archiveUrl": "https://archive.example/2026.09.14/veloccasion-direct-contact",
       "capturedAt": "2026-09-14T09:40:00.000Z",
-      "note": "Mentions légales minimales : une raison sociale, un numéro de téléphone, aucun SIREN."
+      "note": "Minimal legal notice: a company name, a phone number, no SIREN (French company number)."
     },
     {
       "id": "5f82ea77-e6fc-5b20-85e8-9b6470b27ce7",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "WHOIS historique – veloccasion-direct.example",
+      "title": "Historical WHOIS – veloccasion-direct.example",
       "url": "https://whois-history.example/veloccasion-direct.example",
       "capturedAt": "2026-09-14T10:15:00.000Z",
-      "note": "Enregistrement d'août 2026, avant activation de la protection de la vie privée : l'email du titulaire est visible."
+      "note": "August 2026 record, before privacy protection was turned on: the registrant email is visible."
     },
     {
       "id": "d55857e4-2a27-5ada-b85e-9bbd183c6bf3",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "Registre des entreprises (fictif) – KM Négoce",
+      "title": "Company register (fictional) – KM Négoce",
       "url": "https://registre-entreprises.example/km-negoce",
       "capturedAt": "2026-09-14T11:10:00.000Z",
-      "note": "SASU immatriculée en juin 2026, dirigeant : Kévin Morand. Siège dans une société de domiciliation."
+      "note": "Single-shareholder company (SASU) registered in June 2026, director: Kévin Morand. Registered office at a business address provider."
     },
     {
       "id": "ac3f6eda-38d7-5301-b670-b8140f4a3dab",
       "investigationId": "0710bbf8-55c6-50e3-bd05-1cbb965f9e31",
-      "title": "Forum Cycl’Annonces – profil « kmorand33 »",
+      "title": "Cycl’Annonces forum – \"kmorand33\" profile",
       "url": "https://cyclannonces.example/membres/kmorand33",
       "archiveUrl": "https://archive.example/2026.09.15/cyclannonces-kmorand33",
       "capturedAt": "2026-09-15T09:20:00.000Z",
-      "note": "Profil public. Même email que le WHOIS dans le champ « Contact ». Plusieurs annonces de vélos à prix cassés."
+      "note": "Public profile. Same email as the WHOIS in the \"Contact\" field. Several bike listings at slashed prices."
     }
   ],
   "attachments": []

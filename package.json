@@ -2,7 +2,7 @@
   "name": "filrouge",
   "private": true,
   "version": "0.1.0",
-  "description": "Application web statique et local-first pour relier visuellement les trouvailles d'une enquête OSINT.",
+  "description": "Map OSINT investigations as a graph of entities, links and sources, right in your browser. Local-first: no backend, no account, no tracking.",
   "license": "MIT",
   "type": "module",
   "packageManager": "bun@1.2.13",
@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "screenshots": "playwright test -c playwright.screenshots.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",

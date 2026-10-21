@@ -1,7 +1,7 @@
 # localization Specification
 
 ## Purpose
-Lets each user work with filrouge in French or English: the interface language is detected from
+Lets each user work with Filrouge in French or English: the interface language is detected from
 the browser's preferences, can be changed at any time, and never alters investigation content.
 
 ## Requirements

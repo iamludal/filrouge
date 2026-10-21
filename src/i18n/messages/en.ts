@@ -176,7 +176,7 @@ export const en: Messages = {
     errors: {
       tooLarge: 'File too large',
       invalidJson: 'The file is not valid JSON',
-      newerVersion: (version) => `Format v${version} was produced by a newer version of filrouge`,
+      newerVersion: (version) => `Format v${version} was produced by a newer version of Filrouge`,
       tooManyProperties: (max) => `At most ${max} properties`,
       more: (count) => `… and ${count} more error(s)`,
       duplicateId: 'Duplicate identifier',

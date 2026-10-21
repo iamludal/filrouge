@@ -179,7 +179,7 @@ export const fr = {
       tooLarge: 'Fichier trop volumineux',
       invalidJson: `Le fichier n'est pas un JSON valide`,
       newerVersion: (version: number) =>
-        `Format v${version} produit par une version plus récente de filrouge`,
+        `Format v${version} produit par une version plus récente de Filrouge`,
       tooManyProperties: (max: number) => `Au plus ${max} propriétés`,
       more: (count: number) => `… et ${count} autre(s) erreur(s)`,
       duplicateId: 'Identifiant dupliqué',
