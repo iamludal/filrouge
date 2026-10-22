@@ -52,6 +52,8 @@ and how much you trust it. Nothing is sent anywhere, so it is safe for sensitive
 
 - Full-text search across labels, properties and notes, highlighted on the graph
 - Filters by type, tag, status, confidence and importance
+- Automatic layouts in one click: organic, hierarchical or radial around a target entity, for the
+  whole graph or only the selection, undone in one step
 
 **Pivot toolbox**
 
@@ -78,7 +80,7 @@ and how much you trust it. Nothing is sent anywhere, so it is safe for sensitive
 
 </details>
 
-What's next (automatic layouts, shortest path, timeline, encryption…): see
+What's next (shortest path, timeline, encryption…): see
 [ROADMAP.md](./ROADMAP.md).
 
 ## 🔒 Privacy by design
@@ -162,3 +164,6 @@ vulnerability? See [SECURITY.md](./SECURITY.md).
 ## 📄 License
 
 [MIT](./LICENSE) © iamludal
+
+Automatic layouts use [elkjs](https://github.com/kieler/elkjs), unmodified, under the
+[Eclipse Public License 2.0](https://www.eclipse.org/legal/epl-2.0/).

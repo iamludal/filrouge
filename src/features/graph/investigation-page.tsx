@@ -16,6 +16,7 @@ import { GraphCanvas } from '@/features/graph/graph-canvas'
 import { HistoryControls } from '@/features/graph/history-controls'
 import { SaveIndicator } from '@/features/graph/save-indicator'
 import { DisplayMenu } from '@/features/graph/display-menu'
+import { LayoutMenu } from '@/features/graph-layout/layout-menu'
 import { FiltersButton } from '@/features/graph-search/filters-panel'
 import { SearchField } from '@/features/graph-search/search-field'
 import { PasteScreenshot } from '@/features/sources/paste-screenshot'
@@ -123,6 +124,7 @@ export function InvestigationPage({ id }: { id: string }) {
               <SearchField />
               <FiltersButton />
               <DisplayMenu />
+              <LayoutMenu />
               <HistoryControls />
               <SaveIndicator />
               <SourcesLibrary />

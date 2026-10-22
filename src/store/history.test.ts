@@ -219,6 +219,62 @@ describe('graph store history', () => {
     expect(store().entities[b.id]!.position).toEqual({ x: 100, y: 0 })
   })
 
+  it('undoes an automatic layout in one step, without changing dates', () => {
+    openEmpty()
+    const a = store().addEntity('person', { x: 0, y: 0 })
+    const b = store().addEntity('person', { x: 100, y: 0 })
+    const created = store().entities[a.id]!.updatedAt
+    advance(2000)
+
+    store().arrangeEntities({ [a.id]: { x: 320, y: 160 }, [b.id]: { x: 480, y: 160 } })
+    expect(store().entities[a.id]!.position).toEqual({ x: 320, y: 160 })
+    expect(store().entities[a.id]!.updatedAt).toBe(created)
+    store().undo()
+    expect(store().entities[a.id]!.position).toEqual({ x: 0, y: 0 })
+    expect(store().entities[b.id]!.position).toEqual({ x: 100, y: 0 })
+  })
+
+  it('keeps a layout apart from a drag of the same entities made just before', () => {
+    openEmpty()
+    const a = store().addEntity('person', { x: 0, y: 0 })
+    advance(2000)
+
+    store().moveEntities({ [a.id]: { x: 32, y: 32 } })
+    advance(100)
+    store().arrangeEntities({ [a.id]: { x: 320, y: 320 } })
+    advance(100)
+    store().moveEntities({ [a.id]: { x: 64, y: 64 } })
+    store().undo()
+    expect(store().entities[a.id]!.position).toEqual({ x: 320, y: 320 })
+    store().undo()
+    expect(store().entities[a.id]!.position).toEqual({ x: 32, y: 32 })
+  })
+
+  it('records nothing for a layout that moves nothing', () => {
+    openEmpty()
+    const a = store().addEntity('person', { x: 0, y: 0 })
+    store().takeChanges()
+    const steps = temporal().pastStates.length
+
+    store().arrangeEntities({ [a.id]: { x: 0, y: 0 } })
+    expect(temporal().pastStates.length).toBe(steps)
+    expect(store().takeChanges()).toBeNull()
+  })
+
+  it('saves only the entities a layout moved', () => {
+    openEmpty()
+    const a = store().addEntity('person', { x: 0, y: 0 })
+    const b = store().addEntity('person', { x: 100, y: 0 })
+    store().takeChanges()
+
+    store().arrangeEntities({ [a.id]: { x: 320, y: 0 }, [b.id]: { x: 100, y: 0 } })
+    expect(
+      store()
+        .takeChanges()!
+        .upsertEntities.map((entity) => entity.id),
+    ).toEqual([a.id])
+  })
+
   it('merges typing in one field into one step, and separates fields and pauses', () => {
     openEmpty()
     const a = store().addEntity('person', { x: 0, y: 0 }, '')
