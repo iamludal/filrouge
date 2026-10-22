@@ -1,4 +1,4 @@
-import { ArrowLeft, Ellipsis, Eye, ListFilter, Paperclip, Redo2, Search, X } from 'lucide-react'
+import { ArrowLeft, Ellipsis, Eye, LayoutGrid, ListFilter, Paperclip, Redo2, Search, X } from 'lucide-react'
 import { useState } from 'react'
 import { useStore } from 'zustand'
 import { routeHref } from '@/app/router'
@@ -20,6 +20,8 @@ import { isDefaultDisplay } from '@/domain/display-options'
 import { activeCriteriaCount } from '@/domain/graph-view'
 import { useGraphExports } from '@/features/graph-export/use-graph-exports'
 import { DisplayMenuItems } from '@/features/graph/display-menu'
+import { LayoutMenuItems } from '@/features/graph-layout/layout-menu'
+import { useCanLayout } from '@/features/graph-layout/use-auto-layout'
 import { HistoryControls } from '@/features/graph/history-controls'
 import { SaveIndicator } from '@/features/graph/save-indicator'
 import { FiltersDialog } from '@/features/graph-search/filters-panel'
@@ -43,6 +45,7 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
   const displayChanged = useDisplayStore((state) => !isDefaultDisplay(state.options))
   const canRedo = useStore(useGraphStore.temporal, (state) => state.futureStates.length > 0)
   const sourceCount = useGraphStore((state) => Object.keys(state.sources).length)
+  const canLayout = useCanLayout()
   const { empty, exportPng, exportSvg, pngDialog } = useGraphExports()
 
   const closeSearch = () => {
@@ -115,6 +118,17 @@ export function CompactGraphToolbar({ name, onExportJson }: { name: string; onEx
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DisplayMenuItems />
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger
+                  disabled={!canLayout}
+                  className="data-disabled:pointer-events-none data-disabled:opacity-50"
+                >
+                  <LayoutGrid /> {t.graph.layout.menu}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <LayoutMenuItems />
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               <DropdownMenuItem onSelect={() => setSourcesOpen(true)}>

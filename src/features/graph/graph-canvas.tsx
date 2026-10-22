@@ -23,12 +23,14 @@ import { useTheme } from '@/app/theme'
 import { useIsNarrow } from '@/app/use-media-query'
 import { Button } from '@/components/ui/button'
 import { entityAppearance } from '@/domain/entity-appearance'
+import { GRID_SIZE } from '@/domain/graph-geometry'
 import type { GraphView } from '@/domain/graph-view'
 import type { Entity, Position, Relation } from '@/domain/schemas'
 import { AddEntityDialog } from '@/features/entities/add-entity-dialog'
 import { EntityNode } from '@/features/graph/entity-node'
 import { FloatingEdge } from '@/features/graph/floating-edge'
 import type { EntityNode as EntityNodeType, RelationEdge } from '@/features/graph/types'
+import { useLayoutTransition } from '@/features/graph/use-layout-transition'
 import { useLongPress } from '@/features/graph/use-long-press'
 import { useGraphView } from '@/features/graph-search/use-graph-view'
 import { RelationDialog } from '@/features/relations/relation-dialog'
@@ -39,7 +41,6 @@ import { useI18n } from '@/i18n/locale'
 
 const nodeTypes = { entity: EntityNode }
 const edgeTypes = { relation: FloatingEdge }
-export const GRID_SIZE = 16
 const SNAP_GRID: [number, number] = [GRID_SIZE, GRID_SIZE]
 const DELETE_KEYS = ['Delete', 'Backspace']
 /*
@@ -133,7 +134,7 @@ export function GraphCanvas() {
   const { resolved } = useTheme()
   const narrow = useIsNarrow()
   const minimap = useDisplayStore((state) => state.options.minimap)
-  const { screenToFlowPosition } = useReactFlow()
+  const { screenToFlowPosition, fitView: fitViewTo } = useReactFlow()
 
   const [nodes, setNodes] = useState<EntityNodeType[]>(() => {
     const { entities, selection } = useGraphStore.getState()
@@ -170,6 +171,12 @@ export function GraphCanvas() {
       }),
     [],
   )
+
+  const fitLaidOut = useCallback(
+    (options: { nodes: { id: string }[]; duration: number }) => void fitViewTo({ ...options, maxZoom: 1.2 }),
+    [fitViewTo],
+  )
+  useLayoutTransition(setNodes, toCanvas, fitLaidOut)
 
   const shownNodes = useMemo(() => withViewFlags(nodes, view), [nodes, view])
   const shownEdges = useMemo(() => withEdgeViewFlags(edges, view), [edges, view])

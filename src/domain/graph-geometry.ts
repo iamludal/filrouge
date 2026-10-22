@@ -2,6 +2,8 @@ import type { Position } from '@/domain/schemas'
 
 /** Entity nodes are 144px wide; their 48px circle is centred horizontally at the top. */
 export const NODE_WIDTH = 144
+/** Stored positions snap to this grid. */
+export const GRID_SIZE = 16
 export const CIRCLE_RADIUS = 24
 export const CIRCLE_CENTER_Y = 24
 /** Links stop slightly outside the circle border. */

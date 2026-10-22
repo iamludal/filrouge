@@ -134,8 +134,38 @@ test.describe('compact toolbar', () => {
       await expect(page.getByRole('button', { name })).toHaveCount(0)
 
     await openMenu(page)
-    for (const name of ['Rétablir', 'Filtres', 'Sources (0)', 'JSON', 'PNG', 'SVG'])
+    for (const name of [
+      'Rétablir',
+      'Filtres',
+      'Affichage',
+      'Mise en page',
+      'Sources (0)',
+      'JSON',
+      'PNG',
+      'SVG',
+    ])
       await expect(page.getByRole('menuitem', { name })).toBeVisible()
+    // An empty investigation has nothing to lay out.
+    await expect(page.getByRole('menuitem', { name: 'Mise en page' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+  })
+
+  test('applies a layout from the Mise en page submenu', async ({ page }) => {
+    await createInvestigation(page, 'Mise en page')
+    await addEntityAt(page, 100, 150, 'Alice')
+    await addEntityAt(page, 300, 150, 'Bob')
+    await saved(page)
+    const transform = () => node(page, 'Bob').evaluate((element) => (element as HTMLElement).style.transform)
+    const start = await transform()
+
+    await openMenu(page)
+    await page.getByRole('menuitem', { name: 'Mise en page' }).click()
+    for (const name of ['Organique', 'Hiérarchique', 'Radial'])
+      await expect(page.getByRole('menuitem', { name })).toBeVisible()
+    await page.getByRole('menuitem', { name: 'Radial' }).tap()
+    await expect.poll(transform).not.toBe(start)
   })
 
   test('shows the save status as an icon', async ({ page }) => {

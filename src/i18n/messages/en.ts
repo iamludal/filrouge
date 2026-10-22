@@ -257,6 +257,16 @@ export const en: Messages = {
       hideMinimap: 'Hide minimap',
       showMinimap: 'Show minimap',
     },
+    layout: {
+      menu: 'Layout',
+      organic: 'Organic',
+      hierarchical: 'Hierarchical',
+      radial: 'Radial',
+      running: 'Laying out…',
+      cancel: 'Cancel',
+      failed: 'The layout failed',
+      stale: 'Graph changed during the computation: layout cancelled',
+    },
     history: { undo: 'Undo', redo: 'Redo' },
     save: {
       saved: 'Saved',

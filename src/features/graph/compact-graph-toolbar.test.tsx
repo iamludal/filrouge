@@ -47,8 +47,37 @@ describe('CompactGraphToolbar', () => {
   it('lists the other actions in the overflow menu', async () => {
     const { user } = setup()
     await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
-    for (const name of ['Rétablir', 'Filtres', 'Affichage', 'Sources (0)', 'JSON', 'PNG', 'SVG'])
+    for (const name of [
+      'Rétablir',
+      'Filtres',
+      'Affichage',
+      'Mise en page',
+      'Sources (0)',
+      'JSON',
+      'PNG',
+      'SVG',
+    ])
       expect(await screen.findByRole('menuitem', { name })).toBeInTheDocument()
+  })
+
+  it('lists the layouts in a submenu', async () => {
+    const { user } = setup()
+    useGraphStore.getState().addEntity('person', { x: 0, y: 0 })
+    useGraphStore.getState().addEntity('person', { x: 160, y: 0 })
+    await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Mise en page' }))
+    for (const name of ['Organique', 'Hiérarchique', 'Radial'])
+      expect(await screen.findByRole('menuitem', { name })).toBeInTheDocument()
+  })
+
+  it('disables the layouts with fewer than two entities', async () => {
+    const { user } = setup()
+    useGraphStore.getState().addEntity('person', { x: 0, y: 0 })
+    await user.click(screen.getByRole('button', { name: `Plus d'actions` }))
+    expect(await screen.findByRole('menuitem', { name: 'Mise en page' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
   })
 
   it('exports JSON from the menu', async () => {

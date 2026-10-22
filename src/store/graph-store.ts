@@ -77,6 +77,8 @@ export interface GraphState {
   /** Marks a tool as used (or not) on an entity. Its own history step, even in quick succession. */
   setToolCheck: (entityId: string, toolId: string, checked: boolean) => void
   moveEntities: (positions: Record<string, Position>) => void
+  /** Moves entities to the positions of an automatic layout: always its own history step. */
+  arrangeEntities: (positions: Record<string, Position>) => void
   addRelation: (
     from: string,
     to: string,
@@ -229,6 +231,20 @@ export const useGraphStore = create<GraphState>()(
         saveStatus: 'pending' as const,
       })
 
+      /** Moves entities, leaving their last-modified date alone. */
+      const withPositions = (state: GraphState, positions: Record<string, Position>) => {
+        const entities = { ...state.entities }
+        const moved: string[] = []
+        for (const [id, position] of Object.entries(positions)) {
+          const current = entities[id]
+          if (!current || (current.position.x === position.x && current.position.y === position.y)) continue
+          entities[id] = { ...current, position }
+          moved.push(id)
+        }
+        if (moved.length === 0) return state
+        return { entities, ...touch(state, moved, []) }
+      }
+
       /**
        * Deletes a source and strips it from the elements citing it. Its screenshot stays in memory
        * and in storage, so that undoing can bring it back.
@@ -359,20 +375,14 @@ export const useGraphStore = create<GraphState>()(
 
         moveEntities: (positions) =>
           grouping.group(`move:${fieldsOf(positions)}`, () =>
-            set((state) => {
-              const entities = { ...state.entities }
-              const moved: string[] = []
-              for (const [id, position] of Object.entries(positions)) {
-                const current = entities[id]
-                if (!current || (current.position.x === position.x && current.position.y === position.y))
-                  continue
-                entities[id] = { ...current, position }
-                moved.push(id)
-              }
-              if (moved.length === 0) return state
-              return { entities, ...touch(state, moved, []) }
-            }),
+            set((state) => withPositions(state, positions)),
           ),
+
+        // Outside any group: never merged with a drag made just before or after.
+        arrangeEntities: (positions) => {
+          grouping.reset()
+          set((state) => withPositions(state, positions))
+        },
 
         addRelation: (from, to, label, directed = true, status) => {
           const { investigation, entities } = get()

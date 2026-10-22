@@ -260,6 +260,16 @@ export const fr = {
       hideMinimap: 'Masquer la mini-carte',
       showMinimap: 'Afficher la mini-carte',
     },
+    layout: {
+      menu: 'Mise en page',
+      organic: 'Organique',
+      hierarchical: 'Hiérarchique',
+      radial: 'Radial',
+      running: 'Mise en page…',
+      cancel: 'Annuler',
+      failed: 'La mise en page a échoué',
+      stale: 'Graphe modifié pendant le calcul : mise en page annulée',
+    },
     history: { undo: 'Annuler', redo: 'Rétablir' },
     save: {
       saved: 'Enregistré',
