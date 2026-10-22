@@ -84,6 +84,18 @@ openspec/        specifications and change proposals
    `ROADMAP.md` when done.
 4. **Open a pull request** with a short description of what changes and why.
 
+### Trying a pull request build
+
+The CI attaches the static build of every pull request as a `filrouge-pr-<number>` artifact, kept
+14 days: download it from the "Summary" page of the CI run (or with
+`gh run download --name filrouge-pr-<number>`), unzip it, and serve the folder at the root of a
+local server, for example `python3 -m http.server 8080` from inside it, then open
+`http://localhost:8080`. Opening `index.html` directly from the disk does not work (module scripts
+and workers need HTTP).
+
+The local server is another origin than the production site, so the build starts with an empty
+storage and never touches your real investigations: import a demo from `examples/` to try it.
+
 ### Definition of Done
 
 - Strict TypeScript, no unjustified `any`.

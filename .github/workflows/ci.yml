@@ -29,6 +29,22 @@ jobs:
       - run: bun run typecheck
       - run: bun run test
       - run: bun run build
+      # The static build of a pull request, to try it before merging (see CONTRIBUTING.md).
+      - id: build-artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: filrouge-pr-${{ github.event.pull_request.number }}
+          path: dist
+          if-no-files-found: error
+          retention-days: 14
+      - if: github.event_name == 'pull_request'
+        run: |
+          {
+            echo "### Build of this pull request"
+            echo ""
+            echo "[Download filrouge-pr-${{ github.event.pull_request.number }}.zip](${{ steps.build-artifact.outputs.artifact-url }}), unzip it and serve the folder at the root of a local server (see CONTRIBUTING.md)."
+          } >> "$GITHUB_STEP_SUMMARY"
 
   e2e:
     runs-on: ubuntu-latest
